@@ -42,18 +42,28 @@ public class ReportConfigAdapter {
         config.putAll(cfg);
     }
 
+    // extractReporterConfig 提取配置中 key 前缀为 reporter 的配置项
     public static Map<String, String> extractReporterConfig(Config configs) {
+        // 提取配置中 key 前缀为 reporter 的配置项
         Map<String, String> cfg = extractByPrefix(configs.getConfigs(), REPORT);
 
         // default config
+        // reporter.tracing.encoder
         cfg.put(TRACE_ENCODER, NoNull.of(cfg.get(TRACE_ENCODER), SPAN_JSON_ENCODER_NAME));
+        // reporter.metric.encoder
         cfg.put(METRIC_ENCODER, NoNull.of(cfg.get(METRIC_ENCODER), METRIC_JSON_ENCODER_NAME));
+        // reporter.log.encoder
         cfg.put(LOG_ENCODER, NoNull.of(cfg.get(LOG_ENCODER), LOG_DATA_JSON_ENCODER_NAME));
+        // reporter.log.access.encoder
         cfg.put(LOG_ACCESS_ENCODER, NoNull.of(cfg.get(LOG_ACCESS_ENCODER), ACCESS_LOG_JSON_ENCODER_NAME));
 
+        // reporter.tracing.sender.appendType
         cfg.put(TRACE_SENDER_NAME, NoNull.of(cfg.get(TRACE_SENDER_NAME), getDefaultAppender(cfg)));
+        // reporter.metric.sender.appendType
         cfg.put(METRIC_SENDER_NAME, NoNull.of(cfg.get(METRIC_SENDER_NAME), getDefaultAppender(cfg)));
+        // reporter.log.access.sender.appendType
         cfg.put(LOG_ACCESS_SENDER_NAME, NoNull.of(cfg.get(LOG_ACCESS_SENDER_NAME), getDefaultAppender(cfg)));
+        // reporter.log.sender.appendType
         cfg.put(LOG_SENDER_NAME, NoNull.of(cfg.get(LOG_SENDER_NAME), getDefaultAppender(cfg)));
 
         return cfg;

@@ -31,6 +31,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+/**
+ * 负责从 yaml 文件中读取配置的工具类
+ */
 public class YamlReader {
 
     private Map<String, Object> yaml;

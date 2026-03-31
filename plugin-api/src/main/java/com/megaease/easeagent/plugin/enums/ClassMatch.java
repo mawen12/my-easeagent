@@ -17,6 +17,14 @@
 
 package com.megaease.easeagent.plugin.enums;
 
+/**
+ * 匹配方式枚举
+ *
+ * SUPER_CLASS -> ElementMatchers#hasSuperType
+ * INTERFACE -> ElementMatchers#hasSuperType
+ * NAMED -> ElementMatchers#named
+ * ANNOTATION -> ElementMatchers#isAnnotatedWith
+ */
 public enum ClassMatch {
     SUPER_CLASS,
     INTERFACE,

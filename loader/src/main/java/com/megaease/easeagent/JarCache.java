@@ -50,6 +50,7 @@ public class JarCache {
         this.childUrls = childUrls;
     }
 
+    // nestJarUrls 读取子 jar 中匹配前缀的 url 列表
     public ArrayList<URL> nestJarUrls(String prefix) {
         ArrayList<URL> urls = new ArrayList<>();
         for (Map.Entry<String, URL> entry : childUrls.entrySet()) {
@@ -60,6 +61,7 @@ public class JarCache {
         return urls;
     }
 
+    // nestJarFiles 读取子 jar 中匹配前缀的 jar 文件列表
     public ArrayList<JarFile> nestJarFiles(String prefix) {
         ArrayList<JarFile> jarFiles = new ArrayList<>();
         for (Map.Entry<String, JarFile> entry : childJars.entrySet()) {
@@ -75,17 +77,22 @@ public class JarCache {
     }
 
 
+    // build 解析给定的文件路径，从中读取 jar 文件，并将子 jar 文件的内容写入到临时文件中
     static JarCache build(File file) throws IOException {
         final JarFile jarFile = new JarFile(file);
+        // 生成一个随机目录，/tmp/easeagent-<version>-随机数/
         String tmpDir = getTmpDir(jarFile);
         Map<String, JarFile> childJars = new HashMap<>();
         Map<String, URL> childUrls = new HashMap<>();
         jarFile.stream().forEach(jarEntry -> {
             String name = jarEntry.getName();
+            // 不考虑目录，仅处理 .jar 中的内容
             if (!jarEntry.isDirectory() && name.endsWith(".jar")) {
+                // 将 jarEntry 中的内容写入到临时文件中，并返回文件
                 try (InputStream input = jarFile.getInputStream(jarEntry)) {
                     File output = createTempJarFile(tmpDir, input, jarEntry.getName());
                     JarFile childJarFile = new JarFile(output);
+                    // 保存子 jar 文件和对应的 URL
                     childJars.put(name, childJarFile);
                     childUrls.put(name, output.toURI().toURL());
                 } catch (IOException e) {
@@ -96,18 +103,26 @@ public class JarCache {
         return new JarCache(jarFile, childJars, childUrls);
     }
 
+    // createTempJarFile 将输入流中的数据写入到临时文件中，并返回文件（考虑了路径名称过长的问题）
     private static File createTempJarFile(String tmpDir, InputStream input, String outputName) throws IOException {
         File dir;
         String fName = (new File(outputName)).getName();
+        // 处理路径名称过长的问题
         if (fName.length() < outputName.length()) {
+            // 获取被阶段的目录的名称
             String localDir = outputName.substring(0, outputName.length() - fName.length());
+            // 在 tmpDir/localDir/ 作为父级目录
             Path path = Paths.get(tmpDir + File.separatorChar + localDir);
             dir = Files.createDirectories(path).toFile();
         } else {
+            // 直接使用 tmpDir 作为父级目录
             dir = new File(tmpDir);
         }
+        // 写入到 dir/fName 中
         File f = new File(dir, fName);
+        // 首先删除已存在的文件名称
         f.deleteOnExit();
+        // 写入本地文件
         try (FileOutputStream outputStream = new FileOutputStream(f)) {
             copy(input, outputStream);
         }
@@ -115,6 +130,7 @@ public class JarCache {
         return f;
     }
 
+    // copy 从输入流读取数据，并将其复制到输出流
     public static void copy(InputStream input, OutputStream output) throws IOException {
         int n;
         final byte[] buffer = new byte[BUFFER_SIZE];
@@ -123,9 +139,12 @@ public class JarCache {
         }
     }
 
+    // getTmpDir 在临时目录下生成一个随机目录，/tmp/easeagent-<version>-随机数/
     public static String getTmpDir(JarFile jarFile) throws IOException {
+        // 读取临时目录
         String tmp = System.getProperty("java.io.tmpdir");
         Random random = new Random();
+        // 生成一个随机目录名称，easeagent-<version>-随机数
         String dirName = "easeagent-" + getAttribute(jarFile, "Easeagent-Version") + "-" + Math.abs(random.nextLong());
         if (tmp != null && tmp.endsWith(String.valueOf(File.separatorChar))) {
             return tmp + dirName + File.separatorChar;
@@ -133,6 +152,7 @@ public class JarCache {
         return tmp + File.separatorChar + dirName + File.separatorChar;
     }
 
+    // getAttribute 从 mainifest 中读取指定属性值
     public static String getAttribute(JarFile jarFile, String key) throws IOException {
         final Attributes attributes = jarFile.getManifest().getMainAttributes();
         return attributes.getValue(key);

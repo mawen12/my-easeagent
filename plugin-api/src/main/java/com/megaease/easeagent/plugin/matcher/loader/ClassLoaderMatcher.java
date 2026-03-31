@@ -20,6 +20,9 @@ package com.megaease.easeagent.plugin.matcher.loader;
 
 import com.megaease.easeagent.plugin.utils.common.StringUtils;
 
+/**
+ * 类加载器匹配器，支持预定义的类加载器名称和自定义类加载器名称
+ */
 @SuppressWarnings("unused")
 public class ClassLoaderMatcher implements IClassLoaderMatcher {
     public static final String BOOTSTRAP_NAME = "bootstrap";
@@ -28,10 +31,15 @@ public class ClassLoaderMatcher implements IClassLoaderMatcher {
     public static final String AGENT_NAME = "agent";
 
     // predefined classloader name and matcher
+    // ElementMatchers#any
     public static final ClassLoaderMatcher ALL = new ClassLoaderMatcher("all");
+    // ElementMatchers#isBootstrapClassLoader
     public static final ClassLoaderMatcher BOOTSTRAP = new ClassLoaderMatcher(BOOTSTRAP_NAME);
+    // ElementMatchers#isExtensionClassLoader
     public static final ClassLoaderMatcher EXTERNAL = new ClassLoaderMatcher(EXTERNAL_NAME);
+    // ElementMatchers#isSystemClassLoader
     public static final ClassLoaderMatcher SYSTEM = new ClassLoaderMatcher(SYSTEM_NAME);
+    // EaseAgentClassLoader
     public static final ClassLoaderMatcher AGENT = new ClassLoaderMatcher(AGENT_NAME);
 
     // classloader class name or Predefined names

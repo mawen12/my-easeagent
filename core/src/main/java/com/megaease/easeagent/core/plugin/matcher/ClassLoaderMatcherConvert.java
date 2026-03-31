@@ -26,16 +26,23 @@ import net.bytebuddy.matcher.ElementMatcher;
 import static com.megaease.easeagent.plugin.matcher.loader.ClassLoaderMatcher.*;
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
+/**
+ * ClassLoaderMatcher 转换器，从 ease agent 的 IClassLoaderMatcher 转换为 ByteBuddy 的 ElementMatcher<ClassLoader>
+ */
 public class ClassLoaderMatcherConvert implements Converter<IClassLoaderMatcher, ElementMatcher<ClassLoader>> {
     public static final ClassLoaderMatcherConvert INSTANCE = new ClassLoaderMatcherConvert();
 
-  private static final ElementMatcher<ClassLoader> agentLoaderMatcher = is(Bootstrap.class.getClassLoader())
-          .or(is(FinalClassloaderSupplier.CLASSLOADER));
+    // 该 agent loader 实际指向的是 EaseAgentClassLoader
+    private static final ElementMatcher<ClassLoader> agentLoaderMatcher = is(Bootstrap.class.getClassLoader())
+        .or(is(FinalClassloaderSupplier.CLASSLOADER));
 
+    // convert 从 ease agent 的 IClassLoaderMatcher 转换为 byte buddy 的 ElementMatcher<ClassLoader>
     @Override
     public ElementMatcher<ClassLoader> convert(IClassLoaderMatcher source) {
         boolean negate;
         ElementMatcher<ClassLoader> matcher;
+
+        // 处理 Negate
         if (source instanceof NegateClassLoaderMatcher) {
             negate = true;
             source = source.negate();
@@ -43,22 +50,29 @@ public class ClassLoaderMatcherConvert implements Converter<IClassLoaderMatcher,
             negate = false;
         }
 
+        // 处理 ALL
         if (ALL.equals(source)) {
+            // ALL -> ElementMatchers#any
             matcher = any();
         } else {
             switch (source.getClassLoaderName()) {
+                // BOOTSTRAP_NAME -> ElementMatchers#isBootstrapClassLoader
                 case BOOTSTRAP_NAME:
                     matcher = isBootstrapClassLoader();
                     break;
+                // EXTERNAL_NAME -> ElementMatchers#isExtensionClassLoader
                 case EXTERNAL_NAME:
                     matcher = isExtensionClassLoader();
                     break;
+                // SYSTEM_NAME -> ElementMatchers#isSystemClassLoader
                 case SYSTEM_NAME:
                     matcher = isSystemClassLoader();
                     break;
+                // AGENT_NAME -> EaseAgentClassLoader
                 case AGENT_NAME:
                     matcher = agentLoaderMatcher;
                     break;
+                // -> NameMatcher
                 default:
                     matcher = new NameMatcher(source.getClassLoaderName());
                     break;

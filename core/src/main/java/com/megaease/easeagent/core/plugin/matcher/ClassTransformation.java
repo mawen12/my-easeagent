@@ -27,9 +27,14 @@ import java.util.Set;
 
 import static net.bytebuddy.matcher.ElementMatchers.any;
 
+/**
+ *
+ */
 @Data
 public class ClassTransformation implements Ordered {
+    // Plugin 的执行顺序
     private int order;
+    //
     private Junction<TypeDescription> classMatcher;
     private ElementMatcher<ClassLoader> classloaderMatcher;
     private Set<MethodTransformation> methodTransformations;

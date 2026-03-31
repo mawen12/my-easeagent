@@ -59,18 +59,25 @@ public class ContextManager implements IContextManager {
         this.globalContext = new GlobalContext(conf, new MetricRegistrySupplierImpl(), loggerFactory, mdc);
     }
 
+    // build 基于配置初始化 ContextManager，主要核心是：配置，插件管理器，日志工厂，Mdc
     public static ContextManager build(Configs conf) {
         LOGGER.info("build context manager.");
+        // 读取 ProgressFields 相关的配置，并将其保存到静态字段中，同时向配置注册监听器
         ProgressFieldsManager.init(conf);
+        // 构建 PluginConfigManager 实例，负责管理插件配置，并监听配置变化
         PluginConfigManager pluginConfigManager = PluginConfigManager.builder(conf).build();
+        // 初始化日志工厂
         LoggerFactoryImpl loggerFactory = LoggerFactoryImpl.build();
         ILoggerFactory iLoggerFactory = NoOpLoggerFactory.INSTANCE;
         Mdc mdc = NoOpLoggerFactory.NO_OP_MDC_INSTANCE;
+        // 如果有可用的日志工厂，则使用它，并从中获取 MDC 示例
         if (loggerFactory != null) {
             iLoggerFactory = loggerFactory;
             mdc = new LoggerMdc(loggerFactory.factory().mdc());
         }
+        // 创建上下文管理器
         ContextManager contextManager = new ContextManager(conf, pluginConfigManager, iLoggerFactory, mdc);
+        // 将相关信息保存到 EaseAgent 的静态字段中，以便全局使用
         EaseAgent.loggerFactory = contextManager.globalContext.getLoggerFactory();
         EaseAgent.loggerMdc = contextManager.globalContext.getMdc();
         EaseAgent.initializeContextSupplier = contextManager;

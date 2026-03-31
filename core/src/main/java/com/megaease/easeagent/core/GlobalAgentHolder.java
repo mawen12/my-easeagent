@@ -24,9 +24,11 @@ import com.megaease.easeagent.plugin.report.AgentReport;
 import java.net.URLClassLoader;
 
 public class GlobalAgentHolder {
+    // 配置管理器，已注册到 JMX 中
     private static WrappedConfigManager wrappedConfigManager;
     private static AgentHttpServer agentHttpServer;
     private static AgentReport agentReport;
+    // ease agent class loader，加载 ease agent 的类和资源
     private static URLClassLoader agentLoader;
 
     private GlobalAgentHolder() {}

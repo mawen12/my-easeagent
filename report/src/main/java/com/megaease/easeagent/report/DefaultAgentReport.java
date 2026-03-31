@@ -48,6 +48,7 @@ public class DefaultAgentReport implements AgentReport, ConfigChangeListener {
 
     DefaultAgentReport(Config config) {
         this.config = config;
+        // 提取配置中 key 前缀为 reporter 的配置项
         this.reportConfig = new Configs(ReportConfigAdapter.extractReporterConfig(config));
         this.traceReport = new TraceReport(this.reportConfig);
         this.accessLogReporter = new AccessLogReporter(this.reportConfig);
@@ -56,8 +57,11 @@ public class DefaultAgentReport implements AgentReport, ConfigChangeListener {
         this.config.addChangeListener(this);
     }
 
+    // create 加载所需的 encoder 和 sender,提取 report 配置，创建 AgentReport 实例
     public static AgentReport create(Configs config) {
+        // 使用 ServiceLoader 机制，读取 Encoder 和 Sender，并注册到 ReporterRegistry 中
         ReporterLoader.load();
+        // 创建 DefaultAgentReport 实例，并返回
         return new DefaultAgentReport(config);
     }
 

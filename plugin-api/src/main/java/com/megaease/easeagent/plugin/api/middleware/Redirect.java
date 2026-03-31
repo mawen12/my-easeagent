@@ -22,7 +22,9 @@ public enum Redirect {
     ELASTICSEARCH(MiddlewareConstants.ENV_ES, true),
     KAFKA(MiddlewareConstants.ENV_KAFKA, true),
     RABBITMQ(MiddlewareConstants.ENV_RABBITMQ, true),
+    // URL 中包含了用户名和密码，无需单独解析
     DATABASE(MiddlewareConstants.ENV_DATABASE, false),
+    // URL 中包含了用户名和密码，无需单独解析
     MONGODB(MiddlewareConstants.ENV_MONGODB, false);
 
     private final String env;
@@ -32,6 +34,9 @@ public enum Redirect {
     Redirect(String env, boolean needParse) {
         this.env = env;
         this.needParse = needParse;
+        // 从系统环境变量中读取响应中间件的配置
+        // 该配置使用 JSON 格式，包含 url、username、password 等字段
+        // 必须设置了 url 才被视为有效配置
         this.config = ResourceConfig.getResourceConfig(env, needParse);
     }
 

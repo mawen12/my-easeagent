@@ -27,11 +27,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ServiceLoader;
 
+/**
+ * 使用 ServiceLoader 从 META-INF/services/<serviceClass> 读取文件内容
+ * 且支持对 Ordered 子类进行排序
+ */
 public class BaseLoader {
     private static final Logger logger = EaseAgent.loggerFactory.getLogger(BaseLoader.class);
 
+    // load 使用 ServiceLoader 从 META-INF/services/<serviceClass> 读取文件内容
+    // 对于存在UnsupportedClassVersionError的错误，忽略错误
     public static <T> List<T> load(Class<T> serviceClass) {
         List<T> result = new ArrayList<>();
+        // 使用 ServiceLoader 从 META-INF/services/<serviceClass> 读取文件内容
         java.util.ServiceLoader<T> services = ServiceLoader.load(serviceClass);
         for (Iterator<T> it = services.iterator(); it.hasNext(); ) {
             try {
@@ -45,6 +52,7 @@ public class BaseLoader {
         return result;
     }
 
+    // loadOrdered 对于加载出的 services 进行排序
     public static <T extends Ordered> List<T> loadOrdered(Class<T> serviceClass) {
         List<T> result = load(serviceClass);
         result.sort(Comparator.comparing(Ordered::order));

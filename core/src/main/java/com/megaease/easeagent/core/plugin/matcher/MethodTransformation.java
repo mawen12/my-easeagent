@@ -41,8 +41,11 @@ import java.util.stream.Collectors;
 public class MethodTransformation {
     private static final Logger log = LoggerFactory.getLogger(MethodTransformation.class);
 
+    // 该值用于之后从 com.megaease.easeagent.core.plugin.registry.PluginRegistry.INTERCEPTOR_PROVIDERS 获取对应的 Interceptor
     private int index;
+    // 经过转换后的 byte buddy Junction<MethodDescription>，本质是 ease agent 的 IMethodMatcher
     private Junction<? super MethodDescription> matcher;
+    // index 对应的 InterceptorProvider 链构建器，用于之后获取 InterceptorProvider 链
     private ProviderChain.Builder providerBuilder;
 
     public MethodTransformation(int index,
@@ -57,9 +60,11 @@ public class MethodTransformation {
                                                           final String type,
                                                           final String method,
                                                           final String methodDescription) {
+        // 获取 InterceptorProvider 链
         List<Supplier<Interceptor>> suppliers = this.providerBuilder.build()
             .getSupplierChain();
 
+        // 按照 Ordered 排序
         List<Interceptor> interceptors = suppliers.stream()
             .map(Supplier::get)
             .sorted(Comparator.comparing(Ordered::order))

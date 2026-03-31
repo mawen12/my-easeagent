@@ -37,11 +37,13 @@ public class CompoundClassloader {
     }
 
     public static ClassLoader compound(ClassLoader parent, ClassLoader external) {
+        // 如果 external 为 null，或者 CACHE 中已经存在了，则直接返回
         if (external == null || checkClassloaderExist(external)) {
             return parent;
         }
 
         try {
+            // 将 external 添加到 parent 中，本质上，该 parent 实际上为 EaseAgentClassLoader，因为只有该类才有 add 方法
             parent.getClass().getDeclaredMethod("add", ClassLoader.class).invoke(parent, external);
         } catch (Exception e) {
             log.warn("{}, this may be a bug if it was running in production", e.toString());

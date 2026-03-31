@@ -97,19 +97,30 @@ public class AgentLoggerFactory<T extends AgentLogger> {
             this.tClass = tClass;
         }
 
+        // build
         public AgentLoggerFactory<T> build() throws ClassNotFoundException, NoSuchMethodException,
             IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchFieldException {
 
+            // 保存当前线程的 class loader
+            // 这就代表该方法有可能在程序的任意声明周期内被调用，所以需要保证在调用完成后，能够还原为之前的 class loader，以免对程序的其他部分造成影响
             ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
             try {
+                // 临时设置为builder 中的 class loader
                 Thread.currentThread().setContextClassLoader(classLoader);
+                // 定位并加载类 com.megaease.easeagent.log4j2.impl.LoggerProxyFactory
                 Class<?> clazz = classLoader.loadClass("com.megaease.easeagent.log4j2.impl.LoggerProxyFactory");
+                // 定位并加载类 java.lang.String
                 Class<?> parameterTypes = classLoader.loadClass(String.class.getName());
+                // 通过反射获取 LoggerProxyFactory 的构造方法 (String)
                 Constructor<?> constructor = clazz.getDeclaredConstructor(String.class);
+                // 创建实例
                 Object factory = constructor.newInstance(tClass.getName());
+                // 保存指向 getAgentLogger 的方法引用，以便后续调用
                 Method method = clazz.getDeclaredMethod("getAgentLogger", parameterTypes);
+                // 构造示例
                 return new AgentLoggerFactory<>(classLoader, factory, method, loggerSupplier, buildMdc());
             } finally {
+                // 还原为之前的 ClassLoader
                 Thread.currentThread().setContextClassLoader(oldClassLoader);
             }
         }

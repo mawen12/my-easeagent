@@ -22,6 +22,9 @@ import com.megaease.easeagent.httpserver.nanohttpd.protocols.http.response.Respo
 
 import java.util.Map;
 
+/**
+ * 暴露路由为：/config-canary,其会更新 canary 配置
+ */
 public class CanaryUpdateAgentHttpHandler extends ConfigsUpdateAgentHttpHandler {
     public CanaryUpdateAgentHttpHandler() {
         this.mxBeanConfig = GlobalAgentHolder.getWrappedConfigManager();

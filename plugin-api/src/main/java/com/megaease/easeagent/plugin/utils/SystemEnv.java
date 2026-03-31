@@ -20,6 +20,10 @@ package com.megaease.easeagent.plugin.utils;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 负责管理系统环境变量的访问和修改，并将系统环境变量缓存在 ENVIRONMENTS 中，
+ * 之后修改环境变量也都在 ENVIRONMENTS 上进行
+ */
 public class SystemEnv {
     private static final Map<String, String> ENVIRONMENTS = new ConcurrentHashMap<>();
 

@@ -28,25 +28,37 @@ import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+/**
+ * 方法匹配器，在 ease agent 中使用，最终被转换为 byte buddy 的 Junction<MethodDescription>
+ */
 @Data
 @SuppressWarnings("unused")
 public class MethodMatcher implements IMethodMatcher {
     // method name
+    // 匹配的方法名称
     private String name;
 
     // the match type of method name: equals, startWith...
+    // 匹配的方式
     private StringMatch nameMatchType;
 
     // ignored when with default value
+    // 返回值类型
     private String returnType = null;
     // types of method arguments
+    // 参数
     private String[] args;
+    // 参数长度
     private int argsLength = -1;
+    // 匹配的方法的修饰符
     private int modifier = Modifier.ACC_NONE;
+    // 不匹配的方法的修饰符
     private int notModifier = Modifier.ACC_NONE;
 
+    // 匹配的方法是否重写自某个类，null 表示不关心，非 null 则表示必须重写自指定的类
     private IClassMatcher overriddenFrom = null;
 
+    // 匹配的方法权限定名称
     private String qualifier;
 
     public static final int MODIFIER_MASK = Modifier.ACC_ABSTRACT | Modifier.ACC_STATIC

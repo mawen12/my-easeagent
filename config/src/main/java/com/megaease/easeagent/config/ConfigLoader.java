@@ -38,6 +38,7 @@ public class ConfigLoader {
         return filename.endsWith(".yaml") || filename.endsWith(".yml");
     }
 
+    // loadFromFile 从文件中读取配置，支持 yaml/properties 两种格式
     static GlobalConfigs loadFromFile(File file) {
         try (FileInputStream in = new FileInputStream(file)) {
             return ConfigLoader.loadFromStream(in, file.getAbsolutePath());
@@ -47,17 +48,21 @@ public class ConfigLoader {
         return new GlobalConfigs(Collections.emptyMap());
     }
 
+    // loadFromStream 从输入流读取配置，支持 yaml/properties 两种格式
     static GlobalConfigs loadFromStream(InputStream in, String filename) throws IOException {
         if (in != null) {
             Map<String, String> map;
+            // 根据文件名称后缀判断是 yaml 还是 properties 文件，yaml 文件使用 YamlReader 解析，properties 文件使用 Properties 解析
             if (checkYaml(filename)) {
                 try {
+                    // 读取 yaml 配置
                     map = new YamlReader().load(in).compress();
                 } catch (ParserException e) {
                     LOGGER.warn("Wrong Yaml format, load config file failure: {}", filename);
                     map = Collections.emptyMap();
                 }
             } else {
+                // 读取 properties 配置
                 map = extractPropsMap(in);
             }
             return new GlobalConfigs(map);
@@ -66,6 +71,7 @@ public class ConfigLoader {
         }
     }
 
+    // extractPropsMap 将配置读取到properties，再转换为 hashmap
     private static HashMap<String, String> extractPropsMap(InputStream in) throws IOException {
         Properties properties = new Properties();
         properties.load(in);

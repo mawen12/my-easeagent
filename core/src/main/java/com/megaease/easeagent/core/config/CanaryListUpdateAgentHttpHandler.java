@@ -29,6 +29,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * 暴露路由为：/config-global-transmission,其会更新 easeagent.progress.forwarded.headers.global.transmission. 配置
+ */
 public class CanaryListUpdateAgentHttpHandler extends ConfigsUpdateAgentHttpHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(CanaryListUpdateAgentHttpHandler.class);
     public static final AtomicInteger LAST_COUNT = new AtomicInteger(0);

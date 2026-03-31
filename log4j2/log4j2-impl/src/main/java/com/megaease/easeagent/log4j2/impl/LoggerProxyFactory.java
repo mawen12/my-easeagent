@@ -27,6 +27,8 @@ import org.slf4j.Logger;
 
 /**
  * Log4j implementation of SLF4J ILoggerFactory interface.
+ *
+ * 该类在 AgentLoggerFactory 中被使用，使用指定的 Class loader 来实例化该类
  */
 public class LoggerProxyFactory extends AbstractLoggerAdapter<AgentLoggerProxy> {
     private static final LoggerProxyFactory LOGGER_FACTORY = new LoggerProxyFactory();

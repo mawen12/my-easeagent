@@ -25,6 +25,12 @@ import com.megaease.easeagent.plugin.matcher.operator.OrMethodMatcher;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * 顶层的方法匹配器的接口。byte buddy 层面对应 Junction<MethodDescription>
+ * 提供了 and、or、negate 等操作符，方便组合多个 MethodMatcher 进行复杂的匹配
+ *
+ * and ->
+ */
 public interface IMethodMatcher extends Operator<IMethodMatcher>, Matcher {
     String DEFAULT_QUALIFIER = "default";
 

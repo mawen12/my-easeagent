@@ -22,6 +22,14 @@ import com.megaease.easeagent.plugin.matcher.operator.NegateClassMatcher;
 import com.megaease.easeagent.plugin.matcher.operator.Operator;
 import com.megaease.easeagent.plugin.matcher.operator.OrClassMatcher;
 
+/**
+ * 顶层的类拦截器的接口，byte buddy 层面对应 Junction<TypeDescription>
+ * 提供了 and、or、negate 等操作符，方便组合多个 ClassMatcher 进行复杂的匹配
+ * 方法 -> ease agent -> byte buddy
+ * and -> AndClassMatcher -> Junction#and
+ * or -> OrClassMatcher -> Junction#or
+ * negate -> NegatingClassMatcher -> NegatingMatcher
+ */
 public interface IClassMatcher extends Operator<IClassMatcher>, Matcher {
     default IClassMatcher and(IClassMatcher m) {
         return new AndClassMatcher(this, m);

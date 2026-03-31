@@ -24,26 +24,36 @@ import com.megaease.easeagent.plugin.api.dispatcher.IDispatcher;
 import com.megaease.easeagent.plugin.bridge.EaseAgent;
 
 public class BridgeDispatcher implements IDispatcher {
+    // enter
     @Override
     public void enter(int chainIndex, MethodInfo info) {
+        // 获取上下文
         InitializeContext context = EaseAgent.initializeContextSupplier
             .getContext();
+        // 如果上下文为空，则直接退出
         if (context.isNoop()) {
             return;
         }
+        // 调用分发器的enter方法
         Dispatcher.enter(chainIndex, info, context);
     }
 
+    // exit
     @Override
     public Object exit(int chainIndex, MethodInfo methodInfo,
                      Context context, Object result, Throwable e) {
+        // 如果上下文为空，或者上下文不是 InitializeContext 类型，直接返回
         if (context.isNoop() || !(context instanceof InitializeContext)) {
             return result;
         }
         InitializeContext iContext = (InitializeContext)context;
+        // 记录异常
         methodInfo.throwable(e);
+        // 记录返回值
         methodInfo.retValue(result);
+        // 调用分发器的 exit 方法
         Dispatcher.exit(chainIndex, methodInfo, iContext);
+        // 如果方法信息发生了变化，则返回方法信息中的返回值，否则返回原来的返回值
         if (methodInfo.isChanged()) {
             result = methodInfo.getRetValue();
         }

@@ -27,6 +27,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * 暴露路由为：/plugins/domains/:domain/namespaces/:namespace/:id/properties，其会更新查询属性配置
+ */
 public class PluginPropertiesHttpHandler extends ConfigsUpdateAgentHttpHandler {
     public PluginPropertiesHttpHandler() {
         this.mxBeanConfig = GlobalAgentHolder.getWrappedConfigManager();

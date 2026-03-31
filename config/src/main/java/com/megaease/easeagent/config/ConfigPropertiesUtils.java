@@ -24,6 +24,8 @@ import java.util.Locale;
 
 /**
  * Get config from system properties or environment variables.
+ *
+ * 从 system property 中获取配置，如果没有，再从 environment variable 中获取的辅助类。
  */
 final class ConfigPropertiesUtils {
 
@@ -32,6 +34,8 @@ final class ConfigPropertiesUtils {
         return strValue == null ? defaultValue : Boolean.parseBoolean(strValue);
     }
 
+    // getInt 首先从 system property 中获取，如果没有，再从 environment variable 中获取。
+    // 读取之后再转换为 int ，转换失败则使用默认值。
     public static int getInt(String propertyName, int defaultValue) {
         String strValue = getString(propertyName);
         if (strValue == null) {
@@ -44,6 +48,7 @@ final class ConfigPropertiesUtils {
         }
     }
 
+    // getString 首先从 system property 中获取，如果没有，再从 environment variable 中获取。
     @Nullable
     public static String getString(String propertyName) {
         String value = System.getProperty(propertyName);
@@ -55,6 +60,8 @@ final class ConfigPropertiesUtils {
 
     /**
      * dot.case -> UPPER_UNDERSCORE
+     *
+     * 从小写的.转换为 大写的_
      */
     public static String toEnvVarName(String propertyName) {
         return propertyName.toUpperCase(Locale.ROOT).replace('-', '_').replace('.', '_');

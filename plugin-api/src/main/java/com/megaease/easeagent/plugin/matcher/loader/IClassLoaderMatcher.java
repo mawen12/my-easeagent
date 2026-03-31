@@ -20,6 +20,10 @@ package com.megaease.easeagent.plugin.matcher.loader;
 
 import com.megaease.easeagent.plugin.matcher.Matcher;
 
+/**
+ * 顶层的类加载器匹配器接口，byte buddy 层面对应 ElementMatcher<ClassLoader>
+ *
+ */
 public interface IClassLoaderMatcher extends Matcher {
     String getClassLoaderName();
 

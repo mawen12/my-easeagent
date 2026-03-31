@@ -24,12 +24,24 @@ import com.megaease.easeagent.plugin.matcher.operator.AndClassMatcher;
 import com.megaease.easeagent.plugin.matcher.operator.OrClassMatcher;
 import lombok.Data;
 
+/**
+ * 类匹配器，在 ease agent 中使用，最终被转换为 byte buddy 的 Junction<TypeDescription>
+ */
 @Data
 @SuppressWarnings("unused")
 public class ClassMatcher implements IClassMatcher {
+    // 匹配的名称
     private String name;
+    // 匹配的方式，支持父类、接口、指定名称、注解
     private ClassMatch matchType;
+    // 匹配的类的修饰符
+    // ACC_ABSTRACT -> ElementMatchers#isAbstract
+    // ACC_INTERFACE -> ElementMatchers#isInterface
+    // ACC_PRIVATE -> ElementMatchers#isPrivate
+    // ACC_PUBLIC -> ElementMatchers#isPublic
+    // ACC_PROTECTED -> ElementMatchers#isProtected
     private int modifier = Modifier.ACC_NONE;
+    // 不匹配的类的修饰符
     private int notModifier = Modifier.ACC_NONE;
 
     public static final int MODIFIER_MASK = Modifier.ACC_ABSTRACT | Modifier.ACC_INTERFACE

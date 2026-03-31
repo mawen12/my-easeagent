@@ -41,6 +41,7 @@ public class LoggerFactory {
         FACTORY = factory;
     }
 
+    // classLoaderSupplier 获取 class loader
     private static ClassloaderSupplier classLoaderSupplier() {
         return new ClassloaderSupplier.ClassloaderSupplierImpl();
     }

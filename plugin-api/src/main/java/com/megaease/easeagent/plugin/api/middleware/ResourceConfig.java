@@ -33,14 +33,19 @@ public class ResourceConfig {
     private final List<String> uriList = new ArrayList<>();
     private final List<HostAndPort> hostAndPorts = new ArrayList<>();
 
+    // getResourceConfig 从环境变量中读取指定的配置
     public static ResourceConfig getResourceConfig(String env, boolean needParse) {
+        // 读取缓存的系统环境变量
         String str = SystemEnv.get(env);
         if (str == null) {
             return null;
         }
+        // 使用 JSON 反序列化
         ResourceConfig resourceConfig = JsonUtil.toObject(str, new TypeReference<ResourceConfig>() {
         });
+        // 按需解析 Host 和 port
         resourceConfig.parseHostAndPorts(needParse);
+        //如果配置包含 url，则视为合法的，非法的返回 null
         if (resourceConfig.hasUrl()) {
             return resourceConfig;
         }

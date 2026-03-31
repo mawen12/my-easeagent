@@ -32,6 +32,9 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * 暴露路由为：/plugins/domains/:domain/namespaces/:namespace/:id/properties/:property/:value/:version,其会更新插件属性配置
+ */
 public class PluginPropertyHttpHandler extends AgentHttpHandler {
     ConfigManagerMXBean mxBeanConfig;
 

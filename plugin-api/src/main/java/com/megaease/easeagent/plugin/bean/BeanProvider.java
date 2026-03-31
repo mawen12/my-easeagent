@@ -19,6 +19,14 @@ package com.megaease.easeagent.plugin.bean;
 
 import com.megaease.easeagent.plugin.Ordered;
 
+/**
+ * 顶层的 Bean 提供器接口
+ * com.megaease.easeagent.metrics.MetricBeanProviderImpl
+ * com.megaease.easeagent.metrics.jvm.JvmBeanProvider
+ * com.megaease.easeagent.zipkin.TracingProviderImpl
+ * com.megaease.easeagent.core.health.HealthProvider
+ * com.megaease.easeagent.core.info.AgentInfoProvider
+ */
 public interface BeanProvider extends Ordered {
     enum BeanOrder {
         INIT(0, "init"),

@@ -17,6 +17,14 @@
 
 package com.megaease.easeagent.plugin.enums;
 
+/**
+ * 匹配方式枚举
+ *
+ * START_WITH -> ElementMatchers#nameStartsWith
+ * END_WITH -> ElementMatchers#nameEndsWith
+ * CONTAINS -> ElementMatchers#nameContains
+ * EQUALS -> ElementMatchers#named / ElementMatchers#isConstructor
+ */
 public enum StringMatch {
     START_WITH,
     END_WITH,

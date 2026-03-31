@@ -65,15 +65,21 @@ public class PluginConfigManager implements IConfigFactory {
         return getConfig(domain, namespace, id, null);
     }
 
+    // getConfig 获取插件配置，如果未注册过，则进行初始化
     public synchronized PluginConfig getConfig(String domain, String namespace, String id, PluginConfig oldConfig) {
         Key key = new Key(domain, namespace, id);
         PluginConfig pluginConfig = pluginConfigs.get(key);
+        // 已有配置直接返回
         if (pluginConfig != null) {
             return pluginConfig;
         }
+        // 读取全局配置
         Map<String, String> globalConfig = getGlobalConfig(domain, id);
+        // 读取覆盖的配置
         Map<String, String> coverConfig = getCoverConfig(domain, namespace, id);
+        // 构建新的插件配置
         PluginConfig newPluginConfig = PluginConfig.build(domain, id, globalConfig, namespace, coverConfig, oldConfig);
+        // 保存插件配置
         pluginConfigs.put(key, newPluginConfig);
         return newPluginConfig;
     }
@@ -216,14 +222,19 @@ public class PluginConfigManager implements IConfigFactory {
     public class Builder {
         public PluginConfigManager build() {
             synchronized (PluginConfigManager.this) {
+                // 读取配置
                 Map<String, String> sources = configs.getConfigs();
+                // 获取配置键集合
                 Set<Key> sourceKeys = keys(sources.keySet());
                 for (Key sourceKey : sourceKeys) {
+                    // 构建 pluginSourceConfigs 配置
                     pluginSourceConfigs.put(sourceKey, PluginSourceConfig.build(sourceKey.getDomain(), sourceKey.getNamespace(), sourceKey.getId(), sources));
                 }
                 for (Key key : pluginSourceConfigs.keySet()) {
+                    // 将配置注册到 pluginConfigs 中
                     getConfig(key.getDomain(), key.getNamespace(), key.getId());
                 }
+
                 shutdownRunnable = configs.addChangeListener(new ChangeListener());
             }
             return PluginConfigManager.this;

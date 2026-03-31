@@ -23,16 +23,23 @@ import com.megaease.easeagent.plugin.api.config.IPluginConfig;
 import com.megaease.easeagent.plugin.enums.Order;
 import com.megaease.easeagent.plugin.interceptor.MethodInfo;
 
+/**
+ * 顶层的通用拦截器接口
+ */
 public interface Interceptor extends Ordered {
     /**
-     * @param methodInfo instrumented method info
-     * @param context    Interceptor can pass data, method `after` of interceptor can receive context data
+     * 在方法执行之前触发的逻辑
+     *
+     * @param methodInfo instrumented method info 已增强的方法信息
+     * @param context    Interceptor can pass data, method `after` of interceptor can receive context data 上下文
      */
     void before(MethodInfo methodInfo, Context context);
 
     /**
-     * @param methodInfo instrumented method info
-     * @param context    Interceptor can pass data, method `after` of interceptor can receive context data
+     * 在方法执行之后触发的逻辑
+     *
+     * @param methodInfo instrumented method info 已增器的方法信息
+     * @param context    Interceptor can pass data, method `after` of interceptor can receive context data 上下文
      */
     default void after(MethodInfo methodInfo, Context context) {
     };
@@ -50,6 +57,11 @@ public interface Interceptor extends Ordered {
     }
 
     /**
+     * 拦截器的初始化方法
+     *
+     * 对于每一个被这个拦截器注入的方法，这个方法会被调用一次，并且只会被调用一次
+     * 这意味着，当存在多个匹配的方法时，该方法会被调用多次
+     *
      * Initialization method for the interceptor,
      * This method will be called and only be called once for every method which is injected by this interceptor,
      * which means this method may be called several times, when there are several methods matched
@@ -63,6 +75,8 @@ public interface Interceptor extends Ordered {
     }
 
     /**
+     * 拦截器的初始化方法
+     *
      * Initialization method for the interceptor,
      * This method will be called and only be called once for every method which is injected by this interceptor,
      * which means this method may be called several times, when there are several methods matched

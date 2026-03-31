@@ -91,8 +91,10 @@ public class RedirectProcessor {
     }
 
 
+    // init 初始化中间件枚举类，主要是读取并解析对应的中间件配置
     @SuppressWarnings("all")
     public void init() {
+        // TODO 即使值调用一个也会触发 Redirect 所有的初始化操作
         for (Redirect redirect : Redirect.values()) {//init
             //ignore
         }

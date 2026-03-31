@@ -23,6 +23,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 带有 ease agent class loader 和全局配置的 ConfigManagerMXBean 包装类，主要用于在 JMX 中暴露 ConfigManagerMXBean 接口。
+ */
 public class WrappedConfigManager implements ConfigManagerMXBean {
     private final ClassLoader customClassLoader;
     private final ConfigManagerMXBean conf;

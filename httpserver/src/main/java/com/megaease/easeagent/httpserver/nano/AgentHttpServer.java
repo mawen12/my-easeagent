@@ -22,13 +22,20 @@ import lombok.SneakyThrows;
 
 import java.util.List;
 
+/**
+ * 这是 Agent 的 Http Server，当应用使用 ease agent 后，并且配置了 easeagent.server.enabled=true，
+ * 会在配置的端口（默认为 9090）启动一个 Http Server。
+ * 默认支持的路由是：/, /index.html
+ */
 public class AgentHttpServer extends RouterNanoHTTPD {
 
     public static String JSON_TYPE = "application/json";
 
     public AgentHttpServer(int port) {
         super(port);
+        // 注册路由
         this.addMappings();
+        // 添加 JVM 关闭钩子，在 JVM 关闭时停止 Http Server
         Runtime.getRuntime().addShutdownHook(new Thread(this::stop));
     }
 

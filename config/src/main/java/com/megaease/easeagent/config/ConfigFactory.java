@@ -110,11 +110,15 @@ public class ConfigFactory {
 
     /**
      * Get config file path from system properties or environment variables
+     *
+     * 从系统属性或环境变量中获取配置文件路径，key从 easeagent.config.path -> otel.javaagent.configuration-file
      */
     public static String getConfigPath() {
         // get config path from -Deaseagent.config.path=/easeagent/agent.properties || export EASEAGENT_CONFIG_PATH=/easeagent/agent.properties
+        // 从系统属性或环境变量中获取配置文件路径
         String path = ConfigPropertiesUtils.getString(AGENT_CONFIG_PATH_PROP_KEY);
 
+        // 如果为空，则从 otel.javaagent.configuration-file 属性或变量获取值
         if (StringUtils.isEmpty(path)) {
             // eg: -Dotel.javaagent.configuration-file=/easeagent/agent.properties || export OTEL_JAVAAGENT_CONFIGURATION_FILE=/easeagent/agent.properties
             path = OtelSdkConfigs.getConfigPath();
@@ -122,15 +126,21 @@ public class ConfigFactory {
         return path;
     }
 
+    // loadConfigs 读取 agent.properties 和 agent.yaml 文件的配置
+    // 再读取自定义的路径配置，然后进行合并
     public static GlobalConfigs loadConfigs(String pathname, ClassLoader loader) {
         // load property configuration file if exist
+        // 读取 agent.properties 文件的配置
         GlobalConfigs configs = loadDefaultConfigs(loader, CONFIG_PROP_FILE);
 
         // load yaml configuration file if exist
+        // 读取 agent.yaml 文件的配置
         GlobalConfigs yConfigs = loadDefaultConfigs(loader, CONFIG_YAML_FILE);
+        // 合并配置
         configs.mergeConfigs(yConfigs);
 
         // override by user special config file
+        // 读取用户自定义配置的路径，如果不为空，则加载该路径的配置，并进行合并
         if (StringUtils.isNotEmpty(pathname)) {
             GlobalConfigs configsFromOuterFile = ConfigLoader.loadFromFile(new File(pathname));
             LOGGER.info("Loaded user special config file: {}", pathname);
@@ -138,11 +148,14 @@ public class ConfigFactory {
         }
 
         // override by opentelemetry sdk env config
+        // 读取 opentelemetry sdk 的环境变量配置，并进行合并
         configs.updateConfigsNotNotify(OtelSdkConfigs.updateEnvCfg());
 
         // check environment cfg override
+        // 读取环境变量配置，并进行合并，优先级最高
         configs.updateConfigsNotNotify(updateEnvCfg());
 
+        // 输出配置
         if (LOGGER.isDebugEnabled()) {
             final String display = configs.toPrettyDisplay();
             LOGGER.debug("Loaded conf:\n{}", display);

@@ -33,6 +33,9 @@ import net.bytebuddy.dynamic.DynamicType;
 import net.bytebuddy.implementation.bytecode.StackManipulation;
 import net.bytebuddy.utility.JavaModule;
 
+/**
+ * 用于在 EaseAgent 中动态修改类的字节码，以便插入自定义的逻辑
+ */
 public class ForAdviceTransformer implements AgentBuilder.Transformer {
 
     private final AgentForAdvice transformer;
@@ -45,23 +48,32 @@ public class ForAdviceTransformer implements AgentBuilder.Transformer {
         StackManipulation stackManipulation = new AgentJavaConstantValue(value, methodTransformInfo.getIndex());
         TypeDescription typeDescription = value.getTypeDescription();
 
+        // 绑定自定义的 OffsetMapping，此处用于在增强逻辑中绑定额外的参数，比如 Index 注解
         OffsetMapping.Factory<Index> factory = new OffsetMapping.ForStackManipulation.Factory<>(Index.class,
             stackManipulation,
             typeDescription.asGenericType());
 
+        // 使用 AgentForAdvice 来定义增强逻辑，并将其绑定到匹配的方法上
         this.transformer = new AgentForAdvice(AgentAdvice.withCustomMapping()
             .bind(factory))
+            // 使用该类加载的 ClassLoader
             .include(getClass().getClassLoader())
+            // 定义了需要增强的方法匹配规则
             .advice(methodTransformInfo.getMatcher(),
+                // 指定了增强的实现类
                 CommonInlineAdvice.class.getCanonicalName());
     }
 
     @Override
     public DynamicType.Builder<?> transform(DynamicType.Builder<?> b, TypeDescription td, ClassLoader cl, JavaModule m) {
+        // 将传入的 ClassLoader 加入到 EaseAgentClassLoader
         CompoundClassloader.compound(this.getClass().getClassLoader(), cl);
 
+        // 使用静态变量保存传入的 ClassLoader
         AdviceRegistry.setCurrentClassLoader(cl);
+        // 使用自定义的 transformer 进行转换
         DynamicType.Builder<?> bd = transformer.transform(b, td, cl, m);
+        // 清除静态变量中的 ClassLoader
         AdviceRegistry.cleanCurrentClassLoader();
 
         return bd;

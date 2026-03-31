@@ -32,11 +32,14 @@ public class AgentInfoFactory {
     private static final String VERSION_FILE = "version.txt";
 
 
+    // loadAgentInfo 基于当前版本创建一个 AgentInfo
     public static AgentInfo loadAgentInfo(ClassLoader classLoader) {
+        // 构造 AgentInfo，版本信息从 version.txt 文件中加载
         return new AgentInfo(AGENT_TYPE, loadVersion(classLoader, VERSION_FILE));
     }
 
 
+    // loadVersion 使用 ease agent class loader 加载 version.txt 文件，并读取第一行内容，作为版本号
     private static String loadVersion(ClassLoader classLoader, String file) {
         try (InputStream in = classLoader.getResourceAsStream(file)) {
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));

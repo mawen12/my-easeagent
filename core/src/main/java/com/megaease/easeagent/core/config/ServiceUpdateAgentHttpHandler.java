@@ -23,6 +23,9 @@ import com.megaease.easeagent.httpserver.nanohttpd.protocols.http.response.Respo
 
 import java.util.Map;
 
+/**
+ * 暴露路由为 /config，其会更新service配置
+ */
 public class ServiceUpdateAgentHttpHandler extends ConfigsUpdateAgentHttpHandler {
     public ServiceUpdateAgentHttpHandler() {
         this.mxBeanConfig = GlobalAgentHolder.getWrappedConfigManager();

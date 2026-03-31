@@ -31,6 +31,7 @@ public class JarFileConfigLoader {
     private static final Logger LOGGER = LoggerFactory.getLogger(JarFileConfigLoader.class);
 
     static GlobalConfigs load(String file) {
+        // 读取 easeagent.jar.path 系统属性，获取 agent jar 的路径
         String agentJarPath = System.getProperty(ConfigConst.AGENT_JAR_PATH);
         if (agentJarPath == null) {
             return null;

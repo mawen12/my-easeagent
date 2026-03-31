@@ -47,6 +47,7 @@ public final class EaseAgent {
 
     public static IDispatcher dispatcher = new NoOpDispatcher();
 
+    // 该方法本质上由 GlobalAgentHolder.getAgentClassLoader() 实现
     public static Supplier<URLClassLoader> agentClassloader = () -> null;
 
     public static URLClassLoader getAgentClassLoader() {

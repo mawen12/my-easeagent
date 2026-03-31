@@ -28,6 +28,9 @@ import net.bytebuddy.implementation.bytecode.assign.Assigner;
 /**
  * uniform interceptor entrance
  * get interceptor chain thought index generated when transform
+ *
+ * 统一的拦截器入口
+ * 获取在 transform 阶段生成的拦截器链索引
  */
 // suppress all warnings for the code at these warnings is intentionally written this way
 @SuppressWarnings("all")

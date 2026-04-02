@@ -45,6 +45,7 @@ public class EaseAgentClassLoader extends URLClassLoader {
     }
 
     // add 回退加载的 ClassLoader，当 loadClass 无法从当前 class loader 中加载类时，会回退到 externals 中的 class loader 进行加载
+    // 实际上会由 CompoundClassloader 加入到 external 中
     @SuppressWarnings("unused")
     public void add(ClassLoader cl) {
         if (cl != null && !Objects.equals(cl, this)) {

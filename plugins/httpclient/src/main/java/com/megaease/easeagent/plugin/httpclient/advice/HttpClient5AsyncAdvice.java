@@ -38,6 +38,9 @@ public class HttpClient5AsyncAdvice implements Points {
         return ClassMatcher.builder()
             .hasSuperClass("org.apache.hc.client5.http.async.HttpAsyncClient")
             .build();
+
+        // 等价 byte buddy
+        // hasSuperType("org.apache.hc.client5.http.async.HttpAsyncClient")
     }
 
     @Override
@@ -49,5 +52,8 @@ public class HttpClient5AsyncAdvice implements Points {
                 .qualifier("default")
                 .build())
             .build();
+
+        // 等价 byte buddy
+        // named("execute").and(takeArguments(5)).and(returns(named("java.util.concurrent.Future")))
     }
 }

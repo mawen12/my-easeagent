@@ -60,9 +60,19 @@ public class PluginLoader {
         Set<ClassTransformation> sortedTransformations = classTransformationLoad();
 
         // 将要增强的类进行增强
+        // 一个 transformation 底层对应一个组合的 Transformer
         for (ClassTransformation transformation : sortedTransformations) {
-            ab = ab.type(transformation.getClassMatcher(), transformation.getClassloaderMatcher())
-                .transform(compound(transformation.isHasDynamicField(), transformation.getMethodTransformations(), transformation.getTypeFieldAccessor()));
+            //
+            ab = ab.type(
+                    transformation.getClassMatcher(), // 来源于 Points#classMatcher
+                    transformation.getClassloaderMatcher() // 来源于 Points#methodMatcher
+                )
+                .transform(
+                    compound(
+                        transformation.isHasDynamicField(), // 来源于 Points#hasDynamicField
+                        transformation.getMethodTransformations(), // 来源于 Points#methodMatcher
+                        transformation.getTypeFieldAccessor() // 来源于 Points#typeFieldAccessor
+                    ));
         }
         return ab;
     }
@@ -403,26 +413,32 @@ public class PluginLoader {
 
 
     /**
-     * 组合 transforms
+     * 组合 方法transforms
      *
      * @param methodTransformations method matchers under a special classMatcher
      * @return transform
      */
     public static AgentBuilder.Transformer compound(boolean hasDynamicField,
                                                     Iterable<MethodTransformation> methodTransformations, String typeFieldAccessor) {
+        // 从 Points#methodMatcher(业务定义，示例存储) -> MethodTransformation(中间态) -> ForAdviceTransformer(byte buddy)
         List<AgentBuilder.Transformer> agentTransformers = StreamSupport
             .stream(methodTransformations.spliterator(), false)
             .map(ForAdviceTransformer::new)
             .collect(Collectors.toList());
 
+        // 处理 添加动态字段
         if (hasDynamicField) {
+            // hasDynamicField -> DynamicFieldTransformer，其字段名固定为：ease_agent_dynamic_$$$_data
             agentTransformers.add(new DynamicFieldTransformer(AgentDynamicFieldAccessor.DYNAMIC_FIELD_NAME));
         }
 
+        // 处理 读取内部字段
         if (StringUtils.hasText(typeFieldAccessor)) {
+            // typeFieldAccessor -> TypeFieldTransformer
             agentTransformers.add(new TypeFieldTransformer(typeFieldAccessor));
         }
 
+        // 将多个 transformer 合并
         return new CompoundPluginTransformer(agentTransformers);
     }
 }

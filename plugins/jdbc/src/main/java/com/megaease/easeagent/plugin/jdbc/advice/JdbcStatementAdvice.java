@@ -33,6 +33,9 @@ public class JdbcStatementAdvice implements Points {
             .notAbstract()
             .notInterface()
             .build();
+
+        // 等价 byte buddy
+        // hasSuperType("java.sql.Statement").not(isAbstract().or(isInterface()))
     }
 
     @Override
@@ -53,6 +56,11 @@ public class JdbcStatementAdvice implements Points {
                 .qualifier("batch")
                 .build())
             .build();
+
+        // 等价 byte buddy
+        // namedStartsWith("execute")
+        // .and(isOverrideFrom(named("java.sql.Statement"))
+        // .or(named("java.sql.PreparedStatement")))
     }
 
     @Override

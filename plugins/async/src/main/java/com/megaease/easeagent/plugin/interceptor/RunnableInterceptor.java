@@ -25,6 +25,11 @@ import com.megaease.easeagent.plugin.api.logging.Logger;
 import com.megaease.easeagent.plugin.bridge.EaseAgent;
 import com.megaease.easeagent.plugin.enums.Order;
 
+/**
+ * 对  java.util.concurrent.ThreadPoolExecutor#execute 和 reactor.core.scheduler.Schedulers#onSchedule
+ * 进行增强，在方法执行前，将 Runnable 转换为 CurrentContextRunnable
+ * 主要是将 context 传递到 Runnable 中
+ */
 @AdviceTo(CrossThreadAdvice.class)
 @AdviceTo(ReactSchedulersAdvice.class)
 public class RunnableInterceptor implements Interceptor {
@@ -35,6 +40,7 @@ public class RunnableInterceptor implements Interceptor {
         try {
             Object[] args = methodInfo.getArgs();
             Runnable task = (Runnable) args[0];
+            // 对
             if (!context.isWrapped(task)) {
                 Runnable wrap = context.wrap(task);
                 methodInfo.changeArg(0, wrap);

@@ -32,13 +32,17 @@ import static net.bytebuddy.matcher.ElementMatchers.any;
  */
 @Data
 public class ClassTransformation implements Ordered {
-    // Plugin 的执行顺序
+    // Plugin 的执行顺序，来源于 AgentPlugin#order
     private int order;
-    //
+    // 要被增前的类匹配器，匹配一个或多个类，来源于 Points#getClassMatcher
     private Junction<TypeDescription> classMatcher;
+    // 类所在的 Class Loader，来源于 Points#getClassLoaderMatcher
     private ElementMatcher<ClassLoader> classloaderMatcher;
+    // 要被增强的方法集，来源于 Points#getMethodMatcher
     private Set<MethodTransformation> methodTransformations;
+    // 是否需要添加字段，来源于 Points#isAddDynamicField
     private boolean hasDynamicField;
+    // 来源于 Points#getTypeFieldAccessor
     private String typeFieldAccessor;
 
     public ClassTransformation(int order,

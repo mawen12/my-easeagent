@@ -21,6 +21,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 
+/**
+ * 指标名称
+ */
 public class MetricName {
 
     final MetricSubType metricSubType;

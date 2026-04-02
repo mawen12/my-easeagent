@@ -25,6 +25,8 @@ import java.util.function.Supplier;
 
 /**
  * a base Service Metric
+ *
+ * 基础的通用服务指标
  */
 public abstract class ServiceMetric {
     protected final MetricRegistry metricRegistry;
@@ -34,6 +36,7 @@ public abstract class ServiceMetric {
         this.metricRegistry = metricRegistry;
         this.nameFactory = nameFactory;
     }
+
 
     public Meter meter(String key, MetricSubType subType) {
         return metricRegistry.meter(nameFactory.meterName(key, subType));

@@ -32,7 +32,7 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
 public class ClassLoaderMatcherConvert implements Converter<IClassLoaderMatcher, ElementMatcher<ClassLoader>> {
     public static final ClassLoaderMatcherConvert INSTANCE = new ClassLoaderMatcherConvert();
 
-    // 该 agent loader 实际指向的是 EaseAgentClassLoader
+    // 该 agent loader 实际指向的是 Bootstrap class loader or EaseAgentClassLoader
     private static final ElementMatcher<ClassLoader> agentLoaderMatcher = is(Bootstrap.class.getClassLoader())
         .or(is(FinalClassloaderSupplier.CLASSLOADER));
 

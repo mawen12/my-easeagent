@@ -32,6 +32,9 @@ public class ElasticsearchPerformRequestPoints implements Points {
         return ClassMatcher.builder()
             .hasClassName("org.elasticsearch.client.RestClient")
             .build();
+
+        // 等价 byte buddy
+        // named("org.elasticsearch.client.RestClient")
     }
 
     @Override
@@ -41,5 +44,10 @@ public class ElasticsearchPerformRequestPoints implements Points {
             .isPublic()
             .arg(0, "org.elasticsearch.client.Request")
             .build().toSet();
+
+        // 等价 byte buddy
+        // named("performRequest")
+        // .and(isPublic())
+        // .and(takesArgument(0, named("org.elasticsearch.client.Request")))
     }
 }

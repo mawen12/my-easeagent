@@ -34,6 +34,8 @@ import net.bytebuddy.implementation.bytecode.StackManipulation;
 import net.bytebuddy.utility.JavaModule;
 
 /**
+ * 单个方法级别的 Transformer，从 Points#methodMatcher -> MethodTransformation -> ForAdviceTransformer
+ * 该类是使用 byte buddy 最核心的地方
  * 用于在 EaseAgent 中动态修改类的字节码，以便插入自定义的逻辑
  */
 public class ForAdviceTransformer implements AgentBuilder.Transformer {
@@ -44,8 +46,11 @@ public class ForAdviceTransformer implements AgentBuilder.Transformer {
     public ForAdviceTransformer(MethodTransformation methodTransformInfo) {
         this.methodTransformInfo = methodTransformInfo;
 
+        // 用于从 PluginRegistry#INTERCEPTOR_PROVIDERS 获取对应的 Interceptor，转换为 JavaConstant
         MethodIdentityJavaConstant value = new MethodIdentityJavaConstant(methodTransformInfo.getIndex());
+        //
         StackManipulation stackManipulation = new AgentJavaConstantValue(value, methodTransformInfo.getIndex());
+        //
         TypeDescription typeDescription = value.getTypeDescription();
 
         // 绑定自定义的 OffsetMapping，此处用于在增强逻辑中绑定额外的参数，比如 Index 注解
@@ -59,7 +64,7 @@ public class ForAdviceTransformer implements AgentBuilder.Transformer {
             // 使用该类加载的 ClassLoader
             .include(getClass().getClassLoader())
             // 定义了需要增强的方法匹配规则
-            .advice(methodTransformInfo.getMatcher(),
+            .advice(methodTransformInfo.getMatcher(), // Points#MethodMatcher
                 // 指定了增强的实现类
                 CommonInlineAdvice.class.getCanonicalName());
     }

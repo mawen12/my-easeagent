@@ -49,10 +49,16 @@ public class AdviceRegistry {
                                 MethodDescription instrumentedMethod,
                                 Dispatcher.Resolved.ForMethodEnter methodEnter,
                                 Dispatcher.Resolved.ForMethodExit methodExit) {
+        // 读取类名
         String clazz = instrumentedType.getName();
+        // 读取方法名
         String method = instrumentedMethod.getName();
+        // 读取方法描述符
         String methodDescriptor = instrumentedMethod.getDescriptor();
+        // 构造一个 key
         String key = clazz + ":" + method + methodDescriptor;
+
+        // 缓存起来
         PointcutsUniqueId newIdentity = new PointcutsUniqueId();
         PointcutsUniqueId pointcutsUniqueId = methodsSet.putIfAbsent(key, newIdentity);
 
@@ -60,11 +66,16 @@ public class AdviceRegistry {
         boolean merge = false;
 
         // already exist
+        // 如果已经存在了
         if (pointcutsUniqueId != null) {
+            // 进行释放
             newIdentity.tryRelease();
+            // 读取 pointcut 索引
             pointcutIndex = getPointcutIndex(methodEnter);
             // this pointcut's interceptors have injected into chain
+            // 如果已经设置过值
             if (pointcutsUniqueId.checkPointcutExist(pointcutIndex)) {
+                // 检查是否设置过 class loader，设置过无需要再增强了
                 if (pointcutsUniqueId.checkClassloaderExist()) {
                     // don't need to instrumented again.
                     return 0;
@@ -73,6 +84,7 @@ public class AdviceRegistry {
                      * Although the interceptor of the pointcut has been injected,
                      * the method of this class owned by current loader has not been instrumented
                      */
+                    // 该方法未被增强
                     updateStackManipulation(methodEnter, pointcutsUniqueId.getUniqueId());
                     updateStackManipulation(methodExit, pointcutsUniqueId.getUniqueId());
                     return pointcutsUniqueId.getUniqueId();
@@ -81,9 +93,11 @@ public class AdviceRegistry {
                 // Orchestration
                 merge = true;
             }
+        // 之前没有，这是新的
         } else {
             // new
             pointcutsUniqueId = newIdentity;
+            //
             pointcutIndex = updateStackManipulation(methodEnter, pointcutsUniqueId.getUniqueId());
             updateStackManipulation(methodExit, pointcutsUniqueId.getUniqueId());
         }
@@ -102,8 +116,10 @@ public class AdviceRegistry {
             pointcutsUniqueId.lock();
             AgentInterceptorChain previousChain = com.megaease.easeagent.core.plugin.Dispatcher.getChain(uniqueId);
             if (previousChain == null) {
+                // 注册拦截器链
                 com.megaease.easeagent.core.plugin.Dispatcher.register(uniqueId, chain);
             } else {
+                // 合并之前的拦截器
                 chain.merge(previousChain);
                 com.megaease.easeagent.core.plugin.Dispatcher.updateChain(uniqueId, chain);
             }
@@ -184,9 +200,11 @@ public class AdviceRegistry {
         WeakConcurrentMap<ClassLoader, Boolean> cache = new WeakConcurrentMap<>();
 
         public PointcutsUniqueId() {
+            // 初始持有一个全局的index递增后的id
             this.uniqueId = index.incrementAndGet();
         }
 
+        // 检查 pointcutIndexSet 是否设置过值，如果没有则设置一个
         public boolean checkPointcutExist(Integer pointcutIndex) {
             return this.pointcutIndexSet.putIfAbsent(pointcutIndex, pointcutIndex) != null;
         }

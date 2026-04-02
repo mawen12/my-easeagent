@@ -81,6 +81,7 @@
                     </compilerArgs>
                 </configuration>
             </plugin>
+
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>3.0.0</version>
@@ -103,7 +104,8 @@
 
                                 <mkdir dir="target/log4j2"/>
                                 <copy todir="target/log4j2" flatten="true">
-                                    <fileset dir="${project.basedir}/../log4j2/log4j2-impl" includes="**/*agent-lib.jar"/>
+                                    <fileset dir="${project.basedir}/../log4j2/log4j2-impl"
+                                             includes="**/*agent-lib.jar"/>
                                 </copy>
                             </target>
                         </configuration>
@@ -113,6 +115,8 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!--     shade 将 build 和其依赖打包成一个聚合jar(easeagent.jar)       -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -121,9 +125,9 @@
                     <minimizeJar>true</minimizeJar>
                     <transformers>
                         <transformer
-                                implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                            implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                         <transformer
-                                implementation="com.github.edwgiz.maven_shade_plugin.log4j2_cache_transformer.PluginsCacheFileTransformer">
+                            implementation="com.github.edwgiz.maven_shade_plugin.log4j2_cache_transformer.PluginsCacheFileTransformer">
                         </transformer>
                     </transformers>
                     <filters>
@@ -177,6 +181,8 @@
                     </includeOnlyProperties>
                 </configuration>
             </plugin>
+
+            <!--     assembly 根据 descriptor 打一个发行包      -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>

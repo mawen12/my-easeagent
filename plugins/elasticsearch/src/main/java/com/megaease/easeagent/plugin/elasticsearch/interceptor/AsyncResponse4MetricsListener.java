@@ -28,6 +28,9 @@ import org.elasticsearch.client.ResponseListener;
 
 import static com.megaease.easeagent.plugin.elasticsearch.interceptor.ElasticsearchCtxUtils.REQUEST;
 
+/**
+ * 用于收集响应的指标信息：请求的 endpoint，耗时，是否成功
+ */
 public class AsyncResponse4MetricsListener implements ResponseListener {
 
     private final ResponseListener delegate;
@@ -63,10 +66,15 @@ public class AsyncResponse4MetricsListener implements ResponseListener {
         try (Cleaner ignored = asyncContext.importToCurrent()) {
             Context context = EaseAgent.getContext();
             Request request = context.get(REQUEST);
+            // 计算执行耗时
             long duration = ContextUtils.getDuration(context);
+            // 检查请求是否成功
             boolean success = ElasticsearchCtxUtils.checkSuccess(response, exception);
-            this.elasticsearchMetric.collectMetric(ElasticsearchCtxUtils
-                .getIndex(request.getEndpoint()), duration, success);
+            // 收集请求指标：请求的 endpoint + 耗时 + 是否成功
+            this.elasticsearchMetric.collectMetric(
+                ElasticsearchCtxUtils.getIndex(request.getEndpoint()),
+                duration,
+                success);
         }
     }
 }

@@ -328,18 +328,23 @@ public class SessionContext implements InitializeContext {
 
     @Override
     public void clear() {
+        // 清除配置
         if (!this.configs.isEmpty()) {
             this.configs.clear();
         }
+        // 清除返回栈
         if (!this.retStack.isEmpty()) {
             this.retStack.clear();
         }
+        //
         if (!this.retBound.isEmpty()) {
             this.retBound.clear();
         }
+        // 清除上下文
         if (!this.context.isEmpty()) {
             this.context.clear();
         }
+        // 清除进入的
         if (!this.entered.isEmpty()) {
             this.entered.clear();
         }
@@ -363,6 +368,7 @@ public class SessionContext implements InitializeContext {
         }
     }
 
+    // 移除上下文中的字段
     private class FieldCleaner implements Cleaner {
         private final List<String> fields;
 
@@ -378,6 +384,7 @@ public class SessionContext implements InitializeContext {
         }
     }
 
+    // 关闭 scope，并清除上下文中所有的内容
     public class AsyncCleaner implements Cleaner {
         private final Scope scope;
         private final boolean clearContext;

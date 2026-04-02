@@ -30,6 +30,9 @@ public class WebClientBuilderAdvice implements Points {
     public IClassMatcher getClassMatcher() {
         return ClassMatcher.builder().hasSuperClass("org.springframework.web.reactive.function.client.WebClient$Builder")
             .build();
+
+        // 等价 byte buddy
+        // hasSuperType("org.springframework.web.reactive.function.client.WebClient$Builder")
     }
 
     @Override
@@ -39,5 +42,8 @@ public class WebClientBuilderAdvice implements Points {
                 .qualifier("default")
                 .build())
             .build();
+
+        // 等价 byte buddy
+        // named("build")
     }
 }

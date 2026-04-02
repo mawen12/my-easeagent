@@ -23,6 +23,9 @@ import com.megaease.easeagent.plugin.field.DynamicFieldAccessor;
 import com.megaease.easeagent.plugin.field.NullObject;
 import net.bytebuddy.asm.Advice;
 
+/**
+ * 配合 DynamicFieldTransformer，在添加了字段后，在构造器结束时，对齐进行初始化
+ */
 public class DynamicFieldAdvice {
 
     private DynamicFieldAdvice() {
@@ -35,11 +38,14 @@ public class DynamicFieldAdvice {
         private DynamicInstanceInit() {
         }
 
+        // 在方法退出之前
         @Advice.OnMethodExit
         public static void exit(@Advice.This(optional = true) Object target) {
+            // 仅处理 DynamicFieldAccessor 接口实现
             if (target instanceof DynamicFieldAccessor) {
                 DynamicFieldAccessor accessor = (DynamicFieldAccessor) target;
                 if (accessor.getEaseAgent$$DynamicField$$Data() == null) {
+                    // 设置默认值
                     accessor.setEaseAgent$$DynamicField$$Data(NullObject.NULL);
                 }
             }

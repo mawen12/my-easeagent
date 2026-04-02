@@ -20,6 +20,10 @@ package com.megaease.easeagent.plugin.field;
 /**
  * default value for Agent Dynamic Field,
  * avoiding NullPointerException when serialized
+ * <p>
+ *
+ * 需要保持对目标jvm可见，因此需要放到plugin-api,然后将其注册到 bootstrap
+ * 否则就会出现 ClassNotFound 的问题
  */
 public class NullObject {
     public static final Object NULL = new Object();

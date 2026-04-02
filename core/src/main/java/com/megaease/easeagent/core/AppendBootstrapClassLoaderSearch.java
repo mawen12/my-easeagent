@@ -93,6 +93,7 @@ public final class AppendBootstrapClassLoaderSearch {
         final ClassLoader loader = AppendBootstrapClassLoaderSearch.class.getClassLoader();
 
         // 读取位于 META-INF/services/com.megaease.easeagent.plugin.AppendBootstrapLoader 的资源内容
+        // 该类实际位于 lib/ 目录下
         return from(list(loader.getResources("META-INF/services/" + cls.getName())))
             .transform(input -> {
                 try {

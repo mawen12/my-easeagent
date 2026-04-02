@@ -25,6 +25,8 @@ import com.megaease.easeagent.plugin.bridge.NoOpIPluginConfig;
 
 /**
  * A Context remains in the session it was bound to until business finish.
+ *
+ * 上下文会一直保留在其会话中，直到业务结束
  */
 @SuppressWarnings("unused")
 public interface Context {

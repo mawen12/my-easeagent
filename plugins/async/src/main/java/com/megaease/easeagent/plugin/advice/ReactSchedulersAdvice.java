@@ -31,6 +31,9 @@ public class ReactSchedulersAdvice implements Points {
         return ClassMatcher.builder()
             .hasClassName("reactor.core.scheduler.Schedulers")
             .build();
+
+        // 等价 byte buddy
+        // named("reactor.core.scheduler.Schedulers")
     }
 
     @Override
@@ -39,5 +42,10 @@ public class ReactSchedulersAdvice implements Points {
             .argsLength(1)
             .arg(0, "java.lang.Runnable")
             .build().toSet();
+
+        // 等价 byte buddy
+        // named("onSchedule")
+        // .and(takesArguments(1))
+        // .and(takesArguments(0, named("java.lang.Runnable")))
     }
 }

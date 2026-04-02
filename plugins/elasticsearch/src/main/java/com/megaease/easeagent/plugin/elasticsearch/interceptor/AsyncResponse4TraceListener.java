@@ -24,6 +24,9 @@ import com.megaease.easeagent.plugin.bridge.EaseAgent;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.ResponseListener;
 
+/**
+ * 用于将 trace 结束
+ */
 public class AsyncResponse4TraceListener implements ResponseListener {
 
     private final ResponseListener delegate;
@@ -56,6 +59,7 @@ public class AsyncResponse4TraceListener implements ResponseListener {
     private void process(Response response, Exception exception) {
         try (Cleaner ignored = asyncContext.importToCurrent()) {
             Context context = EaseAgent.getContext();
+            // 结束 span
             ElasticsearchCtxUtils.finishSpan(response, exception, context);
         }
     }

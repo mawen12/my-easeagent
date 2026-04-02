@@ -37,6 +37,9 @@ public class HttpClientDoExecuteAdvice implements Points {
         return ClassMatcher.builder()
             .hasSuperClass("org.apache.http.client.HttpClient")
             .build();
+
+        // 等价 byte buddy
+        // hasSuperType("org.apache.http.client.HttpClient")
     }
 
     @Override
@@ -48,5 +51,8 @@ public class HttpClientDoExecuteAdvice implements Points {
                 .qualifier("default")
                 .build())
             .build();
+
+        // 等价 byte buddy
+        // named("doExecute").and(takeArguments(3)).and(returns(named("org.apache.http.client.methods.CloseableHttpResponse")))
     }
 }

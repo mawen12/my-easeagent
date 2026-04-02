@@ -80,7 +80,7 @@ public class PluginRegistry {
         return classname + ":" + qualifier;
     }
 
-    // registerClassTransformation 基于 Points 注册 ClassTransformation
+    // registerClassTransformation 从 Points 中解析 ClassLoaderMatcher/ClassMatcher/MethodMatcher 并生成 ClassTransformation
     public static ClassTransformation registerClassTransformation(Points points) {
         // 获取 Points 的规范类名
         String pointsClassName = points.getClass().getCanonicalName();
@@ -97,6 +97,7 @@ public class PluginRegistry {
         // 获取 Points 的方法匹配器集合
         Set<IMethodMatcher> methodMatchers = points.getMethodMatcher();
 
+        // 处理方法匹配器
         Set<MethodTransformation> mInfo = methodMatchers.stream().map(matcher -> {
             // 将方法匹配器转换为 ByteBuddy 的 Junction<MethodDescription>
             Junction<MethodDescription> bMethodMatcher = MethodMatcherConvert.INSTANCE.convert(matcher);
@@ -123,17 +124,24 @@ public class PluginRegistry {
             return mt;
         }).filter(Objects::nonNull).collect(Collectors.toSet());
 
-        // 获取该 Points 对应的 AgentPlugin
+        // 获取该 Points 对应的 AgentPlugin，读取其执行顺序
         AgentPlugin plugin = POINTS_TO_PLUGIN.get(pointsClassName);
-        // 获取执行顺序
         int order = plugin.order();
         // 构造 ClassTransformation
-        return ClassTransformation.builder().classMatcher(innerClassMatcher)
+        return ClassTransformation.builder()
+            // 来源于 Points#classMatcher
+            .classMatcher(innerClassMatcher)
+            // 来源于 Points#hasDyanmicField
             .hasDynamicField(hasDynamicField)
+            // 来源于 Points#methodMatcher
             .methodTransformations(mInfo)
+            // 来源于 Points#classloaderMatcher
             .classloaderMatcher(loaderMatcher)
+            // 来源 Points#typeFieldAccessor
             .typeFieldAccessor(points.getTypeFieldAccessor())
-            .order(order).build();
+            // 来源于 AgentPlugin#order
+            .order(order)
+            .build();
     }
 
     // register 注册拦截器提供者

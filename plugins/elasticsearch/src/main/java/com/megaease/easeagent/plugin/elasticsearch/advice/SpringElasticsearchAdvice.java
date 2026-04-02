@@ -42,6 +42,11 @@ public class SpringElasticsearchAdvice implements Points {
             .or(hasSuperType("org.springframework.boot.autoconfigure.data.elasticsearch.ReactiveElasticsearchRestClientProperties"))
             .or(name("org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientProperties"))
             .or(name("org.springframework.boot.autoconfigure.data.elasticsearch.ReactiveElasticsearchRestClientProperties"));
+
+        // 等价 byte buddy
+        // named("org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchRestClientProperties")
+        // .or(hasSuperClass("org.springframework.boot.autoconfigure.data.elasticsearch.ReactiveElasticsearchRestClientProperties"))
+        // .or(named("org.springframework.boot.autoconfigure.data.elasticsearch.ReactiveElasticsearchRestClientProperties"))
     }
 
     @Override
@@ -54,5 +59,8 @@ public class SpringElasticsearchAdvice implements Points {
                     .build()
             )
             .build();
+
+        // 等价 byte buddy
+        // namedStartsWith("set")
     }
 }

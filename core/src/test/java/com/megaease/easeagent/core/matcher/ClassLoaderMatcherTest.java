@@ -49,6 +49,7 @@ public class ClassLoaderMatcherTest {
 
         // agent
         matcher = ClassLoaderMatcherConvert.INSTANCE.convert(ClassLoaderMatcher.AGENT);
+        // 因为默认使用 ClassLoaderMatcherConvert#agentLoaderMatcher，其支持 Bootstrap class loader or Easeagent class loader
         Assert.assertTrue(matcher.matches(Bootstrap.class.getClassLoader()));
         Assert.assertFalse(matcher.matches(ClassLoader.getSystemClassLoader().getParent()));
 
@@ -57,8 +58,8 @@ public class ClassLoaderMatcherTest {
             .convert(new ClassLoaderMatcher("com.megaease.easeagent.core.matcher.ClassLoaderMatcherTest.TestClassLoader"));
         URL[] urls = new URL[1];
         urls[0] = this.getClass().getProtectionDomain().getCodeSource().getLocation();
-        Assert.assertFalse(matcher.matches(Bootstrap.class.getClassLoader()));
         Assert.assertTrue(matcher.matches(new TestClassLoader(urls)));
+        Assert.assertFalse(matcher.matches(Bootstrap.class.getClassLoader()));
     }
 
     static class TestClassLoader extends URLClassLoader {

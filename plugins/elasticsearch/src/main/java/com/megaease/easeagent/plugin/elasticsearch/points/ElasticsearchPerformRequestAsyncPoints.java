@@ -32,6 +32,9 @@ public class ElasticsearchPerformRequestAsyncPoints implements Points {
         return ClassMatcher.builder()
             .hasClassName("org.elasticsearch.client.RestClient")
             .build();
+
+        // 等价 byte buddy
+        // named("org.elasticsearch.client.RestClient")
     }
 
     @Override
@@ -42,5 +45,11 @@ public class ElasticsearchPerformRequestAsyncPoints implements Points {
             .arg(0, "org.elasticsearch.client.Request")
             .arg(1, "org.elasticsearch.client.ResponseListener")
             .build().toSet();
+
+        // 等价 byte buddy
+        // named("performRequestAsync")
+        // .and(isPublic())
+        // .and(takesArgument(0, named("org.elasticsearch.client.Request")))
+        // .and(takesArgument(1, named("org.elasticsearch.client.ResponseListener")))
     }
 }

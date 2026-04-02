@@ -31,6 +31,9 @@ public class WebClientFilterAdvice implements Points {
         return ClassMatcher.builder()
             .hasClassName("com.megaease.plugin.easeagent.springweb.interceptor.tracing.WebClientTracingFilter")
             .build();
+
+        // 等价 byte buddy
+        // named("com.megaease.plugin.easeagent.springweb.interceptor.tracing.WebClientTracingFilter")
     }
 
     @Override
@@ -40,5 +43,8 @@ public class WebClientFilterAdvice implements Points {
                 .qualifier("default")
                 .build())
             .build();
+
+        // 等价 byte buddy
+        // named("filter")
     }
 }

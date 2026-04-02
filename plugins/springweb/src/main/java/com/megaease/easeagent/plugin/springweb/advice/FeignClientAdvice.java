@@ -37,6 +37,9 @@ public class FeignClientAdvice implements Points {
     public IClassMatcher getClassMatcher() {
         return ClassMatcher.builder().hasInterface("feign.Client")
             .build();
+
+        // 等价 byte buddy
+        // hasSuperType("feign.Client")
     }
 
     @Override
@@ -50,5 +53,12 @@ public class FeignClientAdvice implements Points {
                 .qualifier("default")
                 .build())
             .build();
+
+        // 等价 byte buddy
+        // named("execute")
+        // .and(isPublic())
+        // .and(takeArguments(2))
+        // .and(takeArgument(0, named("feign.Request")))
+        // .and(takeArgument(1, named("feign.Request$Options"))
     }
 }

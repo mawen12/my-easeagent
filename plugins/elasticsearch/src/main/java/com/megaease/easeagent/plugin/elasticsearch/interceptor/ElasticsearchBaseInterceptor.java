@@ -29,7 +29,12 @@ public abstract class ElasticsearchBaseInterceptor implements Interceptor {
 
     @Override
     public void init(IPluginConfig config, String className, String methodName, String methodDescriptor) {
-        this.config = AutoRefreshPluginConfigRegistry.getOrCreate(ConfigConst.OBSERVABILITY, ConfigConst.Namespace.ELASTICSEARCH, this.getType());
+
+        this.config = AutoRefreshPluginConfigRegistry.getOrCreate(
+            ConfigConst.OBSERVABILITY,
+            ConfigConst.Namespace.ELASTICSEARCH,
+            this.getType()
+        );
     }
 
 }

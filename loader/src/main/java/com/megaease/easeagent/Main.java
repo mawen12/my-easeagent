@@ -70,13 +70,14 @@ public class Main {
         // 读取 boot/ 目录下的子jar文件列表
         final ArrayList<JarFile> bootUrls = JAR_CACHE.nestJarFiles(BOOTSTRAP);
         // 将 boot/ 目录下的所有子 jar 文件添加到 bootstrap class loader 的搜索路径中
+        // boo/ 下的目录实际上是 plugin-api，这些 api 是可以被共享到 bootstrap 中的
         bootUrls.forEach(url -> installBootstrapJar(url, inst));
 
         // 读取 agent jar 中的 Manifest 文件中的属性
         final Attributes attributes = JAR_CACHE.getManifest().getMainAttributes();
         // 获取 Logging-Property 属性值
         final String loggingProperty = attributes.getValue(LOGGING_PROPERTY);
-        // 获取 Bootstrap-Class 属性值，实际为：com.megaease.easeagent.StartBootstrap
+        // 获取 Bootstrap-Class 属性值，实际为：[build]com.megaease.easeagent.StartBootstrap
         final String bootstrap = attributes.getValue("Bootstrap-Class");
         // 将 log4j2/ 目录下的 jar 的 class loader 设置到 com.megaease.easeagent.log4j2.FinalClassloaderSupplier 的 CLASSLOADER 字段中
         initEaseAgentSlf4j2Dir(JAR_CACHE, loader);
@@ -163,6 +164,7 @@ public class Main {
         System.setProperty(hostKey, agent);
 
         try {
+            // 看起来 Callable<Void> 等于 Runnable，但是其存在一个重要特别，Callable 可以抛出异常，而 Runnable 则不会
             callable.call();
         } finally {
             // 将 Thread 的 class loader 切换回原来的 class loader

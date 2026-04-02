@@ -10579,6 +10579,9 @@ public class AgentAdvice extends Advice {
         }
     }
 
+    /**
+     * 自定义新增加的，但是未被使用
+     */
     @Documented
     @Retention(RetentionPolicy.RUNTIME)
     @java.lang.annotation.Target(ElementType.METHOD)
@@ -10654,6 +10657,8 @@ public class AgentAdvice extends Advice {
     }
 
     /**
+     * checked 无区别
+     *
      * A marker class that indicates that an advice method does not suppress any {@link Throwable}.
      */
     public static class NoExceptionHandler extends Throwable {

@@ -14,10 +14,14 @@ import net.bytebuddy.utility.JavaModule;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 读取类中私有字段的 Transformer。通过对类实现接口 TypeFieldGetter，然后添加一个 FieldAccessor 来实现
+ */
 public class TypeFieldTransformer implements AgentBuilder.Transformer {
     private static final Logger log = LoggerFactory.getLogger(TypeFieldTransformer.class);
 
     private static final ConcurrentHashMap<String, Cache<ClassLoader, Boolean>> FIELD_MAP = new ConcurrentHashMap<>();
+    // 要读取的字段名
     private final String fieldName;
     private final Class<?> accessor;
     private final AgentBuilder.Transformer.ForAdvice transformer;
@@ -26,6 +30,7 @@ public class TypeFieldTransformer implements AgentBuilder.Transformer {
         this.accessor = TypeFieldGetter.class;
         this.transformer = new AgentBuilder.Transformer
             .ForAdvice(Advice.withCustomMapping())
+            // 指定查找该类时，使用该类的 Class Loader，确保能找到该类
             .include(getClass().getClassLoader());
     }
 
@@ -34,11 +39,14 @@ public class TypeFieldTransformer implements AgentBuilder.Transformer {
                                             TypeDescription td, ClassLoader cl, JavaModule m) {
         if (check(td, this.accessor, cl) && this.fieldName != null) {
             try {
+                // 实现 TypeFieldGetter 接口
                 b = b.implement(this.accessor)
+                    // 添加一个对 fieldName 字段的访问器
                     .intercept(FieldAccessor.ofField(this.fieldName));
             } catch (Exception e) {
                 log.debug("Type:{} add extend field again!", td.getName());
             }
+            // 进行增强
             return transformer.transform(b, td, cl, m);
         }
         return b;

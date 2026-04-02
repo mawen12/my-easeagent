@@ -30,8 +30,12 @@ public class CrossThreadAdvice implements Points {
     public IClassMatcher getClassMatcher() {
         return ClassMatcher.builder()
             .hasClassName("java.util.concurrent.ThreadPoolExecutor")
+            // TODO Schedulers 并没有 execute 方法
             .or().hasClassName("reactor.core.scheduler.Schedulers")
             .build();
+
+        // 等价 byte buddy
+        // named("java.util.concurrent.ThreadPoolExecutor").or(named("reactor.core.scheduler.Schedulers"))
     }
 
     @Override
@@ -41,5 +45,10 @@ public class CrossThreadAdvice implements Points {
             .argsLength(1)
             .arg(0, "java.lang.Runnable")
             .build().toSet();
+
+        // 等价 byte buddy
+        // named("execute")
+        // .and(takesArguments(1))
+        // .and(takesArguments(0, named("java.lang.Runnable")))
     }
 }

@@ -25,12 +25,16 @@ import net.bytebuddy.utility.JavaModule;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 复合的插件 Transformer，用于将多个 Transformer 合并成一个
+ */
 public class CompoundPluginTransformer implements AgentBuilder.Transformer {
     private final List<AgentBuilder.Transformer> transformers;
 
     public CompoundPluginTransformer(List<AgentBuilder.Transformer> transformers) {
         this.transformers = new ArrayList<>();
         for (AgentBuilder.Transformer transformer : transformers) {
+            // 处理特殊情况，CompoundPluginTransformer
             if (transformer instanceof CompoundPluginTransformer) {
                 this.transformers.addAll(((CompoundPluginTransformer) transformer).transformers);
                 continue;
@@ -44,6 +48,7 @@ public class CompoundPluginTransformer implements AgentBuilder.Transformer {
                                             TypeDescription typeDescription,
                                             ClassLoader classLoader,
                                             JavaModule module) {
+        // 将多个 transformer 应用到 builder 上
         for (AgentBuilder.Transformer transformer : this.transformers) {
             builder = transformer.transform(builder, typeDescription, classLoader, module);
         }

@@ -20,29 +20,57 @@ package com.megaease.easeagent.plugin.api.metric.name;
 
 /**
  * MetricField describes a metric value attributes including what's metric name , what's metric type, and what's metrics precision.
+ *
+ * timer：耗时性：
+ *  min, max, mean, p25, p50, p75, p95, p98, p99, p999
+ *
+ *
  */
 public enum MetricField {
 
+    // 最小执行时间
     MIN_EXECUTION_TIME("min", ConverterType.DURATION, 2),
+    // 最大执行时间
     MAX_EXECUTION_TIME("max", ConverterType.DURATION, 2),
+    // 平均执行时间
     MEAN_EXECUTION_TIME("mean", ConverterType.DURATION, 2),
+    // 25% 的请求快，75% 的请求慢的数据点
     P25_EXECUTION_TIME("p25", ConverterType.DURATION, 2),
+    // 50% 的请求快，50% 的请求慢的数据点
     P50_EXECUTION_TIME("p50", ConverterType.DURATION, 2),
+    // 75% 的请求快，25% 的请求慢的数据点
     P75_EXECUTION_TIME("p75", ConverterType.DURATION, 2),
+    // 95% 的请求快，5% 的请求慢的数据点
     P95_EXECUTION_TIME("p95", ConverterType.DURATION, 2),
+    // 98% 的请求快，2% 的请求慢的数据点
     P98_EXECUTION_TIME("p98", ConverterType.DURATION, 2),
+    // 99% 的请求快，1% 的请求慢的数据点
     P99_EXECUTION_TIME("p99", ConverterType.DURATION, 2),
+    // 99.9% 的请求快，0.1% 的请求慢的数据点
     P999_EXECUTION_TIME("p999", ConverterType.DURATION, 2),
+
     STD("std"),
+
+    // 该应用从启动到现在，累计执行次数
     EXECUTION_COUNT("cnt"),
+    // 该应用从启动到现在，累计执行错误次数
     EXECUTION_ERROR_COUNT("errcnt"),
+
+    // 过去1分钟内的发生的事件数，比如请求速率
     M1_RATE("m1", ConverterType.RATE, 5),
+    // 过去5分钟内的发生的事件数，比如请求速率
     M5_RATE("m5", ConverterType.RATE, 5),
+    // 过去15分钟内的发生的事件数，比如请求速率
     M15_RATE("m15", ConverterType.RATE, 5),
+    // 过去1分钟内的重试的事件数，
     RETRY_M1_RATE("retrym1", ConverterType.RATE, 5),
+    // 过去5分钟内的重试的平均值
     RETRY_M5_RATE("retrym5", ConverterType.RATE, 5),
+    // 过去15分钟内的重试的平均值
     RETRY_M15_RATE("retrym15", ConverterType.RATE, 5),
+    // 过去1分钟内限流的平均值
     RATELIMITER_M1_RATE("rlm1", ConverterType.RATE, 5),
+    // 过去1分钟内限流的平均值
     RATELIMITER_M5_RATE("rlm5", ConverterType.RATE, 5),
     RATELIMITER_M15_RATE("rlm15", ConverterType.RATE, 5),
     CIRCUITBREAKER_M1_RATE("cbm1", ConverterType.RATE, 5),

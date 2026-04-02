@@ -116,19 +116,19 @@ public class MethodMatcherConvert
         if (mc != null) {
             c = c == null ? mc : c.and(mc);
         }
-        // 处理返回值
+        // 处理 returnType
         if (matcher.getReturnType() != null) {
             // returns -> ElementMatchers#returns(ElementMatchers#named)
             mc = returns(named(matcher.getReturnType()));
             c = c == null ? mc : c.and(mc);
         }
-        // 处理参数长度
+        // 处理 argsLength
         if (matcher.getArgsLength() > -1) {
             // argsLength -> ElementMatchers#takesArguments
             mc = takesArguments(matcher.getArgsLength());
             c = c == null ? mc : c.and(mc);
         }
-        // 处理参数类型名称
+        // 处理 args
         String[] args = matcher.getArgs();
         if (args != null) {
             for (int i = 0; i < args.length; i++) {

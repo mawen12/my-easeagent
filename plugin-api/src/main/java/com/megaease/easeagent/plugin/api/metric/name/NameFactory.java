@@ -274,10 +274,15 @@ public interface NameFactory {
 
 
     class Builder {
+        // 记录一组数据的分布情况，如响应时间分布
         private final List<Tuple<MetricSubType, Map<MetricField, MetricValueFetcher>>> histogramTypes = new ArrayList<>();
+        // 记录某个事件发生的次数，只能增加，不能减少
         private final List<Tuple<MetricSubType, Map<MetricField, MetricValueFetcher>>> counterTypes = new ArrayList<>();
+        // 记录某段代码的执行时间，记录开始和结束时间
         private final List<Tuple<MetricSubType, Map<MetricField, MetricValueFetcher>>> timerTypes = new ArrayList<>();
+        // 记录某个数值的变化，可以增加也可以减少，比如系统线程数、内存使用
         private final List<Tuple<MetricSubType, Map<MetricField, MetricValueFetcher>>> gaugeTypes = new ArrayList<>();
+        //
         private final List<Tuple<MetricSubType, Map<MetricField, MetricValueFetcher>>> meterTypes = new ArrayList<>();
 
         Builder() {

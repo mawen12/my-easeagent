@@ -23,6 +23,10 @@ import com.megaease.easeagent.core.plugin.matcher.MethodTransformation;
 import com.megaease.easeagent.log4j2.Logger;
 import com.megaease.easeagent.log4j2.LoggerFactory;
 
+/**
+ * 该类存在的意义在于为了能够访问到目标 JVM 中的类，比如 Redis 这些客户端使用的类，或者是用户自己定义的类，
+ * 这些类不在 Agent 的 Classpath 中，所以需要通过 CompoundClassloader 将这些类添加到 Agent 的 Classpath 中
+ */
 public class CompoundClassloader {
     private static final Logger log = LoggerFactory.getLogger(MethodTransformation.class);
     private static final Cache<ClassLoader, Boolean> CACHE = CacheBuilder.newBuilder().weakKeys().build();

@@ -34,11 +34,16 @@ import net.bytebuddy.utility.JavaModule;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 向目标类添加字段，且实现接口。然后在构造器初始化的时候，将其值初始为默认的 NullObject
+ */
 public class DynamicFieldTransformer implements AgentBuilder.Transformer {
     private static final Logger log = LoggerFactory.getLogger(DynamicFieldTransformer.class);
     private static final ConcurrentHashMap<String, Cache<ClassLoader, Boolean>> FIELD_MAP = new ConcurrentHashMap<>();
 
+    // 要添加的字段名
     private final String fieldName;
+    // 字段的访问器
     private final Class<?> accessor;
     private final AgentBuilder.Transformer.ForAdvice transformer;
 
@@ -51,17 +56,23 @@ public class DynamicFieldTransformer implements AgentBuilder.Transformer {
         this.accessor = accessor;
         this.transformer = new AgentBuilder.Transformer
             .ForAdvice(Advice.withCustomMapping())
+            // 指定查找该类时，使用该类的 Class Loader，确保能找到该类
             .include(getClass().getClassLoader())
+            // 对目标类的构造其，应用 DynamicInstanceInit
             .advice(ElementMatchers.isConstructor(), DynamicInstanceInit.class.getName());
     }
 
     @Override
     public DynamicType.Builder<?> transform(DynamicType.Builder<?> b,
                                             TypeDescription td, ClassLoader cl, JavaModule m) {
+        // 如果没有添加过，则添加该字段
         if (check(td, this.accessor, cl) && this.fieldName != null) {
             try {
+                // 定义一个 private Object ease_agent_dynamic_$$$_data 字段
                 b = b.defineField(this.fieldName, Object.class, Opcodes.ACC_PRIVATE)
+                    // 该类实现了 DynamicFieldAccessor 接口
                     .implement(this.accessor)
+                    // 使用 FieldAccessor 来实现 DynamicFieldAccessor 中的方法，因为其会根据 fieldName 生成 getter/setter 方法
                     .intercept(FieldAccessor.ofField(this.fieldName));
             } catch (Exception e) {
                 log.debug("Type:{} add extend field again!", td.getName());
@@ -72,6 +83,8 @@ public class DynamicFieldTransformer implements AgentBuilder.Transformer {
     }
 
     /**
+     * 避免重复添加字段，因为可能存在多个Points指向同一个Class的情况，如果不进行去重检查，则会报错
+     *
      * Avoiding add a accessor interface to a class repeatedly
      *
      * @param td       represent the class to be enhanced
@@ -82,19 +95,26 @@ public class DynamicFieldTransformer implements AgentBuilder.Transformer {
     private static boolean check(TypeDescription td, Class<?> accessor, ClassLoader cl) {
         String key = td.getCanonicalName() + accessor.getCanonicalName();
 
+        // 从缓存中读取
         Cache<ClassLoader, Boolean> checkCache = FIELD_MAP.get(key);
         if (checkCache == null) {
+            // 创建一个缓存
             Cache<ClassLoader, Boolean> cache = CacheBuilder.newBuilder().weakKeys().build();
             if (cl == null) {
+                // 读取当前线程的 class loader
                 cl = Thread.currentThread().getContextClassLoader();
             }
+            // 将其设值到缓存中
             cache.put(cl, true);
+            // 在放入到 map 中
             checkCache = FIELD_MAP.putIfAbsent(key, cache);
+            // 如果之前没有，则代表之前未设置过
             if (checkCache == null) {
                 return true;
             }
         }
 
+        // 二次检查该class loader 中是否有设置过
         return checkCache.getIfPresent(cl) == null;
     }
 }

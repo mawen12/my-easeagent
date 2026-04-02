@@ -27,6 +27,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * 封装了针对单个 Pointcut 的多个拦截器
+ */
 public class AgentInterceptorChain {
     private static Logger log = EaseAgent.loggerFactory.getLogger(AgentInterceptorChain.class);
     public ArrayList<Interceptor> interceptors;

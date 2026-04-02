@@ -17,6 +17,16 @@
 
 package com.megaease.easeagent.plugin.api.middleware;
 
+/**
+ * 支持的中间件枚举：
+ * - Redis
+ * - Database
+ * - Kafka
+ * - RabbitMQ
+ * - Elasticsearch
+ * - Mongodb
+ * - Motan
+ */
 public enum Type {
     REDIS(MiddlewareConstants.TYPE_REDIS),
     DATABASE(MiddlewareConstants.TYPE_DATABASE),

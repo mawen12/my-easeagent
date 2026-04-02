@@ -35,6 +35,11 @@ import java.util.*;
 
 import static net.bytebuddy.agent.builder.AgentBuilder.*;
 
+/**
+ * 这是 ForAdvice 的子类。
+ * 该类绝大部分代码原样复刻 net.bytebuddy.agent.builder.AgentBuilder.Transformer.ForAdvice。
+ * 仅在构造器处使用了 AgentAdvice 来替代 net.bytebuddy.asm.Advice。
+ */
 @SuppressWarnings("unused")
 public class AgentForAdvice extends Transformer.ForAdvice {
     /**

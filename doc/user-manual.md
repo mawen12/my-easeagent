@@ -5,6 +5,10 @@
   - [Configuration](#configuration)
     - [Getting the configuration file](#getting-the-configuration-file)
     - [Global Configuration](#global-configuration)
+      - [Agent Configuration](#agent-configuration)
+      - [Runtime Code Version Configuration](#runtime-code-version-configuration)
+        - [Jdk](#jdk)
+        - [Spring Boot](#spring-boot)
       - [Internal HTTP Server](#internal-http-server)
       - [Output Data Server: Kafka and HTTP/Zipkin Server](#output-data-server-kafka-and-httpzipkin-server)
       - [Progress Configuration](#progress-configuration)
@@ -98,6 +102,48 @@ $ java "-javaagent:${EASE_AGENT_PATH}/easeagent.jar" -jar user-app.jar
 | `easeagent.name`  | `EASEAGENT_NAME`       | `name`                 | Specify logical service name. |
 | `easeagent.system` | `EASEAGENT_SYSTEM`     | `system`               | Specify logical service system. |
 
+#### Runtime Code Version Configuration
+
+##### jdk
+
+* `System property`: `runtime.code.version.points.jdk`
+* `version`: `jdk8`,`jdk17`
+* `description`: specify the JDK version of the running environment
+* `plugins`:
+  * httpurlconnection: `default`,`jdk8` 
+  * httpurlconnection-jdk17: `jdk17`
+  * tomcat-jdk17: `jdk17`
+* eg. `runtime.code.version.points.jdk=jdk17`
+
+##### spring-boot
+
+* `System property`: `runtime.code.version.points.spring-boot`
+* `version`: `2.x.x`,`3.x.x`
+* `description`: specify the spring-boot version of the running environment
+* `plugins`:
+    * servicename: `default`,`2.x.x`
+    * spring-gateway: `default`,`2.x.x`
+    * springweb(resTemplate): `default`,`2.x.x`
+    * springweb(feignClient,webclient): `default`
+    * spring-boot-gateway-3.5.3: `3.x.x`
+    * spring-boot-rest-template-3.5.3: `3.x.x`
+    * spring-boot-servicename-3.5.3: `3.x.x`
+* eg. `runtime.code.version.points.spring-boot=3.x.x`
+
+###### about spring boot 3.x.x
+When your code uses Spring Boot 3.x.x, it means that your code depends on JDK 17+ and Spring Boot 3+.
+
+In this case, you need to add two configurations for the agent to take effect:
+```properties
+runtime.code.version.points.jdk=jdk17
+runtime.code.version.points.spring-boot=3.x.x
+```
+
+###### about doc
+[spring-boot-3.x.x-demo](spring-boot-3.x.x-demo.md)
+
+[spring-boot-upgrade](spring-boot-upgrade.md)
+
 #### Internal HTTP Server
 EaseAgent opens port `9900` by default to receive configuration change notifications and Prometheus requests.
 
@@ -184,6 +230,23 @@ plugin enabled config: [Enabled](#forwarded-headers-plugin-enabled)
 
 ##### Tracing config
 
+Easeagent supports the original sampling model of zipkin. Currently, there are three types of models supported: `counting`, `rate_limiting`, and `boundary`.
+
+Use the configuration control: `observability.tracings.sampledType`
+
+1. `counting`: percentage sampling, sampled limit 0.01 to 1, 1 is always sample, 0 is never sample, 0.1 is ten samples per hundred
+2. `rate_limiting`: traces per second, sampled >= 0, 0 is never sample, 10 is max 10 traces per second
+3. `boundary`: percentage sampling by traceId, sampled limit 0.0001 to 1, 1 is always sample, 0 is never sample.
+               if sampled=0.001, when (traceId^random)%10000<=(0.001*10000) sampled
+
+sampledType must be used with sampled, otherwise the default value is used Sampler.ALWAYS_SAMPLE
+
+Config format:
+```properties
+observability.tracings.sampledType=counting
+observability.tracings.sampled=0.01
+```
+
 Easeagent will grab the header from the response of the process, and put the name and value of the header as a tag in the Span of Tracing.
 
 Config format:
@@ -266,6 +329,7 @@ Supported components and corresponding namespaces:
 | Plugin/Components | Namespace        | Description                                                                                                                                                                                                                                                                                                                                                                |
 |-------------------|------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | httpservlet       | `httpServlet`    | Http Request Metric                                                                                                                                                                                                                                                                                                                                                        |
+| tomcat            | `tomcat`         | Http Request Metric                                                                                                                                                                                                                                                                                                                                                        |
 | spring-gateway    | `springGateway`  | Http Request Metric                                                                                                                                                                                                                                                                                                                                                        |
 | jdbcConnection    | `jdbcConnection` | JDBC Connection Metric                                                                                                                                                                                                                                                                                                                                                     |
 | jdbcStatement     | `jdbcStatement`  | JDBC SQL Metric. When using SQL as a tag, the string length of SQL is often very long, which will consume network bandwidth and CPU to a great extent. Our solution is to use SQL's MD5 as an indicator, which is associated with the storage and front-end.Closed configuration: `plugin.observability.jdbc.sql.compress.enabled=false`                                   |
@@ -277,7 +341,7 @@ Supported components and corresponding namespaces:
 | JVM Memory        | `jvmMemory`      | JVM Memory Metric                                                                                                                                                                                                                                                                                                                                                          |
 | dubbo             | `dubbo`          | dubbo Metric                                                                                                                                                                                                                                                                                                                                                               |
 | motan             | `motan`          | Motan Metric                                                                                                                                                                                                                                                                                                                                                               |
-| sofarpc          | `sofarpc`       | SOFARPC  Metric                                                                                                                                                                                                                                                                                                                                                            |
+| sofarpc           | `sofarpc`        | SOFARPC  Metric                                                                                                                                                                                                                                                                                                                                                            |
 
 #### Application Log
 Application log modules collecting application logs printed by the application.
@@ -464,14 +528,14 @@ Response Body:
 EaseAgent use [brave](https://github.com/openzipkin/brave) to collect tracing logs.The data format stored in `Kafka`  is [Zipkin Data Model](https://zipkin.io/pages/data_model.html). User can send tracing logs to [Zipkin server](https://zipkin.io/pages/quickstart.html).
 
 ### Tracing Component
-| Component Type | Component                                       | Reference                                                                                                                                                                                                                                                                                                           |
-| -------------- |-------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| HTTP Client    | `RestTemplate`、 `WebClient`、 `FeignClient`      | [brave-instrumentation-http](https://github.com/openzipkin/brave/tree/master/instrumentation/http)                                                                                                                                                                                                                  |
-| HTTP Server    | `Servlet`、`Filter`                              | [brave-instrumentation-http](https://github.com/openzipkin/brave/tree/master/instrumentation/http)                                                                                                                                                                                                                  |
-| DataBase       | `JDBC`                                          | [Brave](https://github.com/openzipkin/brave/tree/master/brave)                                                                                                                                                                                                                                                      |
-| Cache          | `Jedis`、`Lettuce`                               | [Brave](https://github.com/openzipkin/brave/tree/master/brave)                                                                                                                                                                                                                                                      |
-| Message        | `RabbitMQ`、`Kafka`                              | [brave-instrumentation-messaging](https://github.com/openzipkin/brave/tree/master/instrumentation/messaging) 、[Brave Kafka instrumentation](https://github.com/openzipkin/brave/tree/master/instrumentation/kafka-clients)                                                                                          |
-| Logging        | `Log4j2`、`Logback`                              | [brave-context-log4j2](https://github.com/openzipkin/brave/tree/master/context/log4j2) 、[brave-context-slf4j](https://github.com/openzipkin/brave/tree/master/context/slf4j)                                                                                                                                        |
+| Component Type | Component                                      | Reference                                                                                                                                                                                                                                                                                                           |
+| -------------- |------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| HTTP Client    | `RestTemplate`、 `WebClient`、 `FeignClient`     | [brave-instrumentation-http](https://github.com/openzipkin/brave/tree/master/instrumentation/http)                                                                                                                                                                                                                  |
+| HTTP Server    | `Servlet`、`Tomcat`、`Filter`                    | [brave-instrumentation-http](https://github.com/openzipkin/brave/tree/master/instrumentation/http)                                                                                                                                                                                                                  |
+| DataBase       | `JDBC`                                         | [Brave](https://github.com/openzipkin/brave/tree/master/brave)                                                                                                                                                                                                                                                      |
+| Cache          | `Jedis`、`Lettuce`                              | [Brave](https://github.com/openzipkin/brave/tree/master/brave)                                                                                                                                                                                                                                                      |
+| Message        | `RabbitMQ`、`Kafka`                             | [brave-instrumentation-messaging](https://github.com/openzipkin/brave/tree/master/instrumentation/messaging) 、[Brave Kafka instrumentation](https://github.com/openzipkin/brave/tree/master/instrumentation/kafka-clients)                                                                                          |
+| Logging        | `Log4j2`、`Logback`                             | [brave-context-log4j2](https://github.com/openzipkin/brave/tree/master/context/log4j2) 、[brave-context-slf4j](https://github.com/openzipkin/brave/tree/master/context/slf4j)                                                                                                                                        |
 | RPC            | `AlibabaDubbo`、`ApacheDubbo`、`Motan`,`SOFARPC` | [brave-instrumentation-dubbo](https://github.com/openzipkin/brave/tree/master/instrumentation/dubbo) 、[brave-instrumentation-dubbo-rpc](https://github.com/openzipkin/brave/tree/master/instrumentation/dubbo-rpc)、[brave-instrumentation-rpc](https://github.com/openzipkin/brave/tree/master/instrumentation/rpc) |
 
 ### Tracing Component Config Description
@@ -597,6 +661,7 @@ For Example: EaseAgent collect metric of HTTP Request. The collected metric data
 For different kind of metrics, we have different schemas:
 
 #### HTTP Request
+`httpServlet` and `Tomcat` both support HTTP Request 
 HTTP Request schema describes key metrics of service APIs, which include:
 * Total execution count (cnt, errcnt)
 * Throughput (m1, m5, m15)

@@ -51,6 +51,7 @@ public class TracingProviderImpl implements BeanProvider, AgentReportAware, Conf
     public static final String SAMPLER_TYPE_COUNTING = "counting";
     public static final String SAMPLER_TYPE_RATE_LIMITING = "rate_limiting";
     public static final String SAMPLER_TYPE_BOUNDARY = "boundary";
+    // brave 的 Tracing
     private Tracing tracing;
     private volatile ITracing iTracing;
     private AgentReport agentReport;
@@ -70,21 +71,36 @@ public class TracingProviderImpl implements BeanProvider, AgentReportAware, Conf
 
     @Override
     public void afterPropertiesSet() {
+        // brave 的 Tracing 需要一个 CurrentTraceContext 来管理当前的 trace 上下文，Thread
         ThreadLocalCurrentTraceContext traceContext = ThreadLocalCurrentTraceContext.newBuilder()
+            // brave 的上下文关联工具，此处用于与 AgentLogMDC 中的值进行同步
+            // 底层是 目标 JVM 中日志 log4j/logback 的 MDC
             .addScopeDecorator(AgentMDCScopeDecorator.get())
+            // brave 的上下文关联工具，此处用于与 ease agent 的 MDC 中的值进行同步
+            // 底层是 easeagent 自身使用的 log4j 的 MDC
             .addScopeDecorator(AgentMDCScopeDecorator.getV2())
+            // brave 的上下文关联工具，此处用于与 slf4j 中的值进行同步
             .addScopeDecorator(AgentMDCScopeDecorator.getAgentDecorator())
             .build();
 
+        // 读取 Config#name 属性的值，且该支持变更时，自动刷新
+        // 当前从 agent.properties 读取的值为 demo-service
         serviceName = new AutoRefreshConfigItem<>(config, ConfigConst.SERVICE_NAME, Config::getString);
 
         Reporter<ReportSpan> reporter;
         reporter = span -> agentReport.report(span);
+
+        // brave tracing 的创建
         this.tracing = Tracing.newBuilder()
+            // 设置本地的 service name
             .localServiceName(getServiceName())
+            // 使用 64 位，即 8字节的 traceId
             .traceId128Bit(false)
+            // 确定 trace 的采样策略，默认为总是采样
             .sampler(getSampler())
+            // 写入自定义的 span tag
             .addSpanHandler(new CustomTagsSpanHandler(this::getServiceName, AdditionalAttributes.getHostName()))
+            // 写入上报的 zipkin
             .addSpanHandler(ConvertZipkinSpanHandler
                 .builder(reporter)
                 .alwaysReportSpans(true)
@@ -95,23 +111,33 @@ public class TracingProviderImpl implements BeanProvider, AgentReportAware, Conf
     }
 
 
+    // getSampler 获取决定该 trace 是否被采样的 Sampler 示例
+    // 默认使用 ALWAYS_SAMPLE，总是采样
     protected Sampler getSampler() {
+        // 读取 Config#observability.tracings.sampledType 的值
         String sampledType = this.config.getString(ConfigConst.Observability.TRACE_SAMPLED_TYPE);
         if (sampledType == null) {
+            // 默认没有，则使用 always
             return Sampler.ALWAYS_SAMPLE;
         }
+        // 读取 Config#observability.tracings.sampled 的值
         Double probability = this.config.getDouble(ConfigConst.Observability.TRACE_SAMPLED);
         if (probability == null) {
+            // 默认没有，则使用 always
             return Sampler.ALWAYS_SAMPLE;
         }
         try {
             switch (sampledType) {
+                // counting
                 case SAMPLER_TYPE_COUNTING:
                     return CountingSampler.create(probability.floatValue());
+                // rate_limiting
                 case SAMPLER_TYPE_RATE_LIMITING:
                     return RateLimitingSampler.create(probability.intValue());
+                // boundary
                 case SAMPLER_TYPE_BOUNDARY:
                     return BoundarySampler.create(probability.floatValue());
+                // always
                 default:
                     return Sampler.ALWAYS_SAMPLE;
             }

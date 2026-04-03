@@ -34,10 +34,21 @@ import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.function.Supplier;
 
+/**
+ * tracing 的底层实现，依赖 zipkin 的客户端 brave，最主要的就是 brave.Tracing
+ *
+ * 支持四大场景：
+ * - 简单
+ * - async 跨线程
+ * - client-server 跨服务器
+ * - producer-consumer 跨服务器，消息队列
+ */
 public class TracingImpl implements ITracing {
     private static final Logger LOGGER = LoggerFactory.getLogger(TracingImpl.class);
     private final Supplier<InitializeContext> supplier;
+
     private final brave.Tracing tracing;
+
     private final brave.Tracer tracer;
 
     private final TraceContext.Injector<Request> defaultZipkinInjector;
@@ -197,6 +208,7 @@ public class TracingImpl implements ITracing {
         return messagingTracing;
     }
 
+    // 返回底层的 brave tracing
     @Override
     public Object unwrap() {
         return tracing;

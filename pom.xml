@@ -138,35 +138,40 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <!--      生成 java 代码的工具库      -->
             <dependency>
                 <groupId>com.squareup</groupId>
                 <artifactId>javapoet</artifactId>
                 <version>${version.javapoet}</version>
             </dependency>
 
+            <!--      自动生成 META-INF/services 文件，配合 Java SPI      -->
             <dependency>
                 <groupId>com.google.auto.service</groupId>
                 <artifactId>auto-service</artifactId>
                 <version>${version.auto-service}</version>
             </dependency>
-
+            <!--      提供了 @AutoService 注解      -->
             <dependency>
                 <groupId>com.google.auto.service</groupId>
                 <artifactId>auto-service-annotations</artifactId>
                 <version>${version.auto-service}</version>
             </dependency>
 
+            <!--      提供 JSR-305 注解，用于静态代码分析      -->
             <dependency>
                 <groupId>com.google.code.findbugs</groupId>
                 <artifactId>jsr305</artifactId>
                 <version>${version.jsr305}</version>
                 <scope>compile</scope>
             </dependency>
+            <!--      测试库      -->
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${version.junit}</version>
             </dependency>
+            <!--      反应式编程，基于响应流的 Java 库      -->
             <dependency>
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-bom</artifactId>
@@ -174,6 +179,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <!--     字节码增强       -->
             <dependency>
                 <groupId>net.bytebuddy</groupId>
                 <artifactId>byte-buddy</artifactId>
@@ -184,56 +190,66 @@
                 <artifactId>byte-buddy-agent</artifactId>
                 <version>${version.byte-buddy}</version>
             </dependency>
+            <!--      功能丰富的 Java 工具库      -->
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
                 <version>${version.guava}</version>
             </dependency>
+            <!--      日志框架接口      -->
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${version.slf4j}</version>
             </dependency>
+            <!--            -->
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>javax.servlet-api</artifactId>
                 <version>${version.servlet}</version>
             </dependency>
 
+            <!--       分布式追踪：OpenTelemetry，收集和导出追踪、日志和度量数据      -->
             <dependency>
                 <groupId>io.opentelemetry</groupId>
                 <artifactId>opentelemetry-sdk</artifactId>
                 <version>${version.otel}</version>
             </dependency>
 
+            <!--      分布式追踪： OpenTelemetry，包含通用功能     -->
             <dependency>
                 <groupId>io.opentelemetry</groupId>
                 <artifactId>opentelemetry-sdk-common</artifactId>
                 <version>${version.otel}</version>
             </dependency>
 
+            <!--      分布式追踪： OpenTelemetry，标准的语义约定     -->
             <dependency>
                 <groupId>io.opentelemetry</groupId>
                 <artifactId>opentelemetry-semconv</artifactId>
                 <version>${version.otel-alpha}</version>
             </dependency>
 
+            <!--      分布式追踪： OpenTelemetry，支持日志追踪     -->
             <dependency>
                 <groupId>io.opentelemetry</groupId>
                 <artifactId>opentelemetry-sdk-logs</artifactId>
                 <version>${version.otel-alpha}</version>
             </dependency>
 
+            <!--      分布式追踪： brave，zipkin 的 java 客户端，创建和管理追踪信息     -->
             <dependency>
                 <groupId>io.zipkin.brave</groupId>
                 <artifactId>brave</artifactId>
                 <version>${version.brave}</version>
             </dependency>
+            <!--      分布式追踪： brave，zipkin 的 java 客户端，提供 HTTP 追踪功能，自动追踪 HTTP 请求和响应     -->
             <dependency>
                 <groupId>io.zipkin.brave</groupId>
                 <artifactId>brave-instrumentation-http</artifactId>
                 <version>${version.brave}</version>
             </dependency>
+
             <dependency>
                 <groupId>io.zipkin.brave</groupId>
                 <artifactId>brave-context-log4j2</artifactId>
@@ -244,6 +260,7 @@
                 <artifactId>brave-context-slf4j</artifactId>
                 <version>${version.brave}</version>
             </dependency>
+            <!--      分布式追踪： brave，zipkin 的 java 客户端，zipkin 的 kafka 发送器，支持将数据发送到 kafka     -->
             <dependency>
                 <groupId>io.zipkin.reporter2</groupId>
                 <artifactId>zipkin-sender-kafka11</artifactId>
@@ -255,6 +272,7 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+            <!--      分布式追踪： brave，zipkin 的 java 客户端，zipkin 的发送器，使用 urlconnection 发送数据     -->
             <dependency>
                 <groupId>io.zipkin.reporter2</groupId>
                 <artifactId>zipkin-sender-urlconnection</artifactId>
@@ -297,6 +315,7 @@
                 <artifactId>kafka-log4j-appender</artifactId>
                 <version>${version.kafka}</version>
             </dependency>
+            <!--      消息队列：kafka 客户端      -->
             <dependency>
                 <groupId>org.apache.kafka</groupId>
                 <artifactId>kafka-clients</artifactId>
@@ -312,16 +331,19 @@
                 <artifactId>jackson-databind</artifactId>
                 <version>${version.jackson}</version>
             </dependency>
+            <!--      HTTP 客户端，okhttp      -->
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>okhttp</artifactId>
                 <version>${version.okhttp3}</version>
             </dependency>
+            <!--      HTTP 客户端，okhttp tls （传输层安全协议）支持     -->
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>okhttp-tls</artifactId>
                 <version>${version.okhttp3}</version>
             </dependency>
+            <!--      Redis 客户端      -->
             <dependency>
                 <groupId>io.lettuce</groupId>
                 <artifactId>lettuce-core</artifactId>
@@ -332,11 +354,13 @@
                 <artifactId>metrics-core</artifactId>
                 <version>${version.metrics}</version>
             </dependency>
+            <!--      Jedis 客户端      -->
             <dependency>
                 <groupId>redis.clients</groupId>
                 <artifactId>jedis</artifactId>
                 <version>${version.jedis}</version>
             </dependency>
+            <!--      zipkin 客户端：      -->
             <dependency>
                 <groupId>io.zipkin.brave</groupId>
                 <artifactId>brave-instrumentation-kafka-clients</artifactId>
@@ -373,6 +397,7 @@
                 <version>${version.prometheus}</version>
             </dependency>
 
+            <!--     HTTP 客户端：apache httpclient       -->
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
@@ -384,6 +409,7 @@
                 <version>5.1</version>
             </dependency>
 
+            <!--      处理 yaml 格式的文本      -->
             <dependency>
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>

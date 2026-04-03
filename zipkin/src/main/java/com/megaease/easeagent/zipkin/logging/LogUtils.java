@@ -27,6 +27,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 读取不用的日志框架的 MDC 类
+ * <p>
+ * - log4j2
+ * -    org.apache.logging.log4j.core.Appender
+ * -    org.apache.logging.log4j.ThreadContext
+ * - logback
+ * -    ch.qos.logback.core.Appender
+ * -    org.slf4j.MDC
+ */
 @SuppressWarnings("unchecked")
 public class LogUtils {
     /**
@@ -39,7 +49,9 @@ public class LogUtils {
     private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[0];
     private static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
 
+    // log4j2 的 MDC 对应的类
     private static final String LOG4J_MDC_CLASS_NAME = "org.apache.logging.log4j.ThreadContext";
+    // logback 的 MDC 对应的类
     private static final String LOGBACK_MDC_CLASS_NAME = "org.slf4j.MDC";
 
     private static final String LOG4J_CHECK_CLASS_NAME = "org.apache.logging.log4j.core.Appender";
@@ -51,7 +63,8 @@ public class LogUtils {
     private static Class<?> log4jMdcClass;
     private static Class<?> logbackMdcClass;
 
-    private LogUtils() {}
+    private LogUtils() {
+    }
 
     public static Class<?> checkLog4JMDC(ClassLoader classLoader) {
         if (log4jLoaded != null) {

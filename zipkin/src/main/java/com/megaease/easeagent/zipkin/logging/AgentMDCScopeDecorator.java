@@ -58,6 +58,7 @@ public class AgentMDCScopeDecorator {
         }
     }
 
+    // brave 的上下文关联工具，此处用于与 slf4j 中的值进行同步
     enum MDCContextAgentLoader implements CorrelationContext {
         INSTANCE;
 
@@ -77,6 +78,8 @@ public class AgentMDCScopeDecorator {
         }
     }
 
+    // brave 的上下文关联工具，此处用于与 AgentLogMDC 中的值进行同步
+    // 底层是 目标 JVM 中日志 log4j/logback 的 MDC
     enum MDCContextApp implements CorrelationContext {
         INSTANCE;
 
@@ -87,6 +90,7 @@ public class AgentMDCScopeDecorator {
             if (agentLogMDC == null) {
                 return null;
             }
+            // 从 AgentLogMDC 中获取值，保持与 brave 的上下文关联工具中的值同步
             return agentLogMDC.get(name);
         }
 
@@ -97,6 +101,7 @@ public class AgentMDCScopeDecorator {
             if (agentLogMDC == null) {
                 return true;
             }
+            // 更新 AgentLogMDC 中的值，保持与 brave 的上下文关联工具中的值同步
             if (value != null) {
                 agentLogMDC.put(name, value);
             } else {
@@ -110,6 +115,8 @@ public class AgentMDCScopeDecorator {
         }
     }
 
+    // brave 的上下文关联工具，此处用于与 ease agent 的 MDC 中的值进行同步
+    // 底层是 easeagent 自身使用的 log4j 的 MDC
     enum MDCContextEaseLogger implements CorrelationContext {
         INSTANCE;
 

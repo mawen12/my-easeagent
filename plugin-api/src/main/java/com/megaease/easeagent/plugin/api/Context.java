@@ -31,6 +31,8 @@ import com.megaease.easeagent.plugin.bridge.NoOpIPluginConfig;
 @SuppressWarnings("unused")
 public interface Context {
     /**
+     * 如果为 true，该拦截器不应继续执行，并且不应上报任何内容。
+     *
      * When true, do nothing and nothing is reported . However, this Context should
      * still be injected into outgoing requests. Use this flag to avoid performing expensive
      * computation.
@@ -38,6 +40,8 @@ public interface Context {
     boolean isNoop();
 
     /**
+     * 返回最近使用的 tracing 组件，如果已经关闭的话，则返回 null
+     *
      * Returns the most recently created tracing component iff it hasn't been closed. null otherwise.
      *
      * <p>This object should not be cached.
@@ -45,6 +49,8 @@ public interface Context {
     Tracing currentTracing();
 
     /**
+     * 返回上下文中键对应的值，如果不存在或者显示设置了 null，则返回 null。
+     *
      * Returns the value to which the specified key is mapped,
      * or {@code null} if this context contains no mapping for the key.
      *
@@ -68,6 +74,8 @@ public interface Context {
     <V> V get(Object key);
 
     /**
+     * 移除上下文中键对应的值，并返回该值对应的值，如果不存在或者显示设置了 null，则返回 null。
+     *
      * Removes the mapping for a key from this Context if it is present
      * (optional operation).   More formally, if this context contains a mapping
      * from key <tt>k</tt> to value <tt>v</tt> such that
@@ -95,6 +103,8 @@ public interface Context {
     <V> V remove(Object key);
 
     /**
+     * 向上下文中添加键值对，并返回该键之前对应的值，如果不存在或者显示设置了 null，则返回 null。
+     *
      * Associates the specified value with the specified key in this context
      * (optional operation).  If the context previously contained a mapping for
      * the key, the old value is replaced by the specified value.  (A context
@@ -113,6 +123,8 @@ public interface Context {
     <V> V put(Object key, V value);
 
     /**
+     * 读取配置
+     *
      * Looks at the config at the current without removing it
      * from the stack.
      *
@@ -122,6 +134,8 @@ public interface Context {
     IPluginConfig getConfig();
 
     /**
+     * 记录目标对象{@code key}的Session的堆叠序列，该方法必须配合 {@link #exit(Object)}方法。
+     *
      * Record and return the stacking sequence of Object{@code key}'s Session
      * It needs to be used together with the {@link #exit(Object)} to be effective
      * for example 1:
@@ -210,6 +224,8 @@ public interface Context {
     int enter(Object key);
 
     /**
+     * 记录并验证进入目标对象的次数是否符合预期值
+     *
      * Record and verify the stacking sequence of Object{@code key}'s Session
      * It needs to be used together with the {@link #exit(Object, int)} to be effective
      *
@@ -223,6 +239,8 @@ public interface Context {
     }
 
     /**
+     * 退出并返回目标对象{@code key}的Session的堆叠序列，该方法必须配合 {@link #enter(Object)}方法。
+     *
      * Release and return the stacking sequence of Object{@code key}'s Session
      * It needs to be used together with the {@link #enter(Object)} to be effective
      *
@@ -233,6 +251,8 @@ public interface Context {
     int exit(Object key);
 
     /**
+     * 退出并验证进入目标对象的次数是否符合预期值
+     *
      * Release and verify the stacking sequence of Object's Session
      * It needs to be used together with the {@link #enter(Object, int)} to be effective
      *
@@ -247,10 +267,12 @@ public interface Context {
 
 
     //---------------------------------- 1. async context begin ------------------------------------------
-    //---------------------------------- 1. Cross-thread ------------------------------------------
+    //---------------------------------- 1. Cross-thread 主要为跨线程的场景而使用 ------------------------------------------
     // When you import and export the AsyncContext, you will also import and export the Tracing context for Thread.
 
     /**
+     * 创建一个 AsyncContext，其将 copy 当前上下文中所有的 key:value，需要注意仅赋值 Context#context, Context#supplier, Context#tracing#exportAsync
+     *
      * Export a {@link AsyncContext} for async
      * It will copy all the key:value in the current Context
      *
@@ -259,6 +281,8 @@ public interface Context {
     AsyncContext exportAsync();
 
     /**
+     * 从 AsyncContext 导入到当前的上下文中，将 copy 目标上下文中所有的 key:value
+     *
      * Import a {@link AsyncContext} for async
      * It will copy all the key: value to the current Context
      * <p>
@@ -281,11 +305,16 @@ public interface Context {
     Cleaner importAsync(AsyncContext snapshot);
 
     /**
+     * 包装一个 Runnable，本质上是创建一个 AsyncContext 放到该 Runnable 中。
+     * 然后使用 CurrentContextRunnable 返回。
+     *
      * Wraps the input so that it executes with the same context as now.
      */
     Runnable wrap(Runnable task);
 
     /**
+     * 检查该 Task 是否已经被包装过了
+     *
      * Check task is wrapped.
      *
      * @param task Runnable
@@ -298,6 +327,10 @@ public interface Context {
     //----------------------------------2. Cross-server ------------------------------------------
 
     /**
+     * 为下一个 server 创建一个 RequestContext，其将传递多个 key:value 以满足 Trace。
+     * 这发生在向 Dubbo/Motan/HTTP/Sofa/Kafka/RabbitMQ 等 Server 发起请求时
+     *
+     *
      * Create a RequestContext for the next Server
      * It will pass multiple key:value values required by Trace and EaseAgent through
      * {@link Request#setHeader(String, String)}, And set the Span's kind, name and
@@ -332,6 +365,9 @@ public interface Context {
 
 
     /**
+     * 从上游的 Server 创建一个 RequestContext，其将传递多个 key:value 以满足 Trace。
+     * 这发生在接收来自 Dubbo/Motan/HTTP/Sofa/Kafka/RabbitMQ 等 Server 的请求时
+     *
      * Obtain key:value from the request passed by a parent Server and create a RequestContext
      * <p>
      * It will not only obtain the key:value required by Trace from the {@link Request#header(String)},
@@ -368,6 +404,8 @@ public interface Context {
     //---------------------------------- 3. Message Tracing ------------------------------------------
 
     /**
+     * 从 message request 提取 key:value，并生成一个新的 span，例如：Kafka consumer, RabbitMQ consumer
+     *
      * Obtain key:value from the message request and create a Span, Examples: kafka consumer, rabbitMq consumer
      * <p>
      * It will set the Span's kind, name and cached scope through {@link Request#kind()}, {@link Request#name()}
@@ -388,6 +426,8 @@ public interface Context {
 
 
     /**
+     * 从 message request 提取 key:value，并生成一个新的 span，例如：Kafka producer, RabbitMQ producer
+     *
      * Create a Span for message producer. Examples: kafka producer, rabbitMq producer
      * <p>
      * It will set the Span's tags "messaging.operation", "messaging.channel_kind", "messaging.channel_name" from request
@@ -410,6 +450,8 @@ public interface Context {
     Span producerSpan(MessagingRequest request);
 
     /**
+     * 注入 Consumer Span 的 key:value 和 Forwarded Headers 到 Request {@link MessagingRequest#setHeader(String, String)}中。
+     *
      * Inject Consumer's Span key:value and Forwarded Headers to Request {@link MessagingRequest#setHeader(String, String)}.
      *
      * @param span    key:value from
@@ -419,6 +461,8 @@ public interface Context {
     void consumerInject(Span span, MessagingRequest request);
 
     /**
+     * 注入 Producer Span 的 key:value 和 Forwarded Headers 到 Request {@link MessagingRequest#setHeader(String, String)}中。
+     *
      * Inject Producer's Span and Forwarded Headers key:value to Request {@link MessagingRequest#setHeader(String, String)}.
      *
      * @param span    key:value from
@@ -431,6 +475,8 @@ public interface Context {
     //---------------------------------- 4. Span ------------------------------------------
 
     /**
+     * 返回一个新的子 span，如果已经存在了 trace 则直接使用，否则生成一个新的 trace，然后生成一个新的 trace。
+     *
      * Returns a new child span if there's a {@link Tracing#currentSpan()} or a new trace if there isn't.
      *
      * @return {@link Span}
@@ -438,11 +484,16 @@ public interface Context {
     Span nextSpan();
 
     /**
+     * 返回该 key 是否是 Trace 组件必须的 key，如果是的话，则该 key:value 需要被传递到下一个 span 中，
+     *
      * @return true if the key is necessary for EaseAgent
      */
     boolean isNecessaryKeys(String key);
 
     /**
+     * 将 Forwarded Headers key:value 注入到 Setter 中。
+     * 比如对于 Http 来说就是将 key:value 注入到 http header 中。
+     *
      * Inject Forwarded Headers key:value to Setter {@link Setter#setHeader(String, String)}.
      *
      * @param setter key:value to
@@ -451,6 +502,8 @@ public interface Context {
     void injectForwardedHeaders(Setter setter);
 
     /**
+     * 从 Getter 中获取 Forwarded Headers key:value 并注入到 Context 中。
+     *
      * Import Forwarded Headers key:value to Context {@link Getter#header(String)}.
      * <p>
      * The Cleaner must be close after plugin:

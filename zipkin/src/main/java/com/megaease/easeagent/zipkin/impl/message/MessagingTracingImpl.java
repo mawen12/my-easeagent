@@ -78,9 +78,7 @@ public class MessagingTracingImpl<R extends MessagingRequest> implements Messagi
             return NoOpTracer.NO_OP_SPAN;
         }
         setMessageInfo(span, request);
-        Span eSpan = SpanImpl.build(messagingTracing.tracing(), span,
-            request.cacheScope(), this.zipkinConsumerInjector);
-
+        Span eSpan = SpanImpl.build(messagingTracing.tracing(), span, request.cacheScope(), this.zipkinConsumerInjector);
         return NoOpTracer.noNullSpan(eSpan);
     }
 

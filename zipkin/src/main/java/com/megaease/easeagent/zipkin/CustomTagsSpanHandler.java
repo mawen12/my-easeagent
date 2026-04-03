@@ -28,7 +28,9 @@ import java.util.function.Supplier;
 
 public class CustomTagsSpanHandler extends SpanHandler {
     public static final String TAG_INSTANCE = "i";
+    // 保存当前 server host name
     private final String instance;
+    // 当前为 demo-service
     private final Supplier<String> serviceName;
 
     public CustomTagsSpanHandler(Supplier<String> serviceName, String instance) {
@@ -38,9 +40,13 @@ public class CustomTagsSpanHandler extends SpanHandler {
 
     @Override
     public boolean end(TraceContext context, MutableSpan span, Cause cause) {
+        // 写入标记：i -> <hostname>
         span.tag(TAG_INSTANCE, this.instance);
+        // 记录 demo-service
         span.localServiceName(this.serviceName.get());
+        // 写入配置的 service tag
         fillTags(span, ProgressFields.getServiceTags());
+        // 写入 redirect tag
         fillTags(span, RedirectProcessor.tags());
         return true;
     }

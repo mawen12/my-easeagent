@@ -21,6 +21,8 @@ import com.megaease.easeagent.plugin.api.Context;
 import com.megaease.easeagent.plugin.bridge.NoOpTracer;
 
 /**
+ * 提供追踪所需的工具
+ *
  * This provides utilities needed for trace instrumentation.
  *
  * <p>This type can be extended so that the object graph can be built differently or overridden,
@@ -29,6 +31,8 @@ import com.megaease.easeagent.plugin.bridge.NoOpTracer;
 public interface Tracing {
 
     /**
+     * 当为 true 时，什么都不做
+     *
      * When true, do nothing anything and nothing is reported . However, this Tracing should
      * still be injected into outgoing requests. Use this flag to avoid performing expensive
      * computation.
@@ -38,12 +42,16 @@ public interface Tracing {
     boolean isNoop();
 
     /**
+     * 检查当前线程中是否有 span
+     *
      * true if Thread
      * @return boolean
      */
     boolean hasCurrentSpan();
 
     /**
+     * 返回当前 scope 中的 span
+     *
      * Returns the current span in scope or {@link NoOpTracer#NO_OP_SPAN} if there isn't one.
      *
      * <p> as it is a stable type and will never return null.
@@ -53,6 +61,8 @@ public interface Tracing {
     Span currentSpan();
 
     /**
+     * 返回一个新的 span，如果有 {@link #currentSpan()} 则返回一个新的子 span，否则返回一个新的 trace
+     *
      * Returns a new child span if there's a {@link #currentSpan()} or a new trace if there isn't.
      *
      * @return {@link Span}
@@ -60,6 +70,8 @@ public interface Tracing {
     Span nextSpan();
 
     /**
+     * 处理用于消息追踪的场景
+     *
      * get MessagingTracing for message tracing
      * <p>
      * If you have a Message Server and need Span, generate result use {@link Context#consumerSpan(MessagingRequest)} and
@@ -70,6 +82,9 @@ public interface Tracing {
     MessagingTracing<MessagingRequest> messagingTracing();
 
     /**
+     * 返回底层的 tracing 对象，如果没有则返回 {@code null}。
+     * 这里的 tracing 对象是 {@code brave.propagation.TraceContext}。
+     *
      * Returns the underlying Tracing object or {@code null} if there is none. Here is a Tracing
      * objects: {@code brave.propagation.TraceContext}.
      * @return

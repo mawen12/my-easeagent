@@ -34,12 +34,16 @@ public class AgentLogMDC {
 
 
     public static AgentLogMDC create(ClassLoader classLoader) {
+        // 获取当前 ClassLoader 对应的 AgentLogMdc
         AgentLogMDC mdc = appMdcMap.getIfPresent(classLoader);
         if (mdc != null) {
+            // 已经有了就返回
             return mdc;
         }
+        // 获取 log4j MDC 类
         Class<?> aClass = LogUtils.checkLog4JMDC(classLoader);
         if (aClass == null) {
+            // 回退到 logback
             aClass = LogUtils.checkLogBackMDC(classLoader);
         }
 

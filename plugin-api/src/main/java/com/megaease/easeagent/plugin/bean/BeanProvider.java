@@ -20,12 +20,13 @@ package com.megaease.easeagent.plugin.bean;
 import com.megaease.easeagent.plugin.Ordered;
 
 /**
- * 顶层的 Bean 提供器接口
- * com.megaease.easeagent.metrics.MetricBeanProviderImpl
- * com.megaease.easeagent.metrics.jvm.JvmBeanProvider
- * com.megaease.easeagent.zipkin.TracingProviderImpl
- * com.megaease.easeagent.core.health.HealthProvider
- * com.megaease.easeagent.core.info.AgentInfoProvider
+ * 顶层的 Bean 提供器接口：
+ * 具体位于 easeagent.jar/lib/META-INF/services/com.megaease.easeagent.plugin.bean.BeanProvider
+ * - com.megaease.easeagent.metrics.MetricBeanProviderImpl
+ * - com.megaease.easeagent.metrics.jvm.JvmBeanProvider
+ * - com.megaease.easeagent.zipkin.TracingProviderImpl
+ * - com.megaease.easeagent.core.health.HealthProvider
+ * - com.megaease.easeagent.core.info.AgentInfoProvider
  */
 public interface BeanProvider extends Ordered {
     enum BeanOrder {

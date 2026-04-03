@@ -93,14 +93,31 @@ public interface ConfigConst {
         String OUTPUT_TRUST_CERT_TYPE = join(OUTPUT, "ssl.truststore.type");
         String OUTPUT_ENDPOINT_IDENTIFICATION_ALGORITHM = join(OUTPUT, "ssl.endpoint.identification.algorithm");
 
+        /**
+         * observability.metrics
+         */
         String METRICS = join(OBSERVABILITY, "metrics");
+        /**
+         * observability.tracings
+         */
         String TRACE = join(OBSERVABILITY, "tracings");
 
+        // observability.metrics.enabled
         String METRICS_ENABLED = join(METRICS, "enabled");
-
+        // observability.tracings.enabled
         String TRACE_ENABLED = join(TRACE, "enabled");
+        //
+        /**
+         * observability.tracings.sampledType 可为空
+         *
+         * - counting
+         * - rate_limiting
+         * - boundary
+         */
         String TRACE_SAMPLED_TYPE = join(TRACE, KEY_COMM_SAMPLED_TYPE);
+        // observability.tracings.sampled
         String TRACE_SAMPLED = join(TRACE, KEY_COMM_SAMPLED);
+        // observability.tracings.output
         String TRACE_OUTPUT = join(TRACE, KEY_COMM_OUTPUT);
         String TRACE_OUTPUT_ENABLED = join(TRACE_OUTPUT, "enabled");
         String TRACE_OUTPUT_TOPIC = join(TRACE_OUTPUT, "topic");

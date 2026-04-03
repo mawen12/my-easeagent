@@ -21,6 +21,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * 顶层的配置接口，实际会读取 easeagent.jar/agent.properties 中的配置项。
+ * 允许通过接口进行修改。
+ */
 @SuppressWarnings("unused")
 public interface Config {
     boolean hasPath(String path);

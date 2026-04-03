@@ -24,6 +24,13 @@ import com.megaease.easeagent.plugin.api.context.RequestContext;
 import java.util.List;
 
 /**
+ * 这是对特殊场景进行处理的 Tracing 子接口。
+ * 主要是处理 async/client+server/producer+consumer 场景的 span 处理。
+ *
+ * - async 跨线程的 span 处理
+ * - client/server 跨 server (HTTP/RPC) 的 span 处理
+ * - producer/consumer 跨 server (消息队列) 的 span 处理
+ *
  * Subtype of {@link Tracing} which can exportAsync,importAsync,clientRequest and serverReceive.
  *
  * <p>This type can be extended so that the object graph can be built differently or overridden,

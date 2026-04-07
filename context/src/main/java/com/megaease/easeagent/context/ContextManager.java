@@ -101,14 +101,19 @@ public class ContextManager implements IContextManager {
         this.metric = metricProvider.metricSupplier();
     }
 
+    // SessionContextSupplier 复用当前线程中已有的上下文，并且初始化 tracing
     private class SessionContextSupplier implements Supplier<InitializeContext> {
         @Override
         public InitializeContext get() {
+            // 尝试从 ThreadLocal 中获取当前调用的上下文，如果没有则会创建一个
             SessionContext context = LOCAL_SESSION_CONTEXT.get();
+            // 读取 tracing，对于刚进入的调用， tracing 是没有的
             ITracing tracing = context.getTracing();
             if (tracing == null || tracing.isNoop()) {
+                // 使用全局的 tracing supplier 来创建一个 tracing，并设置到本地的上下文中
                 context.setCurrentTracing(NoNull.of(tracingSupplier.get(this), NoOpTracer.NO_OP_TRACING));
             }
+            // 将 supplier 设置为自己
             if (context.getSupplier() == null) {
                 context.setSupplier(this);
             }

@@ -24,7 +24,9 @@ import com.megaease.easeagent.plugin.enums.Order;
 import com.megaease.easeagent.plugin.interceptor.MethodInfo;
 
 /**
- * 顶层的通用拦截器接口
+ * 拦截器，这是 easeagent 插件的核心自定义逻辑，用户在其中可以自定义逻辑，支持 init -> before -> after 三个阶段
+ *
+ * - init 在首次
  */
 public interface Interceptor extends Ordered {
     /**

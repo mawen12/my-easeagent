@@ -29,12 +29,19 @@ import com.megaease.easeagent.plugin.report.encoder.JsonEncoder;
 
 import java.util.Map;
 
+/**
+ * 指标的 json 编码器，指标是以 map 格式进行编码的
+ *
+ * 其底层使用 ByteWrapper 来包装编码结果
+ */
 @AutoService(Encoder.class)
 public class MetricJsonEncoder extends JsonEncoder<Map<String, Object>> {
     public static final String ENCODER_NAME = ReportConfigConst.METRIC_JSON_ENCODER_NAME;
 
+    // Metric json 的编码结果会被保存在这个 key 中
     static final String ENCODED_TMP = "__agent_encoded__";
 
+    // 使用 jackson 进行 json 的编码
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override

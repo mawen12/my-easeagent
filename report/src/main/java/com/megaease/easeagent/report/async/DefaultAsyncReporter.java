@@ -43,6 +43,11 @@ import static java.lang.String.format;
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.WARNING;
 
+/**
+ * 异步的上报器
+ *
+ * @param <S>
+ */
 @SuppressWarnings("unused")
 public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
     static final String NAME_PREFIX = "DefaultAsyncReporter";

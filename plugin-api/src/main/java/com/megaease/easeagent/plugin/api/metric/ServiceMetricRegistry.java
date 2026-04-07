@@ -27,6 +27,22 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ServiceMetricRegistry {
+    // domain，namespace，id，tags，type -> ServiceMetric
+    // application, jvm-gc, resource, tags, JVMGCMetricV2.class -> JVMGCMetricV2
+    // application, jvm-memory, resource, tags, JVMMemoryMetricV2.class -> JVMMemoryMetricV2
+    // application, dubbo, interface, tags, DubboMetrics.class -> DubboMetrics
+    // application, elasticsearch, index, tags, ElasticsearchMetric.class -> ElasticsearchMetric
+    // application, http-request, url, tags, ServerMetric.class -> ServerMetric
+    // application, jdbc-connection, url, tags, JdbcMetric.class -> JdbcMetric
+    // application, jdbc-statement, signature, tags, JdbcMetric.class -> JdbcMetric
+    // application. kafka, resource, tags, KafkaMetric.class -> KafkaMetric
+    // application, mongodbclient, operation, tags, MongoMetric.class -> MongoMetric
+    // application, motan, interface, tags, MotanMetric.class -> MotanMetric
+    // application, cache-redis, signature, tags, RedisMetric.class -> RedisMetric
+    // application, sofarpc, interface, tags, SofaRpcMetrics.class -> SofaRpcMetrics
+    // application, rabbitmq-queue, resource, tags, RabbitMqConsumerMetric.class -> RabbitMqConsumerMetric (EaseAgent 入口)
+    // application, rabbitmq-consumer, resource, tags, RabbitMqConsumerMetric.class -> RabbitMqConsumerMetric (EaseAgent 入口)
+    // application, rabbitmq-ex-ro, resource, tags, RabbitMqProducerMetric.class -> RabbitMqProducerMetric (EaseAgent 入口)
     public static final ConcurrentHashMap<Key, ServiceMetric> INSTANCES = new ConcurrentHashMap<>();
 
     /**
@@ -70,8 +86,12 @@ public class ServiceMetricRegistry {
             // 读取特定插件的配置
             IPluginConfig config = EaseAgent.getConfig(domain, namespace, id);
             NameFactory nameFactory = supplier.newNameFactory();
+            // 根据 domain，namespace，id，tags，type 组成的 key 来创建 MetricRegistry，保证同一组 domain，namespace，id，tags，type 的 ServiceMetric 共享同一个 MetricRegistry
+            // 在实际的场景中，一般一个 Plugin 会有一个或多个 MetricRegistry
             MetricRegistry metricRegistry = EaseAgent.newMetricRegistry(config, nameFactory, tags);
+            // 创建目标的 ServiceMetric 实例
             T newMetric = supplier.newInstance(metricRegistry, nameFactory);
+            // 放入缓存中
             INSTANCES.put(key, newMetric);
             return newMetric;
         }

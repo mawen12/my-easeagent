@@ -38,6 +38,10 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 import java.sql.Connection;
 
+/**
+ * 拦截 java.sql.Statement 的 execute、executeQuery、executeUpdate、addBatch、clearBatch 等方法，
+ * 在方法执行之前执行，创建一个新的 span，记录 SQL 语句和数据库连接信息，并在方法执行之后结束 span。
+ */
 @AdviceTo(value = JdbcStatementAdvice.class, plugin = JdbcTracingPlugin.class)
 public class JdbcStmTracingInterceptor implements NonReentrantInterceptor {
     private final static Logger LOG = EaseAgent.getLogger(JdbcStmTracingInterceptor.class);
@@ -62,18 +66,24 @@ public class JdbcStmTracingInterceptor implements NonReentrantInterceptor {
 
     @Override
     public void doBefore(MethodInfo methodInfo, Context context) {
+        // 从上下文中读取 sqlInfo
         SqlInfo sqlInfo = ContextUtils.getFromContext(context, SqlInfo.class);
         if (sqlInfo == null) {
             LOG.warn("must get sqlInfo from context");
+            // 如果没有则不执行
             return;
         }
+
+        // 创建新的 span
         Span span = context.nextSpan();
         // Statement stm = (Statement) methodInfo.getInvoker();
+        // 记录目标方法，有 execute、executeQuery、executeUpdate、addBatch、clearBatch 等等
         span.name(methodInfo.getMethod());
         span.kind(Span.Kind.CLIENT);
         span.tag(SPAN_SQL_QUERY_TAG_NAME,
             md5SQLCompression.compress(sqlInfo.getSql()));
         span.tag(SPAN_LOCAL_COMPONENT_TAG_NAME, "database");
+        // 获取连接，并提取连接的 url
         Connection conn = sqlInfo.getConnection();
         String url = JdbcUtils.getUrl(conn);
         if (url != null) {
@@ -81,12 +91,15 @@ public class JdbcStmTracingInterceptor implements NonReentrantInterceptor {
         }
         span.tag(MiddlewareConstants.TYPE_TAG_NAME, Type.DATABASE.getRemoteType());
         RedirectProcessor.setTagsIfRedirected(Redirect.DATABASE, span, url);
+        // 读取数据库信息
         DatabaseInfo databaseInfo = DatabaseInfo.getFromConnection(conn);
         if (databaseInfo != null) {
             span.remoteServiceName(remoteServiceName(databaseInfo));
             span.remoteIpAndPort(databaseInfo.getHost(), databaseInfo.getPort());
         }
+        // 启动 span
         span.start();
+        // 保存到上下文中
         context.put(SPAN_KEY, span);
     }
 
@@ -96,10 +109,13 @@ public class JdbcStmTracingInterceptor implements NonReentrantInterceptor {
 
     @Override
     public void doAfter(MethodInfo methodInfo, Context context) {
+        // 读取 span
         Span span = context.get(SPAN_KEY);
         if (methodInfo.getThrowable() != null) {
+            // 记录错误
             span.error(methodInfo.getThrowable());
         }
+        // 结束 span
         span.finish();
     }
 

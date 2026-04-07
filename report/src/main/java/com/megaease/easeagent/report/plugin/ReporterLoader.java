@@ -73,15 +73,17 @@ public class ReporterLoader {
         // 使用 ServiceLoader 从 META-INF/services/com.megaease.easeagent.plugin.report.Sender 读取文件内容
         // 具体位于 easeagent.jar/lib/build-x.x.x.jar中，其中实现有：
         // com.megaease.easeagent.report.sender.AgentKafkaSender
-        // com.megaease.easeagent.report.sender.AgentLoggerSender
+        // com.megaease.easeagent.report.sender.AgentLoggerSender 写入控制台
         // com.megaease.easeagent.report.sender.NoOpSender
         // com.megaease.easeagent.report.sender.metric.MetricKafkaSender
         // com.megaease.easeagent.report.sender.okhttp.HttpSender
         for (Sender sender : load(Sender.class)) {
             try {
+                // 读取它们的构造器
                 Constructor<? extends Sender> constructor = sender.getClass().getConstructor();
                 Supplier<Sender> senderSupplier = () -> {
                     try {
+                        // 通过构造器实例化 Sender 对象
                         return constructor.newInstance();
                     } catch (InvocationTargetException | IllegalAccessException | InstantiationException e) {
                         logger.warn("unable to load sender: {}", sender.name());

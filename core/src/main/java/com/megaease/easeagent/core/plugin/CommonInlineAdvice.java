@@ -47,7 +47,7 @@ public class CommonInlineAdvice {
                                    @Advice.AllArguments(readOnly = false, typing = Assigner.Typing.DYNAMIC) Object[] args, // 参数
                                    @Advice.Local(CONTEXT) InitializeContext context // 上下文
     ) {
-        // 此处返回的是实际是 ContextManager
+        // // 创建本次调用的上下文，将公共的tracing设置到该上下文中,此处返回的是实际是 ContextManager
         context = EaseAgent.initializeContextSupplier.getContext();
         // 如果 Context 设置为 Noop，则不会触发后续的 interceptor chain
         if (context.isNoop()) {
@@ -61,7 +61,7 @@ public class CommonInlineAdvice {
             .method(method)
             .args(args)
             .build();
-        // 使用 interceptor chain 执行
+        // 进入自定义的拦截器，index 用来定位具体的拦截器链，该参数是通过实现 AgentAdvice 来手动创建的
         Dispatcher.enter(index, methodInfo, context);
         // 更新方法参数
         if (methodInfo.isChanged()) {

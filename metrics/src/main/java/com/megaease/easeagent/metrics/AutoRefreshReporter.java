@@ -66,6 +66,7 @@ public class AutoRefreshReporter implements Runnable {
             .convertDurationsTo(TimeUnit.MILLISECONDS)
             .build();
         reporter.setConverter(converter);
+        // 在内容使用 zipkin 的 ScheduleReporter，内部启动单线程的调度器，以配置的间隔固定上报指标数据
         reporter.start(config.getInterval(), config.getIntervalUnit());
     }
 

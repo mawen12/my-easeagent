@@ -157,14 +157,14 @@ public class ProgressFields {
 
         public void put(String key, String value) {
             // 当为 easeagent.progress.forwarded.headers 时
-            if (ProgressFields.isForwardedHeader(key)) {
+            if (ProgressFields.isForwardedHeader(key)) { // easeagent.progress.forwarded.headers
                 // 将值按 , 拆分，并保存到 forwardHeaderSet 中
                 buildForwardedHeaderSet(value);
             // 当为 observability.tracings.tag.response.headers 开头时，保存到 responseHoldTags
-            } else if (ProgressFields.isResponseHoldTagKey(key)) {
+            } else if (ProgressFields.isResponseHoldTagKey(key)) { // observability.tracings.tag.response.headers.
                 responseHoldTags.put(key, value);
             // 当为 observability.tracings.service.tags 开头时，保存到 serverTags
-            } else if (ProgressFields.isServerTags(key)) {
+            } else if (ProgressFields.isServerTags(key)) { // observability.tracings.service.tags.
                 serverTags.put(key, value);
             }
         }

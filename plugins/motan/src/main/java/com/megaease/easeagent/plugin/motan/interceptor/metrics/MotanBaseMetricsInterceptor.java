@@ -21,6 +21,7 @@ public abstract class MotanBaseMetricsInterceptor implements Interceptor {
 
     @Override
     public void init(IPluginConfig config, String className, String methodName, String methodDescriptor) {
+        // application, motan, interface
         Tags tags = new Tags(MotanMetricTags.CATEGORY.name, MotanMetricTags.TYPE.name, MotanMetricTags.LABEL_NAME.name);
         MOTAN_METRIC = ServiceMetricRegistry.getOrCreate(config, tags, MotanMetric.MOTAN_METRIC_SUPPLIER);
     }

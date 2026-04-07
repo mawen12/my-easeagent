@@ -22,6 +22,7 @@ public abstract class SofaRpcMetricsBaseInterceptor implements NonReentrantInter
 
     @Override
     public void init(IPluginConfig config, String className, String methodName, String methodDescriptor) {
+        // application, sofarpc, interface
         Tags tags = new Tags(SofaRpcMetricsTags.CATEGORY.name, SofaRpcMetricsTags.TYPE.name, SofaRpcMetricsTags.LABEL_NAME.name);
         SOFARPC_METRICS = ServiceMetricRegistry.getOrCreate(config, tags, SofaRpcMetrics.SOFARPC_METRICS_SUPPLIER);
     }

@@ -43,30 +43,39 @@ public class AgentInterceptorChain {
     }
 
     public void doBefore(MethodInfo methodInfo, int pos, InitializeContext context) {
+        // 代表已经执行完拦截器的所有 before 方法了，退出
         if (pos == this.interceptors.size()) {
             return;
         }
+        // 获取当前要执行的拦截器
         Interceptor interceptor = interceptors.get(pos);
         try {
             interceptor.before(methodInfo, context);
         } catch (Throwable e) {
             // set error message to context;
+            // 拦截器中的任何异常都要被忽略，不能因为拦截器影响目标方法的执行
             log.debug("Interceptor before execute exception:", e);
         }
+        // 对 pos + 1，代表执行链上的下一个拦截器
         this.doBefore(methodInfo, pos + 1, context);
     }
 
     public Object doAfter(MethodInfo methodInfo, int pos, InitializeContext context) {
+        // 代表已经执行完拦截器的所有 after 方法了
         if (pos < 0) {
             return methodInfo.getRetValue();
         }
+        // 获取当前要执行的拦截器
         Interceptor interceptor = interceptors.get(pos);
         try {
+            // 执行拦截器的 after 方法
             interceptor.after(methodInfo, context);
         } catch (Throwable e) {
             // set error message to context;
+            // 拦截器中的任何异常都要被忽略，不能因为拦截器影响目标方法的结束流程
             log.debug("Interceptor exit execute exception:", e);
         }
+        // 对 pos - 1，代表执行链上的上一个拦截器
         return this.doAfter(methodInfo, pos - 1, context);
     }
 

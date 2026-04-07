@@ -22,7 +22,14 @@ public abstract class DubboBaseMetricsInterceptor implements Interceptor {
 
     @Override
     public void init(IPluginConfig config, String className, String methodName, String methodDescriptor) {
-        Tags tags = new Tags(DubboMetricTags.CATEGORY.name, DubboMetricTags.TYPE.name, DubboMetricTags.LABEL_NAME.name);
+        Tags tags = new Tags(
+            // application
+            DubboMetricTags.CATEGORY.name,
+            // dubbo
+            DubboMetricTags.TYPE.name,
+            // interface
+            DubboMetricTags.LABEL_NAME.name
+        );
         DUBBO_METRICS = ServiceMetricRegistry.getOrCreate(config, tags, DubboMetrics.DUBBO_METRICS_SUPPLIER);
     }
 

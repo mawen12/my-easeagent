@@ -23,23 +23,31 @@ import com.megaease.easeagent.plugin.report.tracing.ReportSpan;
 import com.megaease.easeagent.plugin.report.metric.MetricReporterFactory;
 
 /**
+ * 专门用于 agent 的上报器，用于上报 trace/metric/access-log/app-log 数据
+ *
  * report interface:
  * trace/metric/accessLog
  */
 public interface AgentReport {
     /**
+     * 上报 trace
+     *
      * report trace span
      * @param span trace span
      */
     void report(ReportSpan span);
 
     /**
+     * 上报 access-log
+     *
      * report access-log
      * @param log log info
      */
     void report(AccessLogInfo log);
 
     /**
+     * 上报 application log
+     *
      * report application log
      * @param log log info
      */

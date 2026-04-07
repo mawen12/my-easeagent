@@ -36,6 +36,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 上报 trace
+ */
 public class TraceReport {
     private final RefreshableReporter<ReportSpan> spanRefreshableReporter;
 

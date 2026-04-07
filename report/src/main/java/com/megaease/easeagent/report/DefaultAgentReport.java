@@ -65,16 +65,19 @@ public class DefaultAgentReport implements AgentReport, ConfigChangeListener {
         return new DefaultAgentReport(config);
     }
 
+    // 上报 trace
     @Override
     public void report(ReportSpan span) {
         this.traceReport.report(span);
     }
 
+    // 上报 access-log
     @Override
     public void report(AccessLogInfo log) {
         this.accessLogReporter.report(log);
     }
 
+    // 上报 app-log
     @Override
     public void report(AgentLogData log) {
         this.appLogReporter.report(log);

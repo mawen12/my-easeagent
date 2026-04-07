@@ -27,23 +27,33 @@ public abstract class BaseHttpClientTracingInterceptor implements NonReentrantIn
 
     @Override
     public void doBefore(MethodInfo methodInfo, Context context) {
+        // 读取请求
         HttpRequest request = getRequest(methodInfo, context);
+        // 创建带有 span 和请求信息的请求上下文
         RequestContext requestContext = context.clientRequest(request);
+        // 对 span 进行标记并启动
         HttpUtils.handleReceive(requestContext.span().start(), request);
+        // 将请求上下文保存到 Context 中，以便在方法执行后使用
         context.put(getProgressKey(), requestContext);
     }
 
     @Override
     public void doAfter(MethodInfo methodInfo, Context context) {
+        // 从 Context 中获取之前保存的请求上下文
         RequestContext requestContext = context.remove(getProgressKey());
         if (requestContext == null) {
+            // 如果没有找到请求上下文，说明在 doBefore 中没有正确创建或保存，直接返回
             return;
         }
         try {
+            // 读取响应
             HttpResponse responseWrapper = getResponse(methodInfo, context);
+            // 记录请求状态码，错误信息
             HttpUtils.save(requestContext.span(), responseWrapper);
+            // 完成 span
             requestContext.finish(responseWrapper);
         } finally {
+            // 关闭请求上下文的 Scope，确保资源正确释放
             requestContext.scope().close();
         }
     }

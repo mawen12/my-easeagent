@@ -17,6 +17,9 @@
  */
 package com.megaease.easeagent.plugin.report;
 
+/**
+ * 使用 byte[] 数组作为其实现。
+ */
 public class ByteWrapper implements EncodedData {
     byte[] data;
 

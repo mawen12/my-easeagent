@@ -27,17 +27,24 @@ import com.megaease.easeagent.plugin.interceptor.Interceptor;
 import com.megaease.easeagent.plugin.interceptor.MethodInfo;
 import org.apache.http.client.methods.HttpRequestBase;
 
+/**
+ * 拦截 HttpClient#doExecute 方法，在方法执行前将需要转发的 header 注入到 HttpRequestBase 中
+ * 通过 easeagent.progress.forwarded.headers 来配置需要转发的 header，多个 header
+ */
 @AdviceTo(value = HttpClientDoExecuteAdvice.class, qualifier = "default", plugin = ForwardedPlugin.class)
 public class HttpClientDoExecuteForwardedInterceptor implements Interceptor {
 
     @Override
     public void before(MethodInfo methodInfo, Context context) {
+        // 如果拦截的方法参数为 null，直接返回
         if (methodInfo.getArgs() == null) {
             return;
         }
         for (Object arg : methodInfo.getArgs()) {
-            if (arg instanceof HttpRequestBase) {
+            if (arg instanceof HttpRequestBase) {// 仅处理 HttpRequestBase 类型的参数
                 final HttpRequestBase httpRequestBase = (HttpRequestBase) arg;
+                // 从上下文获取需要转发的 header，并将其注入到 HttpRequestBase 中
+                // 通过 easeagent.progress.forwarded.headers 来配置
                 context.injectForwardedHeaders(httpRequestBase::setHeader);
                 return;
             }

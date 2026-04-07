@@ -35,8 +35,7 @@ import static com.megaease.easeagent.config.ConfigUtils.extractByPrefix;
 import static com.megaease.easeagent.config.report.ReportConfigConst.*;
 
 @Slf4j
-public class SenderConfigDecorator
-    implements SenderWithEncoder, ConfigChangeListener {
+public class SenderConfigDecorator implements SenderWithEncoder, ConfigChangeListener {
 
     protected Sender sender;
     String prefix;

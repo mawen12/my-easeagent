@@ -17,5 +17,8 @@
  */
 package com.megaease.easeagent.plugin;
 
+/**
+ * 该注解代表这些类要被注入到 bootstrap classloader 中。
+ */
 public interface AppendBootstrapLoader {
 }

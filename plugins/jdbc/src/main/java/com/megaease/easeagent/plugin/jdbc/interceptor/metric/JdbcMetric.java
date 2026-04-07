@@ -70,6 +70,21 @@ public class JdbcMetric extends ServiceMetric implements RemovalListener<String,
     public static NameFactory nameFactory() {
         return NameFactory.createBuilder()
             // timer 计时器，记录执行时间相关的指标
+            /**
+             * timerTypes -> [
+             * Default ->
+             *  <min:SnapshotMinValue,
+             *  max:SnapshotMaxValue,
+             *  mean:SnapshotMeanValue,
+             *  p25:Snapshot25Percentile,
+             *  p50:Snapshot50PercentileValue,
+             *  p75:Snapshot75PercentileValue,
+             *  p95:Snapshot95PercentileValue,
+             *  p98:Snapshot98PercentileValue,
+             *  p99:Snapshot99PercentileValue,
+             *  p999:Snapshot999PercentileValue>
+             * ]
+             */
             .timerType(MetricSubType.DEFAULT,
                 ImmutableMap.<MetricField, MetricValueFetcher>builder()
                     .put(MetricField.MIN_EXECUTION_TIME, MetricValueFetcher.SnapshotMinValue)

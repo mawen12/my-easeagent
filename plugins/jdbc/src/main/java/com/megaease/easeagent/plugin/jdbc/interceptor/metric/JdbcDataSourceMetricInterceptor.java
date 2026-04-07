@@ -31,6 +31,10 @@ import com.megaease.easeagent.plugin.jdbc.common.JdbcUtils;
 
 import java.sql.Connection;
 
+/**
+ * 拦截 javax.sql.DataSource#getConnection 方法，
+ * 在拦截方法返回之后执行，统计连接成功和失败的次数
+ */
 @AdviceTo(value = JdbcDataSourceAdvice.class, plugin = JdbcConnectionMetricPlugin.class)
 public class JdbcDataSourceMetricInterceptor implements NonReentrantInterceptor {
     private static JdbcMetric metric;
@@ -52,11 +56,14 @@ public class JdbcDataSourceMetricInterceptor implements NonReentrantInterceptor 
         String key;
         boolean success = true;
         if (methodInfo.getRetValue() == null || methodInfo.getThrowable() != null) {
+            // 处理失败
             key = ERR_CON_METRIC_KEY;
             success = false;
         } else {
+            // 成功
             key = JdbcUtils.getUrl(connection);
         }
+        // 收集连接失败/成功的次数
         metric.collectMetric(key, success, context);
     }
 

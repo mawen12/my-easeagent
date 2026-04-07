@@ -36,7 +36,8 @@ public class DoFilterMetricInterceptor extends BaseServletInterceptor {
 
     @Override
     public void init(IPluginConfig config, String className, String methodName, String methodDescriptor) {
-        SERVER_METRIC = ServiceMetricRegistry.getOrCreate(config, new Tags("application", "http-request", "url"), ServerMetric.SERVICE_METRIC_SUPPLIER);
+        Tags tags = new Tags("application", "http-request", "url");
+        SERVER_METRIC = ServiceMetricRegistry.getOrCreate(config, tags, ServerMetric.SERVICE_METRIC_SUPPLIER);
     }
 
     @Override

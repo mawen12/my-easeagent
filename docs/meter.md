@@ -10,6 +10,14 @@
 
 使用 Grafana 来展示 Prometheus 的数据。
 
+## Report
+
+1. 从 Bootstrap 中获取 BeanProvider 实现，即从 Bootstrap#loadProvider 开始，找到 `MetricBeanProviderImpl`。
+2. 初始化 `MetricBeanProviderImpl` 时，内部会初始化 `MetricProviderImpl`。
+3. 将 `MetricBeanProviderImpl` 注册到 `ContextManager#setMetric` 中，本质上是将 `MetricProviderImpl#ApplicationMetricRegistrySupplier` 注册到 `ContextManager#metric` 中，
+4. 然后再将其传播到 `EaseAgent.metricRegistrySupplier` 上
+5. `ServiceMetricRegistry#getOrCreate` 每当对应的 
+
 ## 设计
 
 ### Metric 

@@ -56,6 +56,30 @@ public class MethodTransformation {
         this.providerBuilder = chain;
     }
 
+    // easeagent 此处做了优化，但是对于普通的 byte buddy 插件来说，可以在获取该 agent chain 时进行调用。
+    // private static final ConcurrentMap<Interger, InterceptorChain> CHAINS = new ConcurrentHashMap<>();
+    // private static final ConcurrentMap<Integer, List<Supplier<Interceptor>>> REGISRTERED = new ConcurrentHashMap<>();
+    //
+    // public static void register(int uniqueIndex, List<Supplier<Interceptor>> suppliers) {
+    //      REGISRTERED.put(uniqueIndex, suppliers);
+    // }
+    //
+    // public static InterceptorChain getOrCreateChain(int uniqueIndex, String className, String methodName, String methodDescriptor, IPluginConfig) {
+    //      return CHAINS.computeIfAbsent(uniqueIndex, index -> {
+    //          List<Supplier<Interceptor>> suppliers = REGISTER.getOrDefault(idx, List.of());
+    //
+    //          List<Interceptor> interceptors = suppliers.stream().map(Supplier::get).sorted(Comparator.comparing(Ordered::order)).collect(Collectors.toList());
+    //
+    //          for (Interceptor i : interceptors) {
+    //             try {
+    //               i.init(config, className, methodName, methodDescriptor);
+    //             } catch(Exception e) {
+    //               //...
+    //            }
+    //          }
+    //         return new InterceptorChain(interceptors);
+    //      })
+    // }
     public AgentInterceptorChain getAgentInterceptorChain(final int uniqueIndex,
                                                           final String type,
                                                           final String method,

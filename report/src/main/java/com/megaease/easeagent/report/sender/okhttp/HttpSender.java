@@ -186,6 +186,7 @@ public class HttpSender implements Sender {
         Request request;
 
         try {
+            // 将已编码的数据转换为 Request
             if (encodedData instanceof RequestBody) {
                 request = newRequest((RequestBody) encodedData);
             } else {

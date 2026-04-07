@@ -35,6 +35,9 @@ import com.megaease.easeagent.plugin.utils.NoNull;
 import java.util.*;
 import java.util.function.Supplier;
 
+/**
+ * 代表一次请求的上下文，包含了请求的相关信息和插件执行过程中产生的相关信息。
+ */
 @SuppressWarnings("unused, unchecked")
 public class SessionContext implements InitializeContext {
     private static final Logger LOGGER = LoggerFactory.getLogger(SessionContext.class);
@@ -47,6 +50,7 @@ public class SessionContext implements InitializeContext {
     private final Deque<Object> retStack = new ArrayDeque<>();
     private final Deque<RetBound> retBound = new ArrayDeque<>();
 
+    // 保存插件执行过程中设置的信息
     private final Map<Object, Object> context = new HashMap<>();
     private final Map<Object, Integer> entered = new HashMap<>();
     private boolean hasCleaner = false;

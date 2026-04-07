@@ -20,7 +20,7 @@ package com.megaease.easeagent.plugin.interceptor;
 import com.megaease.easeagent.plugin.api.Context;
 
 /**
- *
+ * 不可重复的拦截器，代表该拦截器在一次 session 中只能被执行一次
  */
 public interface NonReentrantInterceptor extends Interceptor {
 

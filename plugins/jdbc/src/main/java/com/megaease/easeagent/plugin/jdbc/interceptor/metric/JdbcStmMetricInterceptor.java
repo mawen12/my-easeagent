@@ -34,6 +34,11 @@ import com.megaease.easeagent.plugin.jdbc.common.SQLCompression;
 import com.megaease.easeagent.plugin.jdbc.common.SQLCompressionFactory;
 import com.megaease.easeagent.plugin.jdbc.common.SqlInfo;
 
+/**
+ * 拦截 java.sql.Statement#execute* 方法，
+ * 在拦截方法返回之后执行，统计 sql 执行成功和失败的次数
+ * 通过 sql 压缩算法对 sql 进行压缩
+ */
 @AdviceTo(value = JdbcStatementAdvice.class, plugin = JdbcDataSourceMetricPlugin.class)
 public class JdbcStmMetricInterceptor implements NonReentrantInterceptor {
     private static final int maxCacheSize = 1000;
@@ -65,9 +70,12 @@ public class JdbcStmMetricInterceptor implements NonReentrantInterceptor {
 
     @Override
     public void doAfter(MethodInfo methodInfo, Context context) {
+        // 读取在之前拦截器中设置的 sql
         SqlInfo sqlInfo = context.get(SqlInfo.class);
         String sql = sqlInfo.getSql();
+        // 对 sql 压缩
         String key = sqlCompression.compress(sql);
+        // 收集 sql 执行失败/成功的次数
         metric.collectMetric(key, methodInfo.getThrowable() == null, context);
         String value = cache.getIfPresent(key);
         if (value == null) {

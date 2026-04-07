@@ -36,6 +36,13 @@ public class ReporterRegistry {
     static Logger logger = LoggerFactory.getLogger(ReporterRegistry.class);
 
     static ConcurrentHashMap<String, Supplier<Encoder<?>>> encoders = new ConcurrentHashMap<>();
+    /**
+     * kafka -> com.megaease.easeagent.report.sender.AgentKafkaSender
+     * console -> com.megaease.easeagent.report.sender.AgentLoggerSender
+     * noop -> com.megaease.easeagent.report.sender.NoOpSender
+     * metricKafka -> com.megaease.easeagent.report.sender.metric.MetricKafkaSender
+     * http -> com.megaease.easeagent.report.sender.okhttp.HttpSender
+     */
     static ConcurrentHashMap<String, Supplier<Sender>> senderSuppliers = new ConcurrentHashMap<>();
 
     private ReporterRegistry() {}
@@ -74,15 +81,19 @@ public class ReporterRegistry {
     }
 
     public static SenderWithEncoder getSender(String prefix, Config config) {
+        // 读取配置的 appendType，获取其上报类型
         String name = config.getString(join(prefix, APPEND_TYPE_KEY));
         if (name == null) {
             logger.warn("Can not find sender name for:{}", join(prefix, APPEND_TYPE_KEY));
         }
+        // 根据上报类型获取 Sender 实例，并使用 SenderConfigDecorator 包装，传入配置项
         SenderWithEncoder sender = new SenderConfigDecorator(prefix, getSender(name), config);
         sender.init(config, prefix);
         return sender;
     }
 
+    // 根据上报类型获取 Sender 实例，如果不存在则返回 NoOpSender
+    // 支持 console/kafka/metricKafka/http/noop 等上报类型
     private static Sender getSender(String name) {
         Supplier<Sender> supplier = senderSuppliers.get(name);
         if (supplier == null) {

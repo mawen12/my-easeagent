@@ -38,7 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 public class MetricReporterFactoryImpl implements MetricReporterFactory, ConfigChangeListener {
-    // 维护所有的上报器
+    // namespace -> reporter，基于namespace进行上报隔离
     private final ConcurrentHashMap<String, DefaultMetricReporter> reporters;
     // 所有上报器共享的配置
     private final Config reportConfig;
@@ -88,6 +88,7 @@ public class MetricReporterFactoryImpl implements MetricReporterFactory, ConfigC
 
     public static class DefaultMetricReporter implements Reporter, ConfigChangeListener {
         private MetricProps metricProps;
+        // 实际的底层上报器
         private SenderWithEncoder sender;
         private final IPluginConfig pluginConfig;
         private final Config reportConfig;
@@ -102,9 +103,11 @@ public class MetricReporterFactoryImpl implements MetricReporterFactory, ConfigC
             this.metricProps = Utils.extractMetricProps(this.pluginConfig, reportConfig);
             this.metricConfig = this.metricProps.asReportConfig();
 
+            // 根据 metricProps 中的 senderName 获取对应的 sender 实例
             this.sender = ReporterRegistry.getSender(this.metricProps.getSenderPrefix(), this.metricConfig);
         }
 
+        // report 只要触发 report 方法，其将直接上报
         public void report(String context) {
             try {
                 sender.send(new ByteWrapper(context.getBytes())).execute();
@@ -113,6 +116,7 @@ public class MetricReporterFactoryImpl implements MetricReporterFactory, ConfigC
             }
         }
 
+        // report 只要触发 report 方法，其将直接上报
         @Override
         public void report(EncodedData encodedData) {
             try {

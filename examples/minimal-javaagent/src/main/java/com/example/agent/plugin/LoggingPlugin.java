@@ -6,7 +6,7 @@ import com.example.agent.interceptor.LoggingInterceptor;
 import com.example.agent.interceptor.MethodInfo;
 import com.example.agent.interceptor.MethodInterceptor;
 import com.example.agent.interceptor.TimingInterceptor;
-import net.bytebuddy.agent.builder.AgentBuilder;
+import com.example.agent.metric.MetricInterceptor;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.method.MethodDescription;
 import net.bytebuddy.implementation.bytecode.assign.Assigner;
@@ -97,6 +97,9 @@ public final class LoggingPlugin implements AgentPlugin {
         }
         if ("timing".equals(id)) {
             return new TimingInterceptor(config.timingWarnMs());
+        }
+        if ("metric".equals(id)) {
+            return new MetricInterceptor();
         }
         System.out.println("[agent] unknown interceptor: " + id);
         return null;

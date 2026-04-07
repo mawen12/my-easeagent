@@ -18,6 +18,8 @@
 package com.megaease.easeagent.plugin.api.metric;
 
 /**
+ * 计算值分布状态的指标
+ *
  * A metric which calculates the distribution of a value.
  *
  * @see <a href="http://www.johndcook.com/standard_deviation.html">Accurately computing running

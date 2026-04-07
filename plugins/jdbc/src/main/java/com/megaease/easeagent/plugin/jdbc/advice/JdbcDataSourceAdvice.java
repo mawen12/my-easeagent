@@ -31,6 +31,8 @@ public class JdbcDataSourceAdvice implements Points {
         return ClassMatcher.builder()
             .hasInterface("javax.sql.DataSource")
             .build();
+
+        // hasSuperType(named("javax.sql.DataSource"))
     }
 
     @Override
@@ -39,5 +41,7 @@ public class JdbcDataSourceAdvice implements Points {
             .named("getConnection")
             .returnType("java.sql.Connection")
             .build().toSet();
+
+        // named("getConnection").and(returns(named("java.sql.Connection")))
     }
 }

@@ -38,6 +38,7 @@ import java.util.Optional;
 
 public class JdbcMetric extends ServiceMetric implements RemovalListener<String, String> {
     private final Logger logger = EaseAgent.getLogger(JdbcMetric.class);
+
     public static final ServiceMetricSupplier<JdbcMetric> METRIC_SUPPLIER = new ServiceMetricSupplier<JdbcMetric>() {
         @Override
         public NameFactory newNameFactory() {
@@ -68,6 +69,7 @@ public class JdbcMetric extends ServiceMetric implements RemovalListener<String,
 
     public static NameFactory nameFactory() {
         return NameFactory.createBuilder()
+            // timer 计时器，记录执行时间相关的指标
             .timerType(MetricSubType.DEFAULT,
                 ImmutableMap.<MetricField, MetricValueFetcher>builder()
                     .put(MetricField.MIN_EXECUTION_TIME, MetricValueFetcher.SnapshotMinValue)
@@ -81,7 +83,9 @@ public class JdbcMetric extends ServiceMetric implements RemovalListener<String,
                     .put(MetricField.P99_EXECUTION_TIME, MetricValueFetcher.Snapshot99PercentileValue)
                     .put(MetricField.P999_EXECUTION_TIME, MetricValueFetcher.Snapshot999PercentileValue)
                     .build())
+            // gauge 仪表，记录瞬时值相关的指标
             .gaugeType(MetricSubType.DEFAULT, new HashMap<>())
+            // meter 速率计，记录事件发生频率相关的指标
             .meterType(MetricSubType.DEFAULT,
                 ImmutableMap.<MetricField, MetricValueFetcher>builder()
                     .put(MetricField.M1_RATE, MetricValueFetcher.MeteredM1RateIgnoreZero)
@@ -94,6 +98,7 @@ public class JdbcMetric extends ServiceMetric implements RemovalListener<String,
                     .put(MetricField.M5_ERROR_RATE, MetricValueFetcher.MeteredM5Rate)
                     .put(MetricField.M15_ERROR_RATE, MetricValueFetcher.MeteredM15Rate)
                     .build())
+            // counter 计数器，记录事件发生次数相关的指标
             .counterType(MetricSubType.DEFAULT, ImmutableMap.<MetricField, MetricValueFetcher>builder()
                 .put(MetricField.EXECUTION_COUNT, MetricValueFetcher.CountingCount)
                 .build())
@@ -103,19 +108,28 @@ public class JdbcMetric extends ServiceMetric implements RemovalListener<String,
             .build();
     }
 
+    // collectMetric 收集指标
     public void collectMetric(String key, boolean success, Context ctx) {
+        // 读取计时器，更新统计耗时
         Timer timer = this.metricRegistry.timer(this.nameFactory.timerName(key, MetricSubType.DEFAULT));
         timer.update(Duration.ofMillis(ContextUtils.getDuration(ctx)));
+
+        // 读取计数器，增加统计
         Counter counter = this.metricRegistry.counter(this.nameFactory.counterName(key, MetricSubType.DEFAULT));
+        // 读取速率计，增加统计
         Meter meter = this.metricRegistry.meter(this.nameFactory.meterName(key, MetricSubType.DEFAULT));
         meter.mark();
         counter.inc();
+
+        // 失败时，读取错误计数器，增加统计，读取错误速率计，增加统计
         if (!success) {
             Counter errCounter = this.metricRegistry.counter(this.nameFactory.counterName(key, MetricSubType.ERROR));
             Meter errMeter = this.metricRegistry.meter(this.nameFactory.meterName(key, MetricSubType.ERROR));
             errMeter.mark();
             errCounter.inc();
         }
+
+        // 读取仪表，更新统计
         MetricName gaugeName = this.nameFactory.gaugeNames(key).get(MetricSubType.DEFAULT);
         metricRegistry.gauge(gaugeName.name(), () -> () -> LastMinutesCounterGauge.builder()
             .m1Count((long) meter.getOneMinuteRate() * 60)

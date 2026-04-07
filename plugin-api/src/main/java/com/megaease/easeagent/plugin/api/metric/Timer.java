@@ -23,6 +23,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 /**
+ * 一个计数器指标，用于汇总计时持续事件并提供持续时间统计信息，
+ * 以及通过 {@link Meter} 提供吞吐量统计信息。
+ *
  * A timer metric which aggregates timing durations and provides duration statistics, plus
  * throughput statistics via {@link Meter}.
  */

@@ -25,12 +25,21 @@ import com.megaease.easeagent.plugin.report.EncodedData;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
+/**
+ * 其本身主要支持配置刷新时，组合新参数和现有配置，重建 AgentScheduledReporter。
+ * 内部封装了 AgentScheduledReporter 实现定时 report。
+ */
 public class AutoRefreshReporter implements Runnable {
+    // 提供了刷新的间隔，该间隔支持动态刷新
     private final MetricsConfig config;
+    // 底层用于指标上报的类
+    private AgentScheduledReporter reporter;
+
+    // ================== 当配置刷新时，重建 reporter ==================
     private final Converter converter;
     private final Consumer<EncodedData> consumer;
     private final MetricRegistry metricRegistry;
-    private AgentScheduledReporter reporter;
+
 
     public AutoRefreshReporter(MetricRegistry metricRegistry,
                                MetricsConfig config,
@@ -40,12 +49,12 @@ public class AutoRefreshReporter implements Runnable {
         this.config = config;
         this.consumer = consumer;
         this.converter = converter;
-        config.setIntervalChangeCallback(this);
+        config.setIntervalChangeCallback(this); // 将该类设置为配置更新时，触发 run 方法的回调对象
     }
 
     @Override
     public synchronized void run() {
-        // config changed
+        // config changed 配置变更是触发
         if (reporter != null) {
             reporter.close();
             reporter = null;

@@ -31,6 +31,10 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
+ * 发送数据到 agent log，其为 console。
+ *
+ *
+ *
  * Send span data to agent log
  * It will be printed to console, when the logger configuration to append to console
  */
@@ -61,16 +65,19 @@ public class AgentLoggerSender implements Sender {
         return true;
     }
 
+    // console 不支持更新数据
     @Override
     public void updateConfigs(Map<String, String> changes) {
         // ignored
     }
 
+    // close console 没有可关闭资源
     @Override
     public void close() throws IOException {
         // ignored
     }
 
+    // ConsoleCall 直接打印日志
     static class ConsoleCall implements Call<Void> {
         private final byte[] msg;
 

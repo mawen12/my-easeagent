@@ -25,10 +25,13 @@ import java.util.Map;
  * 指标名称
  */
 public class MetricName {
-
-    final MetricSubType metricSubType;
-    final String key;
+    // 指标大类，dropwizard 的指标分类
     final MetricType metricType;
+    // 指标小类，场景
+    final MetricSubType metricSubType;
+    // 动态的指标内容，比如对于JDBC来说就是 url，对于 httpservlet 就是 method_route
+    final String key;
+    // 获取字段值的映射
     final Map<MetricField, MetricValueFetcher> valueFetcher;
 
     public MetricName(MetricSubType metricSubType, String key, MetricType metricType, Map<MetricField, MetricValueFetcher> valueFetcher) {

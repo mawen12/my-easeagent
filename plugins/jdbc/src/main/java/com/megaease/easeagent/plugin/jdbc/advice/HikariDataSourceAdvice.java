@@ -31,6 +31,8 @@ public class HikariDataSourceAdvice implements Points {
         return ClassMatcher.builder()
             .hasSuperClass("com.zaxxer.hikari.HikariConfig")
             .build();
+
+        // hasSuperType("com.zaxxer.hikari.HikariConfig")
     }
 
     @Override
@@ -38,5 +40,7 @@ public class HikariDataSourceAdvice implements Points {
         return MethodMatcher.builder()
             .nameStartWith("set")
             .build().toSet();
+
+        // namedStartsWith("set")
     }
 }

@@ -18,6 +18,8 @@
 package com.megaease.easeagent.plugin.api.metric;
 
 /**
+ * 一种衡量平均吞吐量以及一分钟、五分钟、15分钟移动的平均吞吐量的指标
+ *
  * A meter metric which measures mean throughput and one-, five-, and fifteen-minute
  * moving average throughput.
  */

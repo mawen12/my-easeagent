@@ -41,6 +41,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+/**
+ * 从 easeagent.jar/lib/META-INF/services/com.megaease.easeagent.plugin.bean.BeanProvider 读取的文件内容
+ *
+ */
 public class MetricProviderImpl implements AgentReportAware, ConfigAware, MetricProvider {
     @SuppressWarnings("unused")
     private Config config;
@@ -111,16 +115,26 @@ public class MetricProviderImpl implements AgentReportAware, ConfigAware, Metric
         public com.megaease.easeagent.plugin.api.metric.MetricRegistry newMetricRegistry(
             IPluginConfig config,
             NameFactory nameFactory, Tags tags) {
+            // 构造指标专属配置
             MetricsConfig metricsConfig = new PluginMetricsConfig(config);
+            // 从指标命名工厂中读取配置的指标类型，此处必须为 List，因为之后需要通过 index 读取
             List<KeyType> keyTypes = keyTypes(nameFactory);
-            ConverterAdapter converterAdapter = new ConverterAdapter(nameFactory, keyTypes,
-                MetricProviderImpl.this.additionalAttributes, tags);
-            Reporter reporter = agentReport.metricReporter().reporter(config);
+            //
+            ConverterAdapter converterAdapter = new ConverterAdapter(nameFactory, keyTypes, MetricProviderImpl.this.additionalAttributes, tags);
+
+
             MetricRegistry metricRegistry = MetricRegistryService.DEFAULT.createMetricRegistry(converterAdapter, additionalAttributes, tags);
-            AutoRefreshReporter autoRefreshReporter = new AutoRefreshReporter(metricRegistry, metricsConfig,
+
+            Reporter reporter = agentReport.metricReporter().reporter(config);
+            AutoRefreshReporter autoRefreshReporter = new AutoRefreshReporter(
+                metricRegistry,
+                metricsConfig,
                 converterAdapter,
                 reporter::report);
+
+            // 启动支持配置刷新的定时刷新器
             autoRefreshReporter.run();
+            // 注册上报器
             registerReporter(autoRefreshReporter);
 
             com.megaease.easeagent.plugin.api.metric.MetricRegistry result = MetricRegistryImpl.build(metricRegistry);

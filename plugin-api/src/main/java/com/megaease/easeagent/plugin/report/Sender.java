@@ -23,15 +23,21 @@ import java.io.Closeable;
 import java.util.Map;
 
 /**
+ * 上报数据的顶层接口
+ *
  * borrow from OpenZipkin's Sender.
  */
 public interface Sender extends Closeable {
     /**
+     * 发送器的名称
+     *
      * Define an unique name for the sender
      */
     String name();
 
     /**
+     * 初始化发送器
+     *
      * Initialize the sender with the configuration
      * @param config configuration with the prefix of "plugin.reporter.sender.[name]
      * @param prefix sender prefix : "reporter.tracing." is the prefix of "reporter.tracing.sender.[name]"
@@ -39,6 +45,8 @@ public interface Sender extends Closeable {
     void init(Config config, String prefix);
 
     /**
+     * 上报数据到传输层，如 http 或 kafka
+     *
      * Sends encoded data to a transport such as http or Kafka.
      *
      * @param encodedData encoded data, such as encoded spans.
@@ -47,11 +55,15 @@ public interface Sender extends Closeable {
     Call<Void> send(EncodedData encodedData);
 
     /**
+     * 发送器是否可用
+     *
      * If sender is available( not closed), return true, otherwise false.
      */
     boolean isAvailable();
 
     /**
+     * 更新配置
+     *
      * when the configuration of sender changed, this method will be called
      * @param changes changed configuration KVs
      */

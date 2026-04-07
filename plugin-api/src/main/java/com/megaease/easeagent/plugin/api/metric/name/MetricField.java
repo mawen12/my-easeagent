@@ -24,7 +24,7 @@ package com.megaease.easeagent.plugin.api.metric.name;
  * timer：耗时性：
  *  min, max, mean, p25, p50, p75, p95, p98, p99, p999
  *
- *
+ * 通用的指标字段定义
  */
 public enum MetricField {
 

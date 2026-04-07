@@ -52,6 +52,7 @@ public class ConfigUtils {
         });
     }
 
+    // 读取首个不为 null 的值
     @SafeVarargs
     private static <R> R firstNotNull(R... ars) {
         for (R one : ars) {

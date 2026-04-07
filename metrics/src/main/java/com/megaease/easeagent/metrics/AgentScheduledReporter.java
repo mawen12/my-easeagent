@@ -37,6 +37,11 @@ import java.util.function.Supplier;
 
 import static com.megaease.easeagent.config.report.ReportConfigConst.METRIC_ENCODER;
 
+/**
+ * 使用 dropwizcard 的定时调度器，定时将日志数据上报。
+ *
+ * 由于 dropwizcard 内置不支持标签的 tag，因此在转换时会将标签转换为字段进行上报。
+ */
 @SuppressWarnings("unused")
 public class AgentScheduledReporter extends ScheduledReporter {
     private Converter converter;
@@ -85,14 +90,17 @@ public class AgentScheduledReporter extends ScheduledReporter {
                        SortedMap<String, Histogram> histograms,
                        SortedMap<String, Meter> meters,
                        SortedMap<String, com.codahale.metrics.Timer> timers) {
+        // 如果关闭了 report 功能，则不进行上报
         Boolean e = this.enabled.get();
         if (e == null || !e) {
             return;
         }
 
+        // 将 metric 的各个类型数据同一转换为 List<Map<String, Object>> 进行上报
         List<Map<String, Object>> outputs = converter.convertMap(gauges, counters, histograms, meters, timers);
 
         for (Map<String, Object> output : outputs) {
+            // 依次进行数据 report
             this.dataConsumer.accept(this.encoder.encode(output));
         }
     }

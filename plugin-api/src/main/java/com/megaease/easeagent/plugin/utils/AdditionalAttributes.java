@@ -53,6 +53,7 @@ public class AdditionalAttributes {
         this(serviceName, "none");
     }
 
+    // 读取 ipv4 地址
     static String getHostIpV4(Enumeration<NetworkInterface> networkInterfaces) throws Exception {
         String ip;
         String secondaryIP = "";
@@ -104,6 +105,7 @@ public class AdditionalAttributes {
         return attributes;
     }
 
+    // 读取主机名
     public static String getHostName() {
         try {
             return (InetAddress.getLocalHost()).getHostName();

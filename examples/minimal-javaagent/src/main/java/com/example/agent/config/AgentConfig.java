@@ -80,6 +80,9 @@ public final class AgentConfig {
         if (interceptorEnabled("timing")) {
             defaults.add("timing");
         }
+        if (interceptorEnabled("metric")) {
+            defaults.add("metric");
+        }
         if (defaults.isEmpty()) {
             defaults.add("logging");
         }
@@ -129,6 +132,23 @@ public final class AgentConfig {
         String key = "interceptor." + interceptorId + ".enabled";
         String v = values.get(key);
         return v == null || Boolean.parseBoolean(v);
+    }
+
+    /**
+     * How often the console metric reporter prints a snapshot (seconds).
+     * Configured via agent arg {@code metric.reportIntervalSec=N}.  Default: 10.
+     */
+    public long metricReportIntervalSec() {
+        String v = values.get("metric.reportIntervalSec");
+        if (v == null) {
+            return 10L;
+        }
+        try {
+            long parsed = Long.parseLong(v);
+            return parsed > 0 ? parsed : 10L;
+        } catch (NumberFormatException ignored) {
+            return 10L;
+        }
     }
 
     public long timingWarnMs() {

@@ -39,8 +39,7 @@ public class JdbcDataSourceMetricInterceptor implements NonReentrantInterceptor 
     @Override
     public void init(IPluginConfig config, String className, String methodName, String methodDescriptor) {
         Tags tags = JdbcMetric.newConnectionTags();
-        metric = ServiceMetricRegistry.getOrCreate(config,
-            tags, JdbcMetric.METRIC_SUPPLIER);
+        metric = ServiceMetricRegistry.getOrCreate(config, tags, JdbcMetric.METRIC_SUPPLIER);
     }
 
     @Override

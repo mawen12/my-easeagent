@@ -32,12 +32,17 @@ public class MetricsAdditionalAttributes implements Supplier<Map<String, Object>
     private volatile String systemName = "";
 
     public MetricsAdditionalAttributes(Config config) {
+        // 读取 config 中的 name
         ConfigUtils.bindProp(ConfigConst.SERVICE_NAME, config, Config::getString, v -> {
+            // 将 name 赋值到 serviceName
             this.serviceName = v;
+            // 更新该值
             this.additionalAttributes = new AdditionalAttributes(this.serviceName, this.systemName).getAdditionalAttributes();
         });
         ConfigUtils.bindProp(ConfigConst.SYSTEM_NAME, config, Config::getString, v -> {
+            // 将 system 赋值到 systemName
             this.systemName = v;
+            // 更新该值
             this.additionalAttributes = new AdditionalAttributes(this.serviceName, this.systemName).getAdditionalAttributes();
         });
     }

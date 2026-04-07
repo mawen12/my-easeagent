@@ -18,6 +18,8 @@
 package com.megaease.easeagent.plugin.api.metric;
 
 /**
+ * 提供特定值的瞬时读数。
+ *
  * A gauge metric is an instantaneous reading of a particular value. To instrument a queue's depth,
  * for example:<br>
  * <pre><code>

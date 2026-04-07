@@ -38,6 +38,7 @@ import java.lang.reflect.InvocationTargetException;
 @AdviceTo(AbstractLoggerPoints.class)
 public class Log4j2AppenderInterceptor implements NonReentrantInterceptor, PluginConfigChangeListener {
     static WeakConcurrentMap<ClassLoader, LogMapper> logMappers = new WeakConcurrentMap<>();
+    // config[level] -> default[INFO] 要记录的日志级别
     int collectLevel = Level.INFO.intLevel();
     @Override
     public void init(IPluginConfig config, int uniqueIndex) {
@@ -45,7 +46,7 @@ public class Log4j2AppenderInterceptor implements NonReentrantInterceptor, Plugi
         if (StringUtils.isNotEmpty(lv)) {
             collectLevel = Level.toLevel(lv, Level.OFF).intLevel();
         }
-        config.addChangeListener(this);
+        config.addChangeListener(this); // 支持配置变更
         AgentHelperClassLoader.registryUrls(this.getClass());
     }
 
@@ -86,6 +87,7 @@ public class Log4j2AppenderInterceptor implements NonReentrantInterceptor, Plugi
     public void onChange(IPluginConfig oldConfig, IPluginConfig newConfig) {
         String lv = newConfig.getString("level");
 
+        // 更新配置值
         if (!StringUtils.isEmpty(lv)) {
             this.collectLevel = Level.toLevel(lv, Level.OFF).intLevel();
         } else {

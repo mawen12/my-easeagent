@@ -30,6 +30,9 @@ import com.megaease.easeagent.report.AgentReportAware;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 实现了 BeanProvider，该接口就可以支持 Service-Loader
+ */
 public class MetricBeanProviderImpl implements BeanProvider, AgentHttpHandlerProvider, ConfigAware,
     MetricProvider, AgentReportAware {
     private final MetricProviderImpl metricProvider = new MetricProviderImpl();

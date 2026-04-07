@@ -27,6 +27,9 @@ import com.megaease.easeagent.plugin.api.config.ConfigChangeListener;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * 配置实现
+ */
 public class Configs implements Config {
     private static final Logger LOGGER = LoggerFactory.getLogger(Configs.class);
     protected Map<String, String> source;

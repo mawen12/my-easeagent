@@ -19,6 +19,9 @@ package com.megaease.easeagent.metrics.config;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * metrics 相关的配置，只有是否开启，上报的间隔
+ */
 public interface MetricsConfig {
     boolean isEnabled();
 

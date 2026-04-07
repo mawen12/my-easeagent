@@ -26,7 +26,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * 全局配置
+ */
 public class GlobalConfigs extends Configs implements ConfigManagerMXBean {
+    // 全局配置
     Configs originalConfig;
 
     public GlobalConfigs(Map<String, String> source) {

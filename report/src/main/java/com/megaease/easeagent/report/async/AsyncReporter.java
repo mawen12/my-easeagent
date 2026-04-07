@@ -23,6 +23,11 @@ import com.megaease.easeagent.report.sender.SenderWithEncoder;
 import java.util.List;
 import java.util.concurrent.ThreadFactory;
 
+/**
+ * AsyncReporter 异步上报工具
+ *
+ * @param <S>
+ */
 public interface AsyncReporter<S> extends ConfigChangeListener {
     void setFlushThreads(List<Thread> flushThreads);
 

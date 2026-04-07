@@ -31,6 +31,8 @@ public class JdbcConnectionAdvice implements Points {
         return ClassMatcher.builder()
             .hasInterface("java.sql.Connection")
             .build();
+
+        // hasSuperType(named("java.sql.Connection"))
     }
 
     @Override
@@ -40,5 +42,9 @@ public class JdbcConnectionAdvice implements Points {
             .or().named("prepareCall").isPublic()
             .or().named("prepareStatement").isPublic()
             .build().toSet();
+
+        // named("createStatement").and(isPublic())
+        // .or(named("prepareCall").and(isPublic()))
+        // .or(named("prepareStatement").and(isPublic()))
     }
 }

@@ -67,6 +67,7 @@ public class ServiceMetricRegistry {
             if (metric != null) {
                 return (T) metric;
             }
+            // 读取特定插件的配置
             IPluginConfig config = EaseAgent.getConfig(domain, namespace, id);
             NameFactory nameFactory = supplier.newNameFactory();
             MetricRegistry metricRegistry = EaseAgent.newMetricRegistry(config, nameFactory, tags);

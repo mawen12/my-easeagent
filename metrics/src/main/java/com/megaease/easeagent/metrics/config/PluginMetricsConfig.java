@@ -28,10 +28,17 @@ import static com.megaease.easeagent.plugin.api.config.ConfigConst.Observability
 import static com.megaease.easeagent.plugin.api.config.Const.METRIC_DEFAULT_INTERVAL;
 import static com.megaease.easeagent.plugin.api.config.Const.METRIC_DEFAULT_INTERVAL_UNIT;
 
+/**
+ * 读取插件配置
+ */
 public class PluginMetricsConfig implements MetricsConfig {
+    // config[enabled] -> default[false]
     private volatile boolean enabled;
+    // config[interval] -> default[30]
     private volatile int interval;
+    // config[intervalUnit] -> default[SECONDS]
     private volatile TimeUnit intervalUnit;
+    // 在配置变更时，实际上是 internal 发生变化，需要执行的操作
     private Runnable callback;
 
     public PluginMetricsConfig(IPluginConfig config) {

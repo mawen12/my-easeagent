@@ -23,6 +23,11 @@ public class ReportConfigConst {
 
     public static final String KAFKA_SENDER_NAME = "kafka";
     public static final String METRIC_KAFKA_SENDER_NAME = "metricKafka";
+    /**
+     * 上报数据到 console
+     *
+     *
+     */
     public static final String CONSOLE_SENDER_NAME = "console";
     public static final String ZIPKIN_SENDER_NAME = "http";
 
@@ -61,10 +66,25 @@ public class ReportConfigConst {
     // -- lv1 --
     public static final String REPORT = "reporter";
     // ---- lv2 ----
+    /**
+     * reporter.outputServer
+     */
     public static final String OUTPUT_SERVER_V2 = join(REPORT, "outputServer");
+    /**
+     * reporter.tracing
+     */
     public static final String TRACE_V2 = join(REPORT, "tracing");
+    /**
+     * reporter.log
+     */
     public static final String LOGS = join(REPORT, "log");
+    /**
+     * reporter.metric
+     */
     public static final String METRIC_V2 = join(REPORT, "metric");
+    /**
+     * reporter.general
+     */
     public static final String GENERAL = join(REPORT, "general");
     // ------ lv3 ------
     public static final String BOOTSTRAP_SERVERS = join(OUTPUT_SERVER_V2, "bootstrapServer");
@@ -74,17 +94,47 @@ public class ReportConfigConst {
     public static final String OUTPUT_SECURITY_PROTOCOL_V2 = join(OUTPUT_SERVER_V2, "security.protocol");
     public static final String OUTPUT_SERVERS_SSL = join(OUTPUT_SERVER_V2, "ssl");
 
+    /**
+     * reporter.log.output
+     */
     public static final String LOG_ASYNC = join(LOGS, ASYNC_KEY);
 
+    /**
+     * reporter.log.sender
+     */
     public static final String LOG_SENDER = join(LOGS, SENDER_KEY);
+
+    /**
+     * reporter.log.encoder
+     */
     public static final String LOG_ENCODER = join(LOGS, ENCODER_KEY);
 
+    /**
+     * reporter.log.access
+     */
     public static final String LOG_ACCESS = join(LOGS, "access");
+
+    /**
+     * reporter.log.access.sender
+     */
     public static final String LOG_ACCESS_SENDER = join(LOG_ACCESS, SENDER_KEY);
+
+    /**
+     * reporter.log.access.encoder
+     */
     public static final String LOG_ACCESS_ENCODER = join(LOG_ACCESS, ENCODER_KEY);
 
+    /**
+     * reporter.tracing.sender
+     */
     public static final String TRACE_SENDER = join(TRACE_V2, SENDER_KEY);
+    /**
+     * reporter.tracing.encoder
+     */
     public static final String TRACE_ENCODER = join(TRACE_V2, ENCODER_KEY);
+    /**
+     * reporter.tracing.output
+     */
     public static final String TRACE_ASYNC = join(TRACE_V2, ASYNC_KEY);
 
     public static final String METRIC_SENDER = join(METRIC_V2, SENDER_KEY);
@@ -99,10 +149,25 @@ public class ReportConfigConst {
     public static final String LOG_ACCESS_SENDER_ENABLED = join(LOG_ACCESS_SENDER, ENABLED_KEY);
     public static final String LOG_ACCESS_SENDER_TOPIC = join(LOG_ACCESS_SENDER, TOPIC_KEY);
 
+    /**
+     * reporter.log.output.messageMaxBytes
+     */
     public static final String LOG_ASYNC_MESSAGE_MAX_BYTES = join(LOG_ASYNC, ASYNC_MSG_MAX_BYTES_KEY);
+    /**
+     * reporter.log.output.reportThread
+     */
     public static final String LOG_ASYNC_REPORT_THREAD = join(LOG_ASYNC, ASYNC_THREAD_KEY);
+    /**
+     * reporter.log.output.messageTimeout
+     */
     public static final String LOG_ASYNC_MESSAGE_TIMEOUT = join(LOG_ASYNC, ASYNC_MSG_TIMEOUT_KEY);
+    /**
+     * reporter.log.output.queuedMaxLogs
+     */
     public static final String LOG_ASYNC_QUEUED_MAX_LOGS = join(LOG_ASYNC, ASYNC_QUEUE_MAX_LOGS_KEY);
+    /**
+     * reporter.log.output.queuedMaxSize
+     */
     public static final String LOG_ASYNC_QUEUED_MAX_SIZE = join(LOG_ASYNC, ASYNC_QUEUE_MAX_SIZE_KEY);
 
     public static final String TRACE_SENDER_NAME = join(TRACE_SENDER, APPEND_TYPE_KEY);

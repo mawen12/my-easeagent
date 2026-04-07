@@ -38,7 +38,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 public class MetricReporterFactoryImpl implements MetricReporterFactory, ConfigChangeListener {
+    // 维护所有的上报器
     private final ConcurrentHashMap<String, DefaultMetricReporter> reporters;
+    // 所有上报器共享的配置
     private final Config reportConfig;
 
     public MetricReporterFactoryImpl(Config reportConfig) {

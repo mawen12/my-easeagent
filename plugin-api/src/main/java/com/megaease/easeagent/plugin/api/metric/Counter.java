@@ -18,6 +18,8 @@
 package com.megaease.easeagent.plugin.api.metric;
 
 /**
+ * 支持自增和自减的计数器指标。
+ *
  * An incrementing and decrementing counter metric.
  */
 public interface Counter extends Metric {

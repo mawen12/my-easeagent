@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 /**
+ * 指标注册接口
+ *
  * A registry of metric interface.
  */
 public interface MetricRegistry {

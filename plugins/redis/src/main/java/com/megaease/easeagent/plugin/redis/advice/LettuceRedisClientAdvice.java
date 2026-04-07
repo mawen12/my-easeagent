@@ -44,6 +44,8 @@ public class LettuceRedisClientAdvice implements Points {
         return ClassMatcher.builder().hasSuperClass("io.lettuce.core.RedisClient")
             .build().or(ClassMatcher.builder().hasClassName("io.lettuce.core.RedisClient")
                 .build());
+
+        // hasSuperType(named("io.lettuce.core.RedisClient")).or(named("io.lettuce.core.RedisClient"))
     }
 
     private IMethodMatcher named(String name) {
@@ -58,5 +60,10 @@ public class LettuceRedisClientAdvice implements Points {
                 .or(named("connectSentinelAsync")))
             .match(constructor())
             .build();
+
+        // named("connectStandaloneAsync")
+        // .or(named("connectPubSubAsync"))
+        // .or(named("connectSentinelAsync"))
+        // .and(isConstructor())
     }
 }

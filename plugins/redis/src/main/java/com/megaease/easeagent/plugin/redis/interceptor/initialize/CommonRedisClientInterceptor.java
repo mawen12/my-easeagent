@@ -37,9 +37,11 @@ import static com.megaease.easeagent.plugin.redis.interceptor.RedisClientUtils.t
 public class CommonRedisClientInterceptor implements NonReentrantInterceptor {
     @Override
     public void doAfter(MethodInfo methodInfo, Context context) {
+        // 方法执行异常，则不进行处理
         if (!methodInfo.isSuccess()) {
             return;
         }
+        // 读取方法调用者对象，判断是 RedisClient 还是 RedisClusterClient
         Object invoker = methodInfo.getInvoker();
         if (invoker instanceof RedisClusterClient) {
             this.processRedisClusterClient(methodInfo, context);
@@ -50,13 +52,16 @@ public class CommonRedisClientInterceptor implements NonReentrantInterceptor {
 
 
     public void processRedisClient(MethodInfo methodInfo, Context context) {
+        // 读取 Redis URI
         RedisURI redisURI = RedisClientUtils.getRedisURI((RedisClient) methodInfo.getInvoker(), methodInfo.getArgs());
         if (redisURI != null) {
+            // 将 Redis URI 写入到返回值的动态字段中
             AgentDynamicFieldAccessor.setDynamicFieldValue(methodInfo.getRetValue(), toURI(redisURI));
         }
         Object ret = methodInfo.getRetValue();
         if (ret instanceof ConnectionFuture) {
             ConnectionFuture<?> future = (ConnectionFuture<?>) ret;
+            // 将方法返回值包装为 ConnectionFutureWrapper，并将 Redis URI 传入包装类中
             methodInfo.setRetValue(new ConnectionFutureWrapper<>(future, redisURI == null ? null : toURI(redisURI)));
         }
     }

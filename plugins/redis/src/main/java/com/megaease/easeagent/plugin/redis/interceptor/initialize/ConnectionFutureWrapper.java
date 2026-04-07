@@ -29,9 +29,16 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/**
+ * ConnectionFuture 的包装器
+ *
+ * @param <T>
+ */
 public class ConnectionFutureWrapper<T> implements ConnectionFuture<T> {
 
+    // 原始的 ConnectionFuture 对象
     private final ConnectionFuture<T> source;
+    // 需要附加到结果对象上的动态字段值
     private final Object attach;
     private volatile boolean processed;
 

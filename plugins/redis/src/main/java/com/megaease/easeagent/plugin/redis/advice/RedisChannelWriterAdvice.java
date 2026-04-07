@@ -30,6 +30,8 @@ public class RedisChannelWriterAdvice implements Points {
     public IClassMatcher getClassMatcher() {
         return ClassMatcher.builder().hasSuperClass("io.lettuce.core.RedisChannelWriter").notInterface()
             .build();
+
+        // hasSuperType(named("io.lettuce.core.RedisChannelWriter")).and(not(isInterface()))
     }
 
     @Override
@@ -38,6 +40,11 @@ public class RedisChannelWriterAdvice implements Points {
             .match(MethodMatcher.builder().named("write").argsLength(1).isPublic().build()
                 .and(MethodMatcher.builder().returnType("void").build().negate()))
             .build();
+
+        // named("write")
+        // .and(takesArguments(1))
+        // .and(isPublic())
+        // .and(not(returns(void.class))))
     }
 
     @Override

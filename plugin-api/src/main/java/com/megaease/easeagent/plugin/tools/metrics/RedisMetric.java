@@ -50,13 +50,13 @@ public class RedisMetric extends ServiceMetric {
         final Counter errorCounter = metricRegistry.counter(nameFactory.counterName(key, MetricSubType.ERROR));
 
         if (!success) {
-            errorMeter.mark();
-            errorCounter.inc();
+            errorMeter.mark(); // 错误+1
+            errorCounter.inc(); // 错误总数+1
         }
-        defaultMeter.mark();
-        defaultCounter.inc();
+        defaultMeter.mark(); // 默认+1
+        defaultCounter.inc(); // 请求总数+1
 
-        MetricName gaugeName = nameFactory.gaugeNames(key).get(MetricSubType.DEFAULT);
+        MetricName gaugeName = nameFactory.gaugeNames(key).get(MetricSubType.DEFAULT); // 生成 Gauge 的 MetricName
         metricRegistry.gauge(gaugeName.name(), () -> () ->
             LastMinutesCounterGauge.builder()
                 .m1Count((long) (defaultMeter.getOneMinuteRate() * 60))

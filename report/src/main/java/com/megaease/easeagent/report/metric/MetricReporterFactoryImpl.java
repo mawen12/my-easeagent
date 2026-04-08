@@ -64,6 +64,7 @@ public class MetricReporterFactoryImpl implements MetricReporterFactory, ConfigC
             if (reporter != null) {
                 return reporter;
             }
+            // 注册一个 reporter
             reporter = new DefaultMetricReporter(pluginConfig, this.reportConfig);
             reporters.put(pluginConfig.namespace(), reporter);
             return reporter;
@@ -89,6 +90,12 @@ public class MetricReporterFactoryImpl implements MetricReporterFactory, ConfigC
     public static class DefaultMetricReporter implements Reporter, ConfigChangeListener {
         private MetricProps metricProps;
         // 实际的底层上报器
+        // 底层是：
+        //  kafka -> com.megaease.easeagent.report.sender.AgentKafkaSender
+        //  console -> com.megaease.easeagent.report.sender.AgentLoggerSender
+        //  noop -> com.megaease.easeagent.report.sender.NoOpSender
+        //  metricKafka -> com.megaease.easeagent.report.sender.metric.MetricKafkaSender
+        //  http -> com.megaease.easeagent.report.sender.okhttp.HttpSender
         private SenderWithEncoder sender;
         private final IPluginConfig pluginConfig;
         private final Config reportConfig;
@@ -110,6 +117,7 @@ public class MetricReporterFactoryImpl implements MetricReporterFactory, ConfigC
         // report 只要触发 report 方法，其将直接上报
         public void report(String context) {
             try {
+                // 使用 report 进行上报
                 sender.send(new ByteWrapper(context.getBytes())).execute();
             } catch (IOException e) {
                 log.warn("send error. {}", e.getMessage());

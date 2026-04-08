@@ -49,8 +49,11 @@ public class MetricProviderImpl implements AgentReportAware, ConfigAware, Metric
     @SuppressWarnings("unused")
     private Config config;
     private final List<com.megaease.easeagent.plugin.api.metric.MetricRegistry> registries = new ArrayList<>();
+    // 注册的多个上报器
     private final List<AutoRefreshReporter> reporters = new ArrayList<>();
+    // 上报的核心类
     private AgentReport agentReport;
+    // 支持动态更新的全局指标
     private Supplier<Map<String, Object>> additionalAttributes;
 
 
@@ -83,6 +86,7 @@ public class MetricProviderImpl implements AgentReportAware, ConfigAware, Metric
         }
     }
 
+    // keyTypes 从命名工厂中读取指标类型，最多有5个
     public static List<KeyType> keyTypes(NameFactory nameFactory) {
         List<KeyType> keyTypes = new ArrayList<>();
         for (MetricType metricType : nameFactory.metricTypes()) {
@@ -137,6 +141,7 @@ public class MetricProviderImpl implements AgentReportAware, ConfigAware, Metric
             // 注册上报器
             registerReporter(autoRefreshReporter);
 
+            // 构建指标
             com.megaease.easeagent.plugin.api.metric.MetricRegistry result = MetricRegistryImpl.build(metricRegistry);
             registerMetricRegistry(result);
             return result;

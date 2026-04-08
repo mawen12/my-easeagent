@@ -47,6 +47,9 @@ import java.util.concurrent.TimeUnit;
 import static com.megaease.easeagent.config.report.ReportConfigConst.*;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
+/**
+ * 使用 okhttp3 进行数据发送的实现
+ */
 @Slf4j
 @AutoService(Sender.class)
 public class HttpSender implements Sender {
@@ -180,6 +183,7 @@ public class HttpSender implements Sender {
 
     @Override
     public Call<Void> send(EncodedData encodedData) {
+        // 为开启，忽略
         if (!enabled) {
             return NoOpCall.getInstance(Void.class);
         }
@@ -190,9 +194,10 @@ public class HttpSender implements Sender {
             if (encodedData instanceof RequestBody) {
                 request = newRequest((RequestBody) encodedData);
             } else {
+                // 对数据进行一次包装
                 request = newRequest(new ByteRequestBody(encodedData.getData()));
             }
-        } catch (IOException e) {
+        } catch (IOException e) { // 请求转换失败，忽略错误
             // log rate-limit
             if (log.isDebugEnabled()) {
                 log.debug("tracing send fail!");

@@ -37,6 +37,8 @@ public interface NameFactory {
     Set<MetricType> metricTypes();
 
     /**
+     * 返回与该 key 相关的所有的 meters 指标。
+     *
      * Return the MetricName of all meters, they must exist in the MetricSubType of
      * the meter that exists in the NameFactory
      *
@@ -45,6 +47,8 @@ public interface NameFactory {
     Map<MetricSubType, MetricName> meterNames(String key);
 
     /**
+     * 返回与该 key 相关的所有的 histograms 指标。
+     *
      * Return the MetricName of all histograms, they must exist in the MetricSubType of
      * the histogram that exists in the NameFactory
      *
@@ -53,6 +57,8 @@ public interface NameFactory {
     Map<MetricSubType, MetricName> histogramNames(String key);
 
     /**
+     * 返回与该 key 相关的所有的 counters 指标。
+     *
      * Return the MetricName of all counters, they must exist in the MetricSubType of
      * the counter that exists in the NameFactory
      *
@@ -69,6 +75,8 @@ public interface NameFactory {
     Map<MetricSubType, MetricName> timerNames(String key);
 
     /**
+     * 返回与该 key 相关的所有的 guages 指标。
+     *
      * Return the MetricName of all gauges, they must exist in the MetricSubType of
      * the gauge that exists in the NameFactory
      *
@@ -77,6 +85,8 @@ public interface NameFactory {
     Map<MetricSubType, MetricName> gaugeNames(String key);
 
     /**
+     * 返回用于 dropwizard 的 meter 指标名
+     *
      * Return a meter name. the {@code subType} must exist in the meter MetricSubType of that exists in the NameFactory
      *
      * @param key     the key for metric
@@ -86,6 +96,8 @@ public interface NameFactory {
     String meterName(String key, MetricSubType subType);
 
     /**
+     * 返回用于 dropwizard 的 histogram 指标名
+     *
      * Return a meter name. the {@code subType} must exist in the meter MetricSubType of that exists in the NameFactory
      *
      * @param key     the key for metric
@@ -95,6 +107,8 @@ public interface NameFactory {
     String histogramName(String key, MetricSubType subType);
 
     /**
+     * 返回用于 dropwizard 的 counter 指标名
+     *
      * Return a counter name. the {@code subType} must exist in the counter MetricSubType of that exists in the NameFactory
      *
      * @param key     the key for metric
@@ -104,6 +118,8 @@ public interface NameFactory {
     String counterName(String key, MetricSubType subType);
 
     /**
+     * 返回用于 dropwizard 的 timer 指标名
+     *
      * Return a timer name. the {@code subType} must exist in the timer MetricSubType of that exists in the NameFactory
      *
      * @param key     the key for metric
@@ -113,6 +129,8 @@ public interface NameFactory {
     String timerName(String key, MetricSubType subType);
 
     /**
+     * 返回用于 dropwizard 的 gauge 指标名
+     *
      * Return a gauge name. the {@code subType} must exist in the gauge MetricSubType of that exists in the NameFactory
      *
      * @param key     the key for metric
@@ -229,11 +247,13 @@ public interface NameFactory {
             return getName(key, MetricType.GaugeType, metricSubType, gaugeTypes);
         }
 
+        // getName 返回用于 dropwizard 的指标名
         private String getName(String key, MetricType metricType, MetricSubType metricSubType, List<Tuple<MetricSubType,
             Map<MetricField, MetricValueFetcher>>> metricsTypes) {
             MetricName metricName = null;
-            for (Tuple<MetricSubType, Map<MetricField, MetricValueFetcher>> t : metricsTypes) {
+            for (Tuple<MetricSubType, Map<MetricField, MetricValueFetcher>> t : metricsTypes) { // 合法性校验，确保传递的 metricSubType 存在与 NameFactory 中
                 if (t.getX().equals(metricSubType)) {
+                    // TODO 此处也许不需要创建对象，直接返回字符串就行了
                     metricName = new MetricName(t.getX(), key, metricType, t.getY());
                 }
             }

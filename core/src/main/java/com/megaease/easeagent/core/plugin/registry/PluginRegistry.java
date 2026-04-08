@@ -44,6 +44,7 @@ public class PluginRegistry {
 
     // 保存 InterceptorProvider#getAdviceTo -> AgentPlugin 的映射
     static final ConcurrentHashMap<String, AgentPlugin> QUALIFIER_TO_PLUGIN = new ConcurrentHashMap<>();
+    // 保存
     static final ConcurrentHashMap<String, AgentPlugin> POINTS_TO_PLUGIN = new ConcurrentHashMap<>();
     // 保存所有的 AgentPlugin 实现
     static final ConcurrentHashMap<String, AgentPlugin> PLUGIN_CLASSNAME_TO_PLUGIN = new ConcurrentHashMap<>();

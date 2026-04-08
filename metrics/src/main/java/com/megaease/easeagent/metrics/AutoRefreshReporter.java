@@ -37,6 +37,7 @@ public class AutoRefreshReporter implements Runnable {
 
     // ================== 当配置刷新时，重建 reporter ==================
     private final Converter converter;
+    // 其底层是 DefaultMetricReporter
     private final Consumer<EncodedData> consumer;
     private final MetricRegistry metricRegistry;
 

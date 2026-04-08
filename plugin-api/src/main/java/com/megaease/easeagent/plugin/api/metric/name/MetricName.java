@@ -57,6 +57,8 @@ public class MetricName {
         return valueFetcher;
     }
 
+    // metricNameFor 将用于 dropwizard 的指标名转换为 MetricName，dropwizard 的指标名格式为：
+    // {subTypeCode}{metricTypeCode}{key}
     public static MetricName metricNameFor(String name) {
         return new MetricName(
                 MetricSubType.valueFor(name.substring(0, 2)),
@@ -65,6 +67,7 @@ public class MetricName {
                 new HashMap<>());
     }
 
+    // name 就是 用于 dropwizard 的指标名
     public String name() {
         return metricSubType.getCode() + metricType.ordinal() + key;
     }

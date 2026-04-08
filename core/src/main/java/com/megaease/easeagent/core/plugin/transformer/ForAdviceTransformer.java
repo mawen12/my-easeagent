@@ -48,7 +48,7 @@ public class ForAdviceTransformer implements AgentBuilder.Transformer {
 
         // 用于从 PluginRegistry#INTERCEPTOR_PROVIDERS 获取对应的 Interceptor，转换为 JavaConstant
         MethodIdentityJavaConstant value = new MethodIdentityJavaConstant(methodTransformInfo.getIndex());
-        //
+        // 将 methodTransformInfo 的索引值作为常量字段写入 @Index 索引指定的参数上
         StackManipulation stackManipulation = new AgentJavaConstantValue(value, methodTransformInfo.getIndex());
         //
         TypeDescription typeDescription = value.getTypeDescription();

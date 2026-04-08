@@ -37,6 +37,7 @@ public class RedirectProcessor {
     public static final RedirectProcessor INSTANCE = new RedirectProcessor();
 
     private volatile Map<Redirect, String> redirectedUris = new HashMap<>();
+    //
     private final Map<String, String> tags = getServiceTagsFromEnv();
 
     public static void redirected(Redirect key, String uris) {
@@ -111,11 +112,14 @@ public class RedirectProcessor {
     }
 
 
+    // 读取 EASEMESH_TAGS
     protected static Map<String, String> getServiceTagsFromEnv() {
         return getServiceTags(ENV_EASEMESH_TAGS);
     }
 
+    // 从环境变量中读取 tags
     protected static Map<String, String> getServiceTags(String env) {
+
         String str = SystemEnv.get(env);
         if (StringUtils.isEmpty(env)) {
             return Collections.emptyMap();

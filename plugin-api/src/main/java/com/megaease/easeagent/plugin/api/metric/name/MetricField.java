@@ -25,6 +25,8 @@ package com.megaease.easeagent.plugin.api.metric.name;
  *  min, max, mean, p25, p50, p75, p95, p98, p99, p999
  *
  * 通用的指标字段定义
+ *
+ * 在进行上报时，将值转换为对应的类型进行上报，比如 Duration, Rate
  */
 public enum MetricField {
 

@@ -36,6 +36,12 @@ import java.util.Map;
  * <b>host_ipv4</b>: an ip address to identical instance address
  * <b>hostname</b>: a name to identical instance name
  * <b>serviceName</b> service name
+ *
+ * 收集全局的指标信息，每一个上报的指标都会包含。
+ * - host_ipv4：主机的 ipv4 地址，通过程序读取
+ * - hostname：主机名，通过程序读取
+ * - system: 系统名，从 agent.properties 中读取 system
+ * - serviceName：服务名，从 agent.properties 读取 name
  */
 public class AdditionalAttributes {
     private final static Logger LOGGER = EaseAgent.getLogger(AdditionalAttributes.class);

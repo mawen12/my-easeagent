@@ -35,6 +35,7 @@ public class ConfigUtils {
     private ConfigUtils() {
     }
 
+    // bindProp 将值绑定到 consumer 上，并且监听配置变化，当配置变化时，重新获取值并绑定到 consumer 上
     public static <R> void bindProp(String name, Config configs, BiFunction<Config, String, R> func, Consumer<R> consumer, R def) {
         Runnable process = () -> {
             R result = func.apply(configs, name);

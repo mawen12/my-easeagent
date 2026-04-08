@@ -33,8 +33,10 @@ import java.util.function.Supplier;
 
 public class ConverterAdapter extends AbstractConverter {
 
+    // 从对应 nameFactory 配置的指标类型进行读取
     private final List<KeyType> keyTypes;
 
+    // 原始的 nameFactory
     private final NameFactory nameFactory;
 
     public ConverterAdapter(String category, String type, NameFactory metricNameFactory, KeyType keyType,
@@ -57,6 +59,7 @@ public class ConverterAdapter extends AbstractConverter {
     }
 
 
+    // 从提供的五种 dropwizcard 的指标中，读取并汇总 key
     @Override
     @SuppressWarnings("rawtypes")
     protected List<String> keysFromMetrics(SortedMap<String, Gauge> gauges,
@@ -136,19 +139,28 @@ public class ConverterAdapter extends AbstractConverter {
     @Override
     @SuppressWarnings("rawtypes")
     protected void writeGauges(String key, MetricSubType metricSubType, SortedMap<String, Gauge> gauges, Map<String, Object> output) {
+        // 返回与该 key 相关的所有的 guages 指标。
         Map<MetricSubType, MetricName> map = nameFactory.gaugeNames(key);
+
         consumerMetric(map, metricSubType, v -> {
+            // 读取 gauages 中特定的指标值
+            // Tips: v.name() 用于获取 dropwizcard 中的指标名称
             Gauge gauge = gauges.get(v.name());
             if (gauge == null) {
                 return;
             }
+            // 读取值
             Object value = gauge.getValue();
+
             if (value instanceof GaugeMetricModel) {
+                // 作为 GaugeMetricModel 进行处理
                 GaugeMetricModel model = (GaugeMetricModel) value;
                 output.putAll(model.toHashMap());
             } else if (value instanceof Number || value instanceof Boolean) {
+                // 当作数字
                 output.put("value", value);
             } else {
+                // 当作字符串
                 output.put("value", value.toString());
             }
         });
@@ -156,20 +168,28 @@ public class ConverterAdapter extends AbstractConverter {
 
     protected static <T> void consumerMetric(Map<MetricSubType, T> map, MetricSubType metricSubType, Consumer<T> consumer) {
         if (metricSubType == null) {
+            // 未指定 metricSubType，则消费该 key 对应的所有指标
             map.values().forEach(consumer);
         }
+        // 读取指定的子类型
         T t = map.get(metricSubType);
         if (t != null) {
+            // 消费该子类型的所有指标
             consumer.accept(t);
         }
     }
 
     @Override
     protected void writeCounters(String key, MetricSubType metricSubType, SortedMap<String, Counter> counters, Map<String, Object> output) {
+        // 返回与该 key 相关的所有的 counters 指标
         Map<MetricSubType, MetricName> map = nameFactory.counterNames(key);
         consumerMetric(map, metricSubType, v -> Optional
             .ofNullable(counters.get(v.name()))
-            .ifPresent(c -> v.getValueFetcher().forEach((fieldName, fetcher) -> appendField(output, fieldName, fetcher, CounterImpl.build(c)))));
+            .ifPresent(c -> v.getValueFetcher()
+                .forEach((fieldName, fetcher) ->
+                    // 将字段转换为对应的类型后写入 output
+                    appendField(output, fieldName, fetcher,
+                        CounterImpl.build(c)))));
 
     }
 
@@ -192,11 +212,12 @@ public class ConverterAdapter extends AbstractConverter {
 
     private void appendField(Map<String, Object> output, MetricField fieldName, MetricValueFetcher fetcher,
                              com.megaease.easeagent.plugin.api.metric.Metric metric) {
+        // 确定字段类型
         switch (fieldName.getType()) {
-            case DURATION:
+            case DURATION: // duration
                 appendDuration(output, fieldName.getField(), fetcher.apply(metric), fieldName.getScale());
                 break;
-            case RATE:
+            case RATE: // rate
                 appendRate(output, fieldName.getField(), fetcher.apply(metric), fieldName.getScale());
                 break;
             default:

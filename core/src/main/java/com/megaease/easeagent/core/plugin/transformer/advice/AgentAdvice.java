@@ -65,6 +65,9 @@ import java.util.*;
 import static net.bytebuddy.matcher.ElementMatchers.*;
 
 
+/**
+ * 重写了 WthCustomMapping#doWrap 方法
+ */
 @SuppressWarnings("unused, rawtypes, unchecked")
 public class AgentAdvice extends Advice {
     private static final ClassReader UNDEFINED = null;
@@ -132,12 +135,12 @@ public class AgentAdvice extends Advice {
     /**
      * The dispatcher for instrumenting the instrumented method upon entering.
      */
-    private final Dispatcher.Resolved.ForMethodEnter methodEnter;
+    private final Dispatcher.Resolved.ForMethodEnter methodEnter; // 从自定义的 Advice 上提取的 @Advice.OnMethodEnter 的解析结果
 
     /**
      * The dispatcher for instrumenting the instrumented method upon exiting.
      */
-    private final Dispatcher.Resolved.ForMethodExit methodExit;
+    private final Dispatcher.Resolved.ForMethodExit methodExit;  // 从自定义的 Advice 上提取的 @Advice.OnMethodEnter 的解析结果
 
     private final Dispatcher.Resolved.ForMethodExit methodExitNonThrowable;
 
@@ -403,14 +406,15 @@ public class AgentAdvice extends Advice {
      * @param readerFlags           The, plies this advice.
      */
     @Override
-    protected MethodVisitor doWrap(TypeDescription instrumentedType,
-                                   MethodDescription instrumentedMethod,
+    protected MethodVisitor doWrap(TypeDescription instrumentedType, // 要拦截的方法所在的类
+                                   MethodDescription instrumentedMethod, // 要拦截的方法
                                    MethodVisitor methodVisitor,
                                    Implementation.Context implementationContext,
                                    int writerFlags,
                                    int readerFlags) {
         Dispatcher.Resolved.ForMethodExit exit;
-        if (instrumentedMethod.isConstructor()) {
+        // 当前使用的 1.11.21 版本中，会有两个退出，在高版本 1.12.23 中，只有一个 methodExit
+        if (instrumentedMethod.isConstructor()) { // 对于构造器来说，这是特殊的方法，不会有任何异常抛出
             exit = methodExitNonThrowable;
         } else {
             exit = methodExit;

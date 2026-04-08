@@ -45,6 +45,12 @@ import static com.megaease.easeagent.config.report.ReportConfigConst.METRIC_ENCO
 @SuppressWarnings("unused")
 public class AgentScheduledReporter extends ScheduledReporter {
     private Converter converter;
+    // 底层是：
+    //  kafka -> com.megaease.easeagent.report.sender.AgentKafkaSender
+    //  console -> com.megaease.easeagent.report.sender.AgentLoggerSender
+    //  noop -> com.megaease.easeagent.report.sender.NoOpSender
+    //  metricKafka -> com.megaease.easeagent.report.sender.metric.MetricKafkaSender
+    //  http -> com.megaease.easeagent.report.sender.okhttp.HttpSender
     private final Consumer<EncodedData> dataConsumer;
     private final Supplier<Boolean> enabled;
     private final Encoder<Map<String, Object>> encoder;

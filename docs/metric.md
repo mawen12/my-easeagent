@@ -1,4 +1,4 @@
-# Meter
+# Metric
 
 度量和监控系统的性能指标，有吞吐量、延迟、错误率等。
 
@@ -17,6 +17,14 @@
 3. 将 `MetricBeanProviderImpl` 注册到 `ContextManager#setMetric` 中，本质上是将 `MetricProviderImpl#ApplicationMetricRegistrySupplier` 注册到 `ContextManager#metric` 中，
 4. 然后再将其传播到 `EaseAgent.metricRegistrySupplier` 上
 5. `ServiceMetricRegistry#getOrCreate` 每当对应的 
+
+### 上报流程
+
+在异步的 `AgentScheduledReporter` 定时调用 `report` 方法。
+1. `report` 方法检查是否开启了 `enabled` 配置，没有开启则直接返回。
+2. `report` 方法将所有指标借助 `converter` 转换为通用的 `List<Map<String,Object>>` 格式。
+3. `report` 方法将转换后的数据使用 `encoder` 进行编码
+4. `report` 方法将编码后的数据使用 `AgentKafkaSender/AgentLoggerSender/NoOpSender/MetricKafkaSender/HttpSender` 进行上报。
 
 ## 设计
 

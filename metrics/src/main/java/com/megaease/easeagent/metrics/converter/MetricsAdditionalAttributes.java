@@ -28,11 +28,12 @@ import java.util.function.Supplier;
 public class MetricsAdditionalAttributes implements Supplier<Map<String, Object>> {
 
     private volatile Map<String, Object> additionalAttributes;
+    // ================== 保存旧值，响应值变化 ==================
     private volatile String serviceName = "";
     private volatile String systemName = "";
 
     public MetricsAdditionalAttributes(Config config) {
-        // 读取 config 中的 name
+        // 绑定到 config 上，并且监听配置变化，当配置变化时，重新获取值并绑定到 consumer 上
         ConfigUtils.bindProp(ConfigConst.SERVICE_NAME, config, Config::getString, v -> {
             // 将 name 赋值到 serviceName
             this.serviceName = v;

@@ -45,6 +45,7 @@ public class AdviceRegistry {
     private static final Logger log = LoggerFactory.getLogger(AdviceRegistry.class);
     static Map<String, PointcutsUniqueId> methodsSet = new ConcurrentHashMap<>();
 
+    // check
     public static Integer check(TypeDescription instrumentedType,
                                 MethodDescription instrumentedMethod,
                                 Dispatcher.Resolved.ForMethodEnter methodEnter,
@@ -55,7 +56,7 @@ public class AdviceRegistry {
         String method = instrumentedMethod.getName();
         // 读取方法描述符
         String methodDescriptor = instrumentedMethod.getDescriptor();
-        // 构造一个 key
+        // 构造一个 key，<class>:<method><desc>
         String key = clazz + ":" + method + methodDescriptor;
 
         // 缓存起来
@@ -67,7 +68,7 @@ public class AdviceRegistry {
 
         // already exist
         // 如果已经存在了
-        if (pointcutsUniqueId != null) {
+        if (pointcutsUniqueId != null) {// 比如一个方法被多次 instrumented
             // 进行释放
             newIdentity.tryRelease();
             // 读取 pointcut 索引
@@ -93,27 +94,35 @@ public class AdviceRegistry {
                 // Orchestration
                 merge = true;
             }
-        // 之前没有，这是新的
-        } else {
-            // new
+        }
+        else { // 首次放入
+            // 将新值覆盖掉空值
             pointcutsUniqueId = newIdentity;
-            //
+            // 更新 CommonInlineAdvice#enter 静态方法上的 @Index 标注的参数值，并返回旧值
             pointcutIndex = updateStackManipulation(methodEnter, pointcutsUniqueId.getUniqueId());
+            // 更新 CommonInlineAdvice#exit 静态方法上的 @Index 标注的参数值，并返回旧值
             updateStackManipulation(methodExit, pointcutsUniqueId.getUniqueId());
         }
 
         // merge or registry
+        // 根据之前的值读取 methodTransformation
         MethodTransformation methodTransformation = PluginRegistry.getMethodTransformation(pointcutIndex);
         if (methodTransformation == null) {
+            // 出错返回0
             log.error("MethodTransformation get fail for {}", pointcutIndex);
             return 0;
         }
+
+        // 获取最新的 id
         int uniqueId = pointcutsUniqueId.getUniqueId();
+        // 读取最新的 拦截器 Chain
         AgentInterceptorChain chain = methodTransformation
             .getAgentInterceptorChain(uniqueId, clazz, method, methodDescriptor);
 
         try {
+            // 加锁
             pointcutsUniqueId.lock();
+            // 获取最新的 Chain
             AgentInterceptorChain previousChain = com.megaease.easeagent.core.plugin.Dispatcher.getChain(uniqueId);
             if (previousChain == null) {
                 // 注册拦截器链
@@ -121,9 +130,11 @@ public class AdviceRegistry {
             } else {
                 // 合并之前的拦截器
                 chain.merge(previousChain);
+                // 更新拦截器链
                 com.megaease.easeagent.core.plugin.Dispatcher.updateChain(uniqueId, chain);
             }
         } finally {
+            // 解锁
             pointcutsUniqueId.unlock();
         }
 
@@ -136,9 +147,14 @@ public class AdviceRegistry {
 
     static Integer getPointcutIndex(Dispatcher.Resolved resolved) {
         int index = 0;
+        // 读取 advice 的方法参数，从 0 开始
         Map<Integer, OffsetMapping> enterMap = resolved.getOffsetMapping();
         for (Map.Entry<Integer, OffsetMapping> offset : enterMap.entrySet()) {
+            //
             OffsetMapping om = offset.getValue();
+            // 仅处理 ForStackManipulation 类型 OffsetMapping
+            // 详见：ForAdviceTransformer.ForAdviceTransformer
+            // 其中会为 Index 字段构造一个 OffsetMapping.ForStackManipulation
             if (!(om instanceof OffsetMapping.ForStackManipulation)) {
                 continue;
             }
@@ -154,25 +170,35 @@ public class AdviceRegistry {
         return index;
     }
 
+    // updateStackManipulation 更新 CommonInlineAdvice 静态方法上的 @Index 标注的参数值，并返回旧值
     static Integer updateStackManipulation(Dispatcher.Resolved resolved, Integer value) {
         int index = 0;
         Map<Integer, OffsetMapping> enterMap = resolved.getOffsetMapping();
 
         for (Map.Entry<Integer, OffsetMapping> offset : enterMap.entrySet()) {
+
             OffsetMapping om = offset.getValue();
+
+            // 仅处理 ForStackManipulation 类型 OffsetMapping
+            // 详见：ForAdviceTransformer.ForAdviceTransformer
+            // 其中会为 Index 字段构造一个 OffsetMapping.ForStackManipulation
             if (!(om instanceof OffsetMapping.ForStackManipulation)) {
                 continue;
             }
             OffsetMapping.ForStackManipulation forStackManipulation = (OffsetMapping.ForStackManipulation) om;
+            // 二次检查，为 Index 字段构造一个 AgentJavaConstantValue
             if (!(forStackManipulation.getStackManipulation() instanceof AgentJavaConstantValue)) {
                 continue;
             }
 
             AgentJavaConstantValue oldValue = (AgentJavaConstantValue) forStackManipulation.getStackManipulation();
+            // 读取在 ForAdviceTransformer 中设置的值
             index = oldValue.getPointcutIndex();
 
+            // 使用新值重新构造一个 MethodIdentityJavaConstant 以及 stackManipulation
             MethodIdentityJavaConstant constant = new MethodIdentityJavaConstant(value);
             StackManipulation stackManipulation = new AgentJavaConstantValue(constant, index);
+            // 放入到 OffsetMappings 中
             enterMap.put(offset.getKey(), forStackManipulation.with(stackManipulation));
 
             return index;

@@ -37,19 +37,27 @@ public abstract class BaseServletInterceptor implements NonReentrantInterceptor 
     @Override
     public void doAfter(MethodInfo methodInfo, Context context) {
         HttpServletRequest httpServletRequest = (HttpServletRequest) methodInfo.getArgs()[0];
+        // 读取 start time
         final long start = ServletUtils.startTime(httpServletRequest);
+        // 检查请求头上是否有 mark 标志，如果有则说明已经被处理过了，直接返回
         if (ServletUtils.markProcessed(httpServletRequest, getAfterMark())) {
             return;
         }
+        // 读取 http 路由
         String httpRoute = ServletUtils.getHttpRouteAttributeFromRequest(httpServletRequest);
+        // 使用 method + http 路由作为 key
         final String key = httpServletRequest.getMethod() + " " + httpRoute;
+        // 读取第二个参数
         HttpServletResponse httpServletResponse = (HttpServletResponse) methodInfo.getArgs()[1];
         if (methodInfo.getThrowable() != null) {
+            // 如果失败了，则直接调用 internalAfter 方法，并传入异常信息
             internalAfter(methodInfo.getThrowable(), key, httpServletRequest, httpServletResponse, start);
         } else if (httpServletRequest.isAsyncStarted()) {
+            // 注册监听器，处理异步场景
             httpServletRequest.getAsyncContext().addListener(new InternalAsyncListener(
                     asyncEvent -> {
                         HttpServletResponse suppliedResponse = (HttpServletResponse) asyncEvent.getSuppliedResponse();
+                        // 异步请求完成后，调用 internalAfter 方法，并传入异常信息（如果有的话）
                         internalAfter(asyncEvent.getThrowable(), key, httpServletRequest, suppliedResponse, start);
                     }
 

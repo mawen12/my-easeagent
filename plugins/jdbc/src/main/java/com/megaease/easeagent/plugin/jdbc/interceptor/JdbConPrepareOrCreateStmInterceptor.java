@@ -39,6 +39,7 @@ import java.sql.Statement;
  * 以便后续的 Statement 执行方法能够获取到 SQL 语句信息进行追踪和监控。
  */
 @AdviceTo(value = JdbcConnectionAdvice.class, plugin = JdbcTracingPlugin.class)
+// TODO 类名编写错误，应该是 Jdbc 开头
 public class JdbConPrepareOrCreateStmInterceptor implements NonReentrantInterceptor {
     private static final Logger logger = EaseAgent.getLogger(JdbConPrepareOrCreateStmInterceptor.class);
 

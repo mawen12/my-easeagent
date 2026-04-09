@@ -156,7 +156,8 @@ public interface Points {
     Set<IMethodMatcher> getMethodMatcher();
 
     /**
-     * 如果返回true，则添加一个字段和访问器。通过 AgentDynamicFieldAccessor 来设置和读取
+     * 如果返回true，则添加一个字段（ease_agent_dynamic_$$$_data）和访问器（DynamicFieldAccessor）。通过 AgentDynamicFieldAccessor 来设置和读取
+     * 具体实现由：com.megaease.easeagent.core.plugin.transformer.DynamicFieldTransformer 进行处理
      *
      * when return true, the transformer will add a Object field and a accessor
      * The dynamically added member can be accessed by AgentDynamicFieldAccessor:
@@ -170,6 +171,7 @@ public interface Points {
 
     /**
      * 返回一个该类内部的字段名，通过 TypeFieldGetter.get(instance) 来读取
+     * 具体实现由：com.megaease.easeagent.core.plugin.transformer.TypeFieldTransformer 进行处理
      *
      * When a non-null string is returned, the converter will add an accessor to get the member variables inside the class.
      * Get method: value = TypeFieldGetter.get(instance)

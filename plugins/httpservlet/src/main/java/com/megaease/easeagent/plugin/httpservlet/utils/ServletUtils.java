@@ -67,6 +67,7 @@ public class ServletUtils {
     }
 
     public static boolean markProcessed(HttpServletRequest request, String mark) {
+        // 读取
         if (request.getAttribute(mark) != null) {
             return true;
         }
@@ -75,12 +76,13 @@ public class ServletUtils {
     }
 
     public static long startTime(HttpServletRequest httpServletRequest) {
+        // 读取请求头上的开始时间
         Object startObj = httpServletRequest.getAttribute(START_TIME);
         Long start = null;
-        if (startObj == null) {
+        if (startObj == null) {// 没有则设置为当前时间
             start = System.currentTimeMillis();
             httpServletRequest.setAttribute(START_TIME, start);
-        } else {
+        } else { // 有则返回
             start = (Long) startObj;
         }
         return start;

@@ -32,6 +32,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public class MetricRegistryImpl implements com.megaease.easeagent.plugin.api.metric.MetricRegistry {
     private final ConcurrentMap<String, Metric> metricCache;
+    // dropwizcard 的 metric registry
     private final MetricRegistry metricRegistry;
 
     MetricBuilder<Counter> counters = new MetricBuilder<Counter>() {

@@ -25,6 +25,9 @@ import com.megaease.easeagent.plugin.matcher.MethodMatcher;
 
 import java.util.Set;
 
+/**
+ * byte buddy 会将此处的 interceptor 注入到 Connection#createStatement、prepareCall、prepareStatement 中，拦截这三个方法的调用
+ */
 public class JdbcConnectionAdvice implements Points {
     @Override
     public IClassMatcher getClassMatcher() {

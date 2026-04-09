@@ -62,7 +62,6 @@ public class PluginLoader {
         // 将要增强的类进行增强
         // 一个 transformation 底层对应一个组合的 Transformer
         for (ClassTransformation transformation : sortedTransformations) {
-            //
             ab = ab.type(
                     transformation.getClassMatcher(), // 来源于 Points#classMatcher
                     transformation.getClassloaderMatcher() // 来源于 Points#methodMatcher

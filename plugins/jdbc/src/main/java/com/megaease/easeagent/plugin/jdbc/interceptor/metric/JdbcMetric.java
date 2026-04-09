@@ -125,26 +125,28 @@ public class JdbcMetric extends ServiceMetric implements RemovalListener<String,
 
     // collectMetric 收集指标
     public void collectMetric(String key, boolean success, Context ctx) {
-        // 读取计时器，更新统计耗时
+        // 读取计时器，更新统计耗时 TODO 因为其继承了 ServiceMetric，因此可以直接调用 timer 方法来获取 Timer 实例
         Timer timer = this.metricRegistry.timer(this.nameFactory.timerName(key, MetricSubType.DEFAULT));
         timer.update(Duration.ofMillis(ContextUtils.getDuration(ctx)));
 
-        // 读取计数器，增加统计
+        // 读取计数器，增加统计 TODO 因为其继承了 ServiceMetric，因此可以直接调用 counter 方法来获取 Counter 实例
         Counter counter = this.metricRegistry.counter(this.nameFactory.counterName(key, MetricSubType.DEFAULT));
-        // 读取速率计，增加统计
+        // 读取速率计，增加统计 TODO 因为其继承了 ServiceMetric，因此可以直接调用 meter 方法来获取 Meter 实例
         Meter meter = this.metricRegistry.meter(this.nameFactory.meterName(key, MetricSubType.DEFAULT));
         meter.mark();
         counter.inc();
 
         // 失败时，读取错误计数器，增加统计，读取错误速率计，增加统计
         if (!success) {
+            // TODO 因为其继承了 ServiceMetric，因此可以直接调用 counter 方法来获取 Counter 实例
             Counter errCounter = this.metricRegistry.counter(this.nameFactory.counterName(key, MetricSubType.ERROR));
+            // TODO 因为其继承了 ServiceMetric，因此可以直接调用 meter 方法来获取 Meter 实例
             Meter errMeter = this.metricRegistry.meter(this.nameFactory.meterName(key, MetricSubType.ERROR));
             errMeter.mark();
             errCounter.inc();
         }
 
-        // 读取仪表，更新统计
+        // 读取仪表，更新统计 TODO 因为其继承了 ServiceMetric，因此可以直接调用 gauge 方法来获取 Gauge 实例
         MetricName gaugeName = this.nameFactory.gaugeNames(key).get(MetricSubType.DEFAULT);
         metricRegistry.gauge(gaugeName.name(), () -> () -> LastMinutesCounterGauge.builder()
             .m1Count((long) meter.getOneMinuteRate() * 60)

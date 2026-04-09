@@ -42,18 +42,37 @@ import java.util.stream.Collectors;
 public class PluginRegistry {
     static Logger log = EaseAgent.getLogger(PluginRegistry.class);
 
-    // 保存 InterceptorProvider#getAdviceTo -> AgentPlugin 的映射
-    static final ConcurrentHashMap<String, AgentPlugin> QUALIFIER_TO_PLUGIN = new ConcurrentHashMap<>();
-    // 保存
-    static final ConcurrentHashMap<String, AgentPlugin> POINTS_TO_PLUGIN = new ConcurrentHashMap<>();
+    // ======================= Plugins =============================
     // 保存所有的 AgentPlugin 实现
+    // "com.megaease.easeagent.plugin.jdbc.JdbcTracingPlugin" -> com.megaease.easeagent.plugin.jdbc.JdbcTracingPlugin
     static final ConcurrentHashMap<String, AgentPlugin> PLUGIN_CLASSNAME_TO_PLUGIN = new ConcurrentHashMap<>();
+
+    // ======================= Points =============================
     // 保存满足CodeVersion的 Points 实现
+    // "com.megaease.easeagent.plugin.jdbc.advice.JdbcConnectionAdvice" -> com.megaease.easeagent.plugin.jdbc.advice.JdbcConnectionAdvice
     static final ConcurrentHashMap<String, Points> POINTS_CLASSNAME_TO_POINTS = new ConcurrentHashMap<>();
+
+    // ======================= Advice -> Plugin =============================
+    // 保存 Interceptor#getAdviceTo 去除 qualifier 后的 points class name -> AgentPlugin 的映射
+    // "com.megaease.easeagent.plugin.jdbc.advice.JdbcConnectionAdvice" -> com.megaease.easeagent.plugin.jdbc.JdbcTracingPlugin
+    static final ConcurrentHashMap<String, AgentPlugin> POINTS_TO_PLUGIN = new ConcurrentHashMap<>();
+
+    // ======================= Advice:qualifier -> Plugin =============================
+    // 保存 Interceptor#getAdviceTo -> AgentPlugin 的映射
+    // 这是从 Interceptor的 @AdviceTo 注解解析出来的，并动态解析生成代码的
+    // 比如 "com.megaease.easeagent.plugin.jdbc.advice.JdbcConnectionAdvice:default" -> com.megaease.easeagent.plugin.jdbc.JdbcTracingPlugin
+    static final ConcurrentHashMap<String, AgentPlugin> QUALIFIER_TO_PLUGIN = new ConcurrentHashMap<>();
+
+
     // 保存 InterceptorProvider#getAdviceTo -> index 的映射，index 用于在 ProviderChain 中获取对应的 InterceptorProvider
+    // "com.megaease.easeagent.plugin.jdbc.advice.JdbcConnectionAdvice:default" -> Idx
     static final ConcurrentHashMap<String, Integer> QUALIFIER_TO_INDEX = new ConcurrentHashMap<>();
+
+    // 保存
     static final ConcurrentHashMap<Integer, MethodTransformation> INDEX_TO_METHOD_TRANSFORMATION = new ConcurrentHashMap<>();
+
     // 保存拦截器提供者
+    // Idx -> Interceptor的单个@AdviceTo的信息
     static final AgentArray<Builder> INTERCEPTOR_PROVIDERS = new AgentArray<>();
 
     private PluginRegistry() {
@@ -61,11 +80,15 @@ public class PluginRegistry {
 
     // register 注册 AgentPlugin
     public static void register(AgentPlugin plugin) {
+        // 比如对于 JdbcTracingPlugin 来说，注册结果为：
+        // "com.megaease.easeagent.plugin.jdbc.JdbcTracingPlugin" -> com.megaease.easeagent.plugin.jdbc.JdbcTracingPlugin
         PLUGIN_CLASSNAME_TO_PLUGIN.putIfAbsent(plugin.getClass().getCanonicalName(), plugin);
     }
 
     // register 注册 Points
     public static void register(Points points) {
+        // 比如对于 JdbcConnectionAdvice 来说，注册结果为：
+        // "com.megaease.easeagent.plugin.jdbc.advice.JdbcConnectionAdvice" -> com.megaease.easeagent.plugin.jdbc.advice.JdbcConnectionAdvice
         POINTS_CLASSNAME_TO_POINTS.putIfAbsent(points.getClass().getCanonicalName(), points);
     }
 
@@ -82,6 +105,8 @@ public class PluginRegistry {
     }
 
     // registerClassTransformation 从 Points 中解析 ClassLoaderMatcher/ClassMatcher/MethodMatcher 并生成 ClassTransformation
+    // 即每个 Points 对应一个 ClassTransformation
+    //
     public static ClassTransformation registerClassTransformation(Points points) {
         // 获取 Points 的规范类名
         String pointsClassName = points.getClass().getCanonicalName();
@@ -102,7 +127,7 @@ public class PluginRegistry {
         Set<MethodTransformation> mInfo = methodMatchers.stream().map(matcher -> {
             // 将方法匹配器转换为 ByteBuddy 的 Junction<MethodDescription>
             Junction<MethodDescription> bMethodMatcher = MethodMatcherConvert.INSTANCE.convert(matcher);
-            // 拼接全限定方法名称
+            // 拼接全限定方法名称，比如将 com.megaease.easeagent.plugin.jdbc.advice.JdbcConnectionAdvice 和 default 拼接成 com.megaease.easeagent.plugin.jdbc.advice.JdbcConnectionAdvice:default
             String qualifier = getMethodQualifier(pointsClassName, matcher.getQualifier());
             // 获取 qualifier 对应的 index，如果没有则返回 null
             Integer index = QUALIFIER_TO_INDEX.get(qualifier);
@@ -112,11 +137,12 @@ public class PluginRegistry {
                 return null;
             }
             // 获取 index 对应的 InterceptorProvider.Builder，如果没有则返回 null
+            // providerBuilder 中包含了单个 Interceptor 的单个 @AdviceTo 的信息
             Builder providerBuilder = INTERCEPTOR_PROVIDERS.get(index);
             if (providerBuilder == null) {
                 return null;
             }
-            // 创建 MethodTransformation
+            // 创建 MethodTransformation，
             MethodTransformation mt = new MethodTransformation(index, bMethodMatcher, providerBuilder);
             // 注册 index -> MethodTransformation 映射，如果已经存在则记录错误日志
             if (INDEX_TO_METHOD_TRANSFORMATION.putIfAbsent(index, mt) != null) {
@@ -148,22 +174,29 @@ public class PluginRegistry {
     // register 注册拦截器提供者
     public static int register(InterceptorProvider provider) {
         // 获取要被增强的方法名称
+        // JdbConPrepareOrCreateStmInterceptor\$Provider0.class
+        //  getAdviceTo -> com.megaease.easeagent.plugin.jdbc.advice.JdbcConnectionAdvice:default
+        //  getPluginClassName -> com.megaease.easeagent.plugin.jdbc.JdbcTracingPlugin
+        //  getInterceptorProvider -> () -> com.megaease.easeagent.plugin.jdbc.interceptor.JdbConPrepareOrCreateStmInterceptor
         String qualifier = provider.getAdviceTo();
         // map interceptor/pointcut to plugin
         // 读取该拦截器提供者对应的插件实现类名
-        AgentPlugin plugin = PLUGIN_CLASSNAME_TO_PLUGIN.get(provider.getPluginClassName());
+        AgentPlugin plugin = PLUGIN_CLASSNAME_TO_PLUGIN.get(provider.getPluginClassName()); // 检查其绑定的插件存在，因此插件是最先注册的
         if (plugin == null) {
             // code autogenerate issues that are unlikely to occur!
             // 出现这种问题，只能是代码生成出现了问题
             throw new RuntimeException();
         }
         // 注册 qualifier -> plugin 映射
+        // "com.megaease.easeagent.plugin.jdbc.advice.JdbcConnectionAdvice:default" -> com.megaease.easeagent.plugin.jdbc.JdbcTracingPlugin
         QUALIFIER_TO_PLUGIN.putIfAbsent(qualifier, plugin);
         // 注册 points class name -> plugin 映射
+        // "com.megaease.easeagent.plugin.jdbc.advice.JdbcConnectionAdvice" -> com.megaease.easeagent.plugin.jdbc.JdbcTracingPlugin
         POINTS_TO_PLUGIN.putIfAbsent(getPointsClassName(qualifier), plugin);
 
         // generate index and supplier chain
         // 获取该拦截器提供者对应的 index，如果没有则创建一个新的 index，并将该 index 与 qualifier 进行映射
+        //
         Integer index = QUALIFIER_TO_INDEX.get(provider.getAdviceTo());
         if (index == null) {
             synchronized (QUALIFIER_TO_INDEX) {
@@ -179,6 +212,7 @@ public class PluginRegistry {
         }
         // 注册 index -> InterceptorProvider 映射
         INTERCEPTOR_PROVIDERS.get(index)
+            // 保存 interceptor 单个 @AdviceTo 的级别
             .addProvider(new ProviderPluginDecorator(plugin, provider));
 
         return index;
@@ -186,6 +220,7 @@ public class PluginRegistry {
 
     // getPointsClassName 从中提取 point class name
     // 去除 : 及其后面的内容
+    // 比如 com.megaease.easeagent.plugin.jdbc.advice.JdbcConnectionAdvice:default 处理后为：com.megaease.easeagent.plugin.jdbc.advice.JdbcConnectionAdvice
     public static String getPointsClassName(String name) {
         int index;
         if (Strings.isNullOrEmpty(name)) {

@@ -36,6 +36,9 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+/**
+ * 一个 MethodTransformation 本质上对应一个 Interceptor 的单个 @AdviceTo 的所有信息：即一个 Interceptor + 一个 Plugin + 一个 Advice
+ */
 @Data
 @SuppressWarnings("unused")
 public class MethodTransformation {

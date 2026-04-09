@@ -24,8 +24,10 @@ import java.util.function.Supplier;
 /**
  * used in autogenerate code
  *
+ * plugin 特定，位于 plugin/<xxx>/META-INF/services/com.megaease.easeagent.plugin.interceptor.InterceptorProvider
+ *
  * 该类的内容是由 PluginProcessor 借助 google 的 AutoService 自动生成的，而非手动生成的
- * 需要通过反编译才能看到
+ * 需要通过反编译才能看到，javap -c <xxxx>.class
  * 拦截器提供者的接口，
  * async -> com.megaease.easeagent.plugin.interceptor.RunnableInterceptor$Provider0
  *          com.megaease.easeagent.plugin.interceptor.RunnableInterceptor$Provider1

@@ -22,6 +22,7 @@ import com.megaease.easeagent.plugin.Ordered;
 /**
  * 顶层的 Bean 提供器接口：
  * 具体位于 easeagent.jar/lib/META-INF/services/com.megaease.easeagent.plugin.bean.BeanProvider
+ * 这是使用手动编码的，而不是通过 auto-service 的。
  * - com.megaease.easeagent.metrics.MetricBeanProviderImpl
  * - com.megaease.easeagent.metrics.jvm.JvmBeanProvider
  * - com.megaease.easeagent.zipkin.TracingProviderImpl

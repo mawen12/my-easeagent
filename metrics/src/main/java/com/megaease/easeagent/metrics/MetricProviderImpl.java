@@ -123,7 +123,7 @@ public class MetricProviderImpl implements AgentReportAware, ConfigAware, Metric
             MetricsConfig metricsConfig = new PluginMetricsConfig(config);
             // 从指标命名工厂中读取配置的指标类型，此处必须为 List，因为之后需要通过 index 读取
             List<KeyType> keyTypes = keyTypes(nameFactory);
-            //
+            // 使用 nameFactory 来构造
             ConverterAdapter converterAdapter = new ConverterAdapter(nameFactory, keyTypes, MetricProviderImpl.this.additionalAttributes, tags);
 
 

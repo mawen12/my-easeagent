@@ -111,13 +111,17 @@ public class EaseAgentPrometheusExports extends Collector implements Collector.D
 
         public void addToMap(Map<String, MetricFamilySamples> mfSamplesMap) {
             Map<String, Object> values = new HashMap<>();
+            // 通过 dropwizard 读取不同的指标
             SortedMap<String, T> gaugeSortedMap = getMetric();
             for (String s : gaugeSortedMap.keySet()) {
+                // 将值写入到 values 中
                 writeValue(MetricName.metricNameFor(s), gaugeSortedMap, values);
                 for (Map.Entry<String, Object> entry : values.entrySet()) {
+                    // 将 value 转换为合法的 MetricFamilySamples
                     MetricFamilySamples.Sample sample = doubleValue(s, entry.getValue(), entry.getKey(), clzss);
                     EaseAgentPrometheusExports.this.addToMap(mfSamplesMap, new MetricFamilySamples(sample.name, type, getHelpMessage(sample.name, clzss), Collections.singletonList(sample)));
                 }
+                // 清空 values，等待下一次写入值
                 values.clear();
             }
         }
@@ -141,6 +145,7 @@ public class EaseAgentPrometheusExports extends Collector implements Collector.D
 
         @Override
         protected void writeValue(MetricName metricName, SortedMap<String, Counter> metric, Map<String, Object> values) {
+            // 底层使用转换器来写入值
             abstractConverter.writeCounters(metricName.getKey(), metricName.getMetricSubType(), metric, values);
         }
     }

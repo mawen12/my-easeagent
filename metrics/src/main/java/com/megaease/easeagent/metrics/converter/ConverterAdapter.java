@@ -31,6 +31,9 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+/**
+ * 每一个 converter 都负责一个 nameFactory
+ */
 public class ConverterAdapter extends AbstractConverter {
 
     // 从对应 nameFactory 配置的指标类型进行读取

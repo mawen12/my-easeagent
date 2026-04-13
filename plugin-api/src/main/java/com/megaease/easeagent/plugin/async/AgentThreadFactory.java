@@ -21,12 +21,17 @@ import javax.annotation.Nullable;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * 自定义的线程工厂，线程名称为 EaseAgent-<x>，且仅使用守护线程
+ */
 public class AgentThreadFactory implements ThreadFactory {
     protected static AtomicInteger createCount = new AtomicInteger(1);					// Used internally to compute Thread names that comply with the Java specification
 
     @Override
     public Thread newThread(@Nullable Runnable r) {
+        // 线程名称为：EaseAgent-<x>
         Thread thread = new Thread(r, "EaseAgent-" + createCount.getAndIncrement());
+        // 守护线程，不会影响JVM的正常关闭
         thread.setDaemon(true);
         return thread;
     }

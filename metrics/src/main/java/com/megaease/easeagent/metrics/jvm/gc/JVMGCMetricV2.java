@@ -50,10 +50,14 @@ public class JVMGCMetricV2 extends ServiceMetric {
     private static IPluginConfig config;
 
     public static JVMGCMetricV2 getMetric() {
+        // 读取 plugin.observability.jvmGc.metric 的配置信息
         config = AutoRefreshPluginConfigRegistry.getOrCreate("observability", "jvmGc", "metric");
+        // 创建用于上报的指标名称前缀
         Tags tags = new Tags("application", "jvm-gc", "resource");
 
+        // 创建 MetricRegistry
         JVMGCMetricV2 v2 = ServiceMetricRegistry.getOrCreate(config, tags, METRIC_SUPPLIER);
+        // 通过监听器收集
         v2.collect();
 
         return v2;
@@ -66,10 +70,12 @@ public class JVMGCMetricV2 extends ServiceMetric {
 
     static NameFactory nameFactory() {
         return NameFactory.createBuilder()
+            // 收集测量时间
             .meterType(MetricSubType.DEFAULT, ImmutableMap.<MetricField, MetricValueFetcher>builder()
                 .put(MetricField.TIMES, MetricValueFetcher.MeteredCount)
                 .put(MetricField.TIMES_RATE, MetricValueFetcher.MeteredMeanRate)
                 .build())
+            // 收集回收次数
             .counterType(MetricSubType.DEFAULT, ImmutableMap.<MetricField, MetricValueFetcher>builder()
                 .put(MetricField.TOTAL_COLLECTION_TIME, MetricValueFetcher.CountingCount)
                 .build())

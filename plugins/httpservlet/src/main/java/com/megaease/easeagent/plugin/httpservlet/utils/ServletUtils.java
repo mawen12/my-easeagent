@@ -66,6 +66,7 @@ public class ServletUtils {
         return httpRoute != null ? httpRoute.toString() : "";
     }
 
+    // 检查请求头上是否存在指定属性
     public static boolean markProcessed(HttpServletRequest request, String mark) {
         // 读取
         if (request.getAttribute(mark) != null) {
@@ -75,6 +76,7 @@ public class ServletUtils {
         return false;
     }
 
+    // startTime 读取开始时间，如果没有则设置为当前时间
     public static long startTime(HttpServletRequest httpServletRequest) {
         // 读取请求头上的开始时间
         Object startObj = httpServletRequest.getAttribute(START_TIME);
@@ -89,26 +91,32 @@ public class ServletUtils {
     }
 
 
+    // getQueries 读取请求的 queryString
     @SneakyThrows
     public static Map<String, List<String>> getQueries(HttpServletRequest httpServletRequest) {
         Map<String, List<String>> map = new HashMap<>();
+        // 获取查询字符串
         String queryString = httpServletRequest.getQueryString();
         if (queryString == null || queryString.isEmpty()) {
             return map;
         }
+        // 使用 & 拆分
         String[] pairs = queryString.split("&");
         for (String pair : pairs) {
+            // 提取 key value
             int idx = pair.indexOf("=");
             String key = idx > 0 ? URLDecoder.decode(pair.substring(0, idx), "UTF-8") : pair;
             if (!map.containsKey(key)) {
                 map.put(key, new LinkedList<>());
             }
+            // 处理多值场景
             String value = idx > 0 && pair.length() > idx + 1 ? URLDecoder.decode(pair.substring(idx + 1), "UTF-8") : null;
             map.get(key).add(value);
         }
         return map;
     }
 
+    // getQueries4SingleValue 对 queryString 中的多值仅取首个值
     public static Map<String, String> getQueries4SingleValue(HttpServletRequest httpServletRequest) {
         Map<String, List<String>> map = getQueries(httpServletRequest);
         Map<String, String> singleValueMap = new HashMap<>();

@@ -64,6 +64,7 @@ public abstract class BaseServletInterceptor implements NonReentrantInterceptor 
                 )
             );
         } else {
+            // TODO 优化代码分支判断，该分支和第一个 if 重复
             internalAfter(null, key, httpServletRequest, httpServletResponse, start);
         }
     }

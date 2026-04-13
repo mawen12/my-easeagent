@@ -23,6 +23,9 @@ import com.megaease.easeagent.metrics.jvm.memory.JVMMemoryMetricV2;
 import com.megaease.easeagent.plugin.bean.AgentInitializingBean;
 import com.megaease.easeagent.plugin.bean.BeanProvider;
 
+/**
+ * 主要负责注册 JVM 相关的指标，比如 GC 和 Memory
+ */
 public class JvmBeanProvider implements BeanProvider, AgentInitializingBean {
     private final MetricProviderImpl metricProvider = new MetricProviderImpl();
 

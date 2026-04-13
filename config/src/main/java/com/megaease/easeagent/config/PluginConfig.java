@@ -35,8 +35,11 @@ public class PluginConfig implements IPluginConfig {
     private final String domain;
     private final String namespace;
     private final String id;
+    // 全局配置
     private final Map<String, String> global;
+    // 覆盖配置，即特定该插件的配置
     private final Map<String, String> cover;
+    // 配置是否开启
     private final boolean enabled;
 
     protected PluginConfig(@Nonnull String domain, @Nonnull String id, @Nonnull Map<String, String> global, @Nonnull String namespace, @Nonnull Map<String, String> cover, @Nonnull Set<PluginConfigChangeListener> listeners) {
@@ -46,6 +49,8 @@ public class PluginConfig implements IPluginConfig {
         this.global = global;
         this.cover = cover;
         this.listeners = listeners;
+
+        // 读取 enabled 配置，如果没有配置，则默认为 false
         Boolean b = getBoolean(Const.ENABLED_CONFIG);
         if (b == null) {
             enabled = false;
@@ -89,16 +94,20 @@ public class PluginConfig implements IPluginConfig {
 
     @Override
     public String getString(String property) {
+        // 从 cover 读取配置
         String value = cover.get(property);
         if (value != null) {
             return value;
         }
+
+        // fallback 从 global 读取配置
         return global.get(property);
     }
 
 
     @Override
     public Integer getInt(String property) {
+        // conver -> global
         String value = this.getString(property);
         if (value == null) {
             return null;
@@ -116,16 +125,21 @@ public class PluginConfig implements IPluginConfig {
 
     @Override
     public Boolean getBoolean(String property) {
+        // 从 cover 中读取配置
         String value = cover.get(property);
         boolean implB = true;
         if (value != null) {
             implB = isTrue(value);
         }
+
+        // 从 global 中读取配置
         value = global.get(property);
         boolean globalB = false;
         if (value != null) {
             globalB = isTrue(value);
         }
+
+        // 取两者的与，即只有当 cover 中配置为 true 且 global 中配置为 true 时，才返回 true，否则返回 false
         return implB && globalB;
     }
 
@@ -136,6 +150,7 @@ public class PluginConfig implements IPluginConfig {
 
     @Override
     public Double getDouble(String property) {
+        // conver -> global
         String value = this.getString(property);
         if (value == null) {
             return null;
@@ -149,6 +164,7 @@ public class PluginConfig implements IPluginConfig {
 
     @Override
     public Long getLong(String property) {
+        // conver -> global
         String value = this.getString(property);
         if (value == null) {
             return null;

@@ -102,20 +102,27 @@ public class ConfigUtils {
         return PLUGIN_GLOBAL.equals(namespace);
     }
 
+    // 只有以 plugin. 开头的配置才是 plugin 配置
     public static boolean isPluginConfig(String key) {
         return key != null && key.startsWith(PLUGIN_PREFIX);
     }
 
+    // 只有以 plugin.{domain}.{namespace}.{id} 开头的配置才是 plugin 配置
+    // 其中 domain 是指插件的领域，比如 async 就是 observability，namespace 是指插件的命名空间，比如 async 就是 async，id 是指插件的 id，
+    // biru
     public static boolean isPluginConfig(String key, String domain, String namespace, String id) {
         return key != null && key.startsWith(ConfigConst.join(PLUGIN, domain, namespace, id));
     }
 
+    // plugin.observability.redis.tracing.enabled
     public static PluginProperty pluginProperty(String path) {
         String[] configs = path.split("\\" + DELIMITER);
+        // 比如大于等于5
         if (configs.length < 5) {
             throw new ValidateUtils.ValidException(String.format("Property[%s] must be format: %s", path, ConfigConst.join(PLUGIN, "<Domain>", "<Namespace>", "<Id>", "<Properties>")));
         }
 
+        // TODO 该代码中处理的值没有被使用
         for (int idOffsetEnd = 3; idOffsetEnd < configs.length - 1; idOffsetEnd++) {
             new PluginProperty(configs[1], configs[2],
                 ConfigConst.join(Arrays.copyOfRange(configs, 3, idOffsetEnd)),

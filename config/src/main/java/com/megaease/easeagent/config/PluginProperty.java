@@ -19,6 +19,13 @@ package com.megaease.easeagent.config;
 
 import java.util.Objects;
 
+/**
+ * 单个配置属性，比如 plugin.observability.redis.tracing.enabled 解析为
+ * domain: observability
+ * namesapce: redis
+ * id: tracing
+ * property: enabled
+ */
 public class PluginProperty {
     private final String domain;
     private final String namespace;

@@ -85,6 +85,7 @@ public class PluginConfigManager implements IConfigFactory {
     }
 
     private Map<String, String> getGlobalConfig(String domain, String id) {
+        // 全局配置为:plugin：
         return getConfigSource(domain, PLUGIN_GLOBAL, id);
     }
 
@@ -104,6 +105,7 @@ public class PluginConfigManager implements IConfigFactory {
     private Set<Key> keys(Set<String> keys) {
         Set<Key> propertyKeys = new HashSet<>();
         for (String k : keys) {
+            // 比如 k = plugin.observability.redis.tracing.enabled
             if (!ConfigUtils.isPluginConfig(k)) {
                 continue;
             }
@@ -224,7 +226,7 @@ public class PluginConfigManager implements IConfigFactory {
             synchronized (PluginConfigManager.this) {
                 // 读取配置
                 Map<String, String> sources = configs.getConfigs();
-                // 获取配置键集合
+                // 获取配置键集合，比如 plugin.observability.redis.tracing.enabled=true
                 Set<Key> sourceKeys = keys(sources.keySet());
                 for (Key sourceKey : sourceKeys) {
                     // 构建 pluginSourceConfigs 配置

@@ -149,6 +149,7 @@ public class JdbcMetric extends ServiceMetric implements RemovalListener<String,
         // 读取仪表，更新统计 TODO 因为其继承了 ServiceMetric，因此可以直接调用 gauge 方法来获取 Gauge 实例
         MetricName gaugeName = this.nameFactory.gaugeNames(key).get(MetricSubType.DEFAULT);
         metricRegistry.gauge(gaugeName.name(), () -> () -> LastMinutesCounterGauge.builder()
+            // getOneMinuteRate 返回的是 1分钟内发生的事件平均数，值单位为：事件数/秒
             .m1Count((long) meter.getOneMinuteRate() * 60)
             .m5Count((long) meter.getFiveMinuteRate() * 60 * 5)
             .m15Count((long) meter.getFifteenMinuteRate() * 60 * 15)

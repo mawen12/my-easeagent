@@ -30,10 +30,18 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
+/**
+ * 用于创建 AgentLogger 的工厂类
+ *
+ * @param <T>
+ */
 public class AgentLoggerFactory<T extends AgentLogger> {
     private final AgentLogger agentLogger;
+    // 本质上是指向 easeagent.jar/log4j2 的专门的 URLClassLoader
     private final ClassLoader classLoader;
+    // 指向 com.megaease.easeagent.log4j2.impl.LoggerProxyFactory("com.megaease.easeagent.log4j2.api.AgentLogger")
     private final Object factory;
+    // 指向 com.megaease.easeagent.log4j2.impl.LoggerProxyFactory#getAgentLogger(String)
     private final Method method;
     private final Function<Logger, T> loggerSupplier;
     private final Mdc mdc;
@@ -58,7 +66,8 @@ public class AgentLoggerFactory<T extends AgentLogger> {
 
     public <N extends AgentLogger> AgentLoggerFactory<N> newFactory(Function<Logger, N> loggerSupplier, Class<N> tClass) {
         try {
-            return new Builder<N>(classLoader, loggerSupplier, tClass).build();
+            return new Builder<N>(classLoader, loggerSupplier, tClass)
+                .build();
         } catch (ClassNotFoundException | NoSuchMethodException
             | NoSuchFieldException | InstantiationException | InvocationTargetException | IllegalAccessException e) {
             agentLogger.error("new factory fail: {}", e);
@@ -67,13 +76,18 @@ public class AgentLoggerFactory<T extends AgentLogger> {
     }
 
     public T getLogger(String name) {
+        // 切换 Thread Class Loader
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         try {
+            // 切换到指向 easeagent.jar/log4j2 的专属 class loader
             Thread.currentThread().setContextClassLoader(classLoader);
+            // 调用 LoggerProxyFactory#getAgentLogger
             Object o = method.invoke(factory, name);
+            // 切换回原先的 ClassLoader
             Thread.currentThread().setContextClassLoader(oldClassLoader);
+            // 转换为 jul
             java.util.logging.Logger logger = (java.util.logging.Logger) o;
-            // 还原为之前的 ClassLoader
+            // 本质上是调用 AgentLogger#new
             return loggerSupplier.apply(logger);
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new Log4j2Exception(e);
@@ -97,7 +111,7 @@ public class AgentLoggerFactory<T extends AgentLogger> {
             this.tClass = tClass;
         }
 
-        // build
+        // build 创建 AgentLogger 工厂
         public AgentLoggerFactory<T> build() throws ClassNotFoundException, NoSuchMethodException,
             IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchFieldException {
 
@@ -105,11 +119,12 @@ public class AgentLoggerFactory<T extends AgentLogger> {
             // 这就代表该方法有可能在程序的任意声明周期内被调用，所以需要保证在调用完成后，能够还原为之前的 class loader，以免对程序的其他部分造成影响
             ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
             try {
-                // 临时设置为builder 中的 class loader
+                // 切换到指向 easeagent.jar/log4j2 的专属 class loader
+                // 这是为了进行 class 隔离
                 Thread.currentThread().setContextClassLoader(classLoader);
                 // 定位并加载类 com.megaease.easeagent.log4j2.impl.LoggerProxyFactory
                 Class<?> clazz = classLoader.loadClass("com.megaease.easeagent.log4j2.impl.LoggerProxyFactory");
-                // 定位并加载类 java.lang.String
+                // 定位并加载类 java.lang.String，本质上是通过 Bootstrap class loader来加载
                 Class<?> parameterTypes = classLoader.loadClass(String.class.getName());
                 // 通过反射获取 LoggerProxyFactory 的构造方法 (String)
                 Constructor<?> constructor = clazz.getDeclaredConstructor(String.class);

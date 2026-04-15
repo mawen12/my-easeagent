@@ -51,7 +51,7 @@
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
         </dependency>
-        
+
         <dependency>
             <groupId>com.lmax</groupId>
             <artifactId>disruptor</artifactId>
@@ -100,6 +100,7 @@
                         </goals>
                         <configuration>
                             <shadedArtifactAttached>true</shadedArtifactAttached><!-- optional -->
+                            <!-- 将 shade 后的包后缀加上 agent-lib -->
                             <shadedClassifierName>agent-lib</shadedClassifierName>
 
                             <relocations>

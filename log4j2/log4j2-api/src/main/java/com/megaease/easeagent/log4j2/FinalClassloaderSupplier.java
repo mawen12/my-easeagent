@@ -20,12 +20,13 @@ package com.megaease.easeagent.log4j2;
 import java.util.function.Supplier;
 
 /**
- * 该类会在 Main.java 中使用 EaseAgent class loader进行加载，
- * 然后会给 CLASSLOADER 赋值，值为 agent jar 下的 log4j2/ 目录下的所有 jar 为搜索范围，且没有父级的的 class loader.
+ * 在 loader/Main 中，被 EaseAgentClassLoader 进行加载，但是其内部的 CLASSLOADER 却是独立的。
  */
 @SuppressWarnings("all")
 public class FinalClassloaderSupplier implements Supplier<ClassLoader> {
-    // 该 ClassLoader 指向 agent jar/log4j2 下所有 jar 单独的一个 class loader
+    // 该 ClassLoader 指向 easeagent.jar/log4j2 下单独的一个 class loader
+    // 具体看 com.megaease.easeagent.Main#initEaseAgentSlf4j2Dir
+    // 名称为 URLClassLoader
     public static volatile ClassLoader CLASSLOADER = null;
 
 

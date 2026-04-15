@@ -24,6 +24,9 @@ import java.util.logging.Level;
 
 import static com.megaease.easeagent.log4j2.api.ILevel.*;
 
+/**
+ * 其实现 jul 只是为了避免直接在项目中注入 slf4j/logback/log4j 的依赖
+ */
 public class Slf4jLogger extends java.util.logging.Logger {
     private final Logger logger;
 

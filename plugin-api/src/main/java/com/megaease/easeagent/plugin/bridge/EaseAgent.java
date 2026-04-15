@@ -40,6 +40,8 @@ public final class EaseAgent {
     public static AgentInfo agentInfo;
     public static MetricRegistrySupplier metricRegistrySupplier = NoOpMetrics.NO_OP_METRIC_SUPPLIER;
     public static IContextManager initializeContextSupplier = () -> NoOpContext.NO_OP_CONTEXT;
+    // 所有 Interceptor 中使用的 Logger 都从该工厂中获取，该类起到一个适配器的用途。
+    // 其底层为：LoggerFactoryImpl -> log4j2-api/LoggerFactory
     public static ILoggerFactory loggerFactory = NoOpLoggerFactory.INSTANCE;
     public static Mdc loggerMdc = NoOpLoggerFactory.NO_OP_MDC_INSTANCE;
     public static IConfigFactory configFactory = new NoOpConfigFactory();

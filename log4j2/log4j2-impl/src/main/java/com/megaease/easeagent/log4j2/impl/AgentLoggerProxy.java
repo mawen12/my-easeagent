@@ -40,6 +40,14 @@ import java.io.Serializable;
 
 /**
  * SLF4J logger implementation that uses Log4j.
+ *
+ * 底层使用 Log4j。
+ * - isXxxEnabled -> logIfEnabled
+ * - Xxx(String) -> logIfEnabled(Xxx, null, String)
+ * - Xxx(String, Object) -> logIfEnabled(Xxx, null, String, Object)
+ * - Xxx(String, Object, Object) -> logIfEnabled(Xxx, null, String, Object, Object)
+ * - Xxx(String, Object...) -> logIfEnabled(Xxx, null, String, Object...)
+ * - Xxx(String, Throwable) -> logIfEnabled(Xxx, null, String, Throwable)
  */
 public class AgentLoggerProxy implements LocationAwareLogger, Serializable {
 

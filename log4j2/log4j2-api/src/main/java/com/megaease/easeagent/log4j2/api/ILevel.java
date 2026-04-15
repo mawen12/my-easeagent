@@ -17,6 +17,17 @@
 
 package com.megaease.easeagent.log4j2.api;
 
+/**
+ * 日志级别映射。
+ * - OFF -> 1
+ * - FATAL -> 2
+ * - ERROR -> 3
+ * - WARN -> 4
+ * - INFO -> 5
+ * - DEBUG -> 6
+ * - TRACE -> 7
+ * - ALL -> 8
+ */
 public class ILevel extends java.util.logging.Level {
     public static final int OFF_VALUE = 1;
     public static final int FATAL_VALUE = 2;

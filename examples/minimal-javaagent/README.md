@@ -69,26 +69,6 @@ Built-in interceptors:
 - `logging`: print enter/exit
 - `timing`: print slow-call logs when elapsed time >= `interceptor.timing.warnMs`
 
-## Route different methods to different chains
-
-You can bind interceptor chains by method name:
-
-- `targetMethods`: methods to instrument, split by `|`
-- `defaultInterceptors`: default chain, split by `|`
-- `methodInterceptors`: per-method override, format `methodA=interceptor1|interceptor2;methodB=interceptor1`
-
-Example:
-
-```bash
-java -javaagent:target/minimal-javaagent-1.0.0.jar=targetClass=com.example.app.GreetingService,targetMethods=sayHello|sayHello2,defaultInterceptors=logging,methodInterceptors=sayHello=logging|timing,interceptor.timing.warnMs=1 -cp target/minimal-javaagent-1.0.0.jar com.example.app.DemoApplication
-```
-
-Meaning:
-
-- `sayHello` uses `logging + timing`
-- `sayHello2` uses default `logging`
-- methods not in `methodInterceptors` fall back to `defaultInterceptors`
-
 ## Replace package names
 
 You can replace `com.example` with your own package name and keep the same structure.

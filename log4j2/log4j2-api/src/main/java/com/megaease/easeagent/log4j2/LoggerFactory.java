@@ -24,10 +24,12 @@ import java.util.function.Function;
 import java.util.logging.Level;
 
 public class LoggerFactory {
+    // 默认使用 java log
     public static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(LoggerFactory.class.getName());
     protected static final AgentLoggerFactory<AgentLogger> FACTORY;
 
     static {
+        // 构造用于获取 AgentLogger 的日志工厂
         AgentLoggerFactory<AgentLogger> factory = null;
         try {
             factory = AgentLoggerFactory.builder(
@@ -41,7 +43,7 @@ public class LoggerFactory {
         FACTORY = factory;
     }
 
-    // classLoaderSupplier 获取 class loader
+    // classLoaderSupplier 获取 class loader，本质上是获取专门指向 eaeagent.jar/log4j2 的 URLClassLoader
     private static ClassloaderSupplier classLoaderSupplier() {
         return new ClassloaderSupplier.ClassloaderSupplierImpl();
     }
@@ -66,6 +68,7 @@ public class LoggerFactory {
     }
 
 
+    // NOP 实现
     public static class NoopLogger implements Logger {
         private final String name;
 

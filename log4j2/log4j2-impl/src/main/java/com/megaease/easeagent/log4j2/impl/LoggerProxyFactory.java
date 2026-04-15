@@ -47,6 +47,7 @@ public class LoggerProxyFactory extends AbstractLoggerAdapter<AgentLoggerProxy> 
         this.loggerFqcn = loggerFqcn;
     }
 
+    // getAgentLogger 返回 Slf4jLogger
     public static Slf4jLogger getAgentLogger(String name) {
         return new Slf4jLogger(LOGGER_FACTORY.getLogger(name));
     }

@@ -20,9 +20,19 @@ package com.megaease.easeagent.log4j2.api;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
+/**
+ * agent 内部使用的 Log，底层使用 java log。
+ * - isXxxEnabled -> isLoggable(XXX)
+ * - Xxx(String) -> log(Xxx, String)
+ * - Xxx(String, Object) -> log(Xxx, String, Object)
+ * - Xxx(String, Object, Object) -> log(Xxx, String, Object[])
+ * - Xxx(String, Object...) -> log(Xxx, String, Object...)
+ * - Xxx(String, Throwable) -> log(Xxx, String, Throwable)
+ */
 public class AgentLogger implements com.megaease.easeagent.log4j2.Logger {
     public static final Function<Logger, AgentLogger> LOGGER_SUPPLIER = AgentLogger::new;
 
+    // 底层使用 Slf4jLogger
     private final Logger logger;
 
     public AgentLogger(Logger logger) {

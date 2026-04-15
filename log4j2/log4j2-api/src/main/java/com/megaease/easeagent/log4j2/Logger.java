@@ -19,6 +19,15 @@ package com.megaease.easeagent.log4j2;
 /**
  * This interface extract from slf4j-api to avoid conflict with user's application's usage of slf4j
  * By warping log4j2, Logger is compatible with slf4j interface.
+ *
+ * 底层的日志接口，提供一下功能：
+ * - logger 的实例名称
+ * - isXXXEnabled 是否开启了指定了的日志级别
+ * - xxx(String) 记录一条字符串日志
+ * - xxx(String, Object) 记录一条带有单个可替换参数的字符串日志
+ * - xxx(String, Object, Object) 记录一条带有两个可替换参数的字符串日志
+ * - xxx(String, Object...) 记录一条带有3个及以上可替换参数的字符串日志
+ * - xxx(String, Throwable) 记录一条带有异常信息的字符串日志
  */
 public interface Logger {
 

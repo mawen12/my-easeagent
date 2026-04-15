@@ -33,6 +33,7 @@ import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 
 public class Main {
+    // 指向 Bootstrap Class loader
     private static final ClassLoader BOOTSTRAP_CLASS_LOADER = null;
     private static final String LIB = "lib/";
     private static final String BOOTSTRAP = "boot/";
@@ -63,7 +64,7 @@ public class Main {
             urls.addAll(directoryPluginUrls(p));
         }
 
-        // 使用agent jar中(lib/, plguins/, log4j2/)的路径构造自定义的 class loader
+        // 使用agent jar中(lib/, plugins/, log4j2/)的路径构造自定义的 class loader
         loader = buildClassLoader(urls.toArray(new URL[0]));
 
         // install bootstrap jar
@@ -73,12 +74,12 @@ public class Main {
         // boo/ 下的目录实际上是 plugin-api，这些 api 是可以被共享到 bootstrap 中的
         bootUrls.forEach(url -> installBootstrapJar(url, inst));
 
-        // 读取 agent jar 中的 Manifest 文件中的属性
+        // 读取 agent jar 中的 Manifest 文件中的属性，用于获取 Logging-Property 值
         final Attributes attributes = JAR_CACHE.getManifest().getMainAttributes();
-        // 获取 Logging-Property 属性值
         final String loggingProperty = attributes.getValue(LOGGING_PROPERTY);
         // 获取 Bootstrap-Class 属性值，实际为：[build]com.megaease.easeagent.StartBootstrap
         final String bootstrap = attributes.getValue("Bootstrap-Class");
+
         // 将 log4j2/ 目录下的 jar 的 class loader 设置到 com.megaease.easeagent.log4j2.FinalClassloaderSupplier 的 CLASSLOADER 字段中
         initEaseAgentSlf4j2Dir(JAR_CACHE, loader);
 
@@ -193,7 +194,6 @@ public class Main {
         // 如果没有设值，则使用默认的 easeagent-log4j2.xml
         if (Strings.isNullOrEmpty(logConfigPath)) {
             logConfigPath = DEFAULT_AGENT_LOG_CONF;
-
         }
         return logConfigPath;
     }

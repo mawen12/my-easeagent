@@ -36,6 +36,7 @@ public class MetricCallback extends AsyncCallback {
     @Override
     public void onCompletion(RecordMetadata metadata, Exception exception) {
         try {
+            // TODO 这部分逻辑可以专门放到 collectProducerMetric(String, long, bool) 方法中，与之前写法保持一致
             this.kafkaMetric.producerStop(start, topic);
             if (exception != null) {
                 this.kafkaMetric.errorProducer(topic);

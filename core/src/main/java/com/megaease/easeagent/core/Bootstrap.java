@@ -161,6 +161,7 @@ public class Bootstrap {
         builder.installOn(inst);
         LOGGER.info("installBegin use time: {}ms", (System.currentTimeMillis() - installBegin));
 
+        // TODO ns fix to ms, because it use toMillis
         LOGGER.info("Initialization has took {}ns", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - begin));
     }
 

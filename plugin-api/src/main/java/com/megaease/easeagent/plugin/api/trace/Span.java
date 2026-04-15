@@ -49,6 +49,7 @@ import javax.annotation.Nullable;
 // can simply call start when they are ready.
 @SuppressWarnings("unused")
 public interface Span {
+    // 支持不同场景的区分
     enum Kind {
         CLIENT,
         SERVER,
@@ -76,6 +77,8 @@ public interface Span {
     }
 
     /**
+     * 不记录任何消息
+     *
      * When true, no recording is done and nothing is reported . However, this span should
      * still be injected into outgoing requests. Use this flag to avoid performing expensive
      * computation.
@@ -88,6 +91,8 @@ public interface Span {
     Span name(String name);
 
     /**
+     * 用于记录上下文，比如 your_app.version
+     *
      * Tags give your span context for search, viewing and analysis. For example, a key
      * "your_app.version" would let you lookup spans by version. A tag "sql.query" isn't searchable,
      * but it can help in debugging when viewing a trace.
@@ -105,6 +110,7 @@ public interface Span {
     Span annotate(String value);
 
     /**
+     * 开始一个 span
      * Starts the span with an implicit timestamp.
      *
      * <p>Spans can be modified before calling start. For example, you can add tags to the span and
@@ -121,6 +127,8 @@ public interface Span {
     Span start(long timestamp);
 
     /**
+     * 标识上下文中span的类型
+     *
      * When present, the span is remote. This value clarifies how to interpret {@link
      * #remoteServiceName(String)} and {@link #remoteIpAndPort(String, int)}.
      */
@@ -135,6 +143,8 @@ public interface Span {
     Span annotate(long timestamp, String value);
 
     /**
+     * 记录错误
+     *
      * Records an error that impacted this operation.
      *
      * <p><em>Note:</em> Calling this does not {@linkplain #finish() finish} the span.
@@ -186,16 +196,22 @@ public interface Span {
     boolean remoteIpAndPort(@Nullable String remoteIp, int remotePort);
 
     /**
+     * 丢失 span
+     *
      * Throws away the current span without reporting it.
      */
     void abandon();
 
     /**
+     * 结束 span
+     *
      * Reports the span complete, assigning the most precise duration possible.
      */
     void finish();
 
     /**
+     * 结束 span
+     *
      * Like {@link #finish()}, except with a given timestamp in microseconds.
      *
      * <p> span duration is derived by subtracting the start
@@ -207,6 +223,8 @@ public interface Span {
     void finish(long timestamp);
 
     /**
+     * 上报 span 给 zipkin
+     *
      * Reports the span, even if unfinished. Most users will not call this method.
      *
      * <p>This primarily supports two use cases: one-way spans and orphaned spans. For example, a
@@ -240,6 +258,8 @@ public interface Span {
     Span cacheScope();
 
     /**
+     * 返回当前 span 的 traceId
+     *
      * Returns the hex representation of the span's trace ID
      */
     String traceIdString();

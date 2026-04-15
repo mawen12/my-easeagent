@@ -49,6 +49,8 @@ public class KafkaProducerAdvice implements Points {
             .build().or(ClassMatcher.builder().hasClassName("org.apache.kafka.clients.producer.MockProducer")
                 .build());
 
+        // named("org.apache.kafka.clients.producer.KafkaProducer").or(named("org.apache.kafka.clients.producer.MockProducer"))
+
     }
 
     @Override

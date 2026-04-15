@@ -28,6 +28,8 @@ import com.megaease.easeagent.plugin.redis.interceptor.RedisClientUtils;
 public class LettuceMetricInterceptor extends CommonRedisMetricInterceptor {
     @Override
     public String getKey(MethodInfo methodInfo, Context context) {
+        // 使用首个参数的值作为 key，首个参数一般为 RedisCommand/Collection<RedisCommand>
+        // 其中带有 type，就是其命令
         return RedisClientUtils.cmd(methodInfo.getArgs()[0]);
     }
 }

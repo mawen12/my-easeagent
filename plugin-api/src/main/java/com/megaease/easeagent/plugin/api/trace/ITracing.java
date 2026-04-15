@@ -38,6 +38,8 @@ import java.util.List;
  */
 public interface ITracing extends Tracing {
     /**
+     * 为 async 导出一个 SpanContext
+     *
      * Export a {@link SpanContext} for async
      * It will only export the information about the current Span.
      * If you need SpanContext, generate result use {@link Context#exportAsync()}.
@@ -48,6 +50,8 @@ public interface ITracing extends Tracing {
     SpanContext exportAsync();
 
     /**
+     * 为 async 导入一个 SpanContext
+     *
      * Import a {@link SpanContext} for async
      * It will only import the information about the async TraceContext.
      * If you need import SpanContext and get Scope, generate result use {@link Context#importAsync(AsyncContext)}.

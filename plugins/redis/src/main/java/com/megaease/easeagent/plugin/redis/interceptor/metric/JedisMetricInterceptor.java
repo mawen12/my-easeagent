@@ -27,6 +27,7 @@ import com.megaease.easeagent.plugin.redis.advice.JedisAdvice;
 public class JedisMetricInterceptor extends CommonRedisMetricInterceptor {
     @Override
     public String getKey(MethodInfo methodInfo, Context context) {
+        // 使用方法名称作为 key，比如 Jedis#ping
         return methodInfo.getMethod();
     }
 }

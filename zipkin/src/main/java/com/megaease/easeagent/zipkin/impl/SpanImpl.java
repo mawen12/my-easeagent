@@ -32,6 +32,9 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
 
+/**
+ * Span 的底层实现，使用 brave.Span
+ */
 public class SpanImpl implements Span {
     private static final Map<Kind, brave.Span.Kind> KINDS;
 
@@ -174,6 +177,7 @@ public class SpanImpl implements Span {
 
     @Override
     public boolean remoteIpAndPort(@Nullable String remoteIp, int remotePort) {
+        // TODO 是否应该以该方法返回值为准
         span.remoteIpAndPort(remoteIp, remotePort);
         return false;
     }

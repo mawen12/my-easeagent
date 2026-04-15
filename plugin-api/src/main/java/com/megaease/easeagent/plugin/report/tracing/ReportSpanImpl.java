@@ -19,6 +19,9 @@ package com.megaease.easeagent.plugin.report.tracing;
 
 import java.util.*;
 
+/**
+ * 用于上报到 zipkin 的 span 实现类
+ */
 public class ReportSpanImpl implements ReportSpan {
     String traceId;
     String parentId;

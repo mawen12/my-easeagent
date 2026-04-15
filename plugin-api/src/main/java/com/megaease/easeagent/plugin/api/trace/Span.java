@@ -265,21 +265,29 @@ public interface Span {
     String traceIdString();
 
     /**
+     * 读取当前 span 的 spanId
+     *
      * Returns the hex representation of the span's ID
      */
     String spanIdString();
 
     /**
+     * 读取当前 span 的 parentId
+     *
      * Returns the hex representation of the span's parent ID
      */
     String parentIdString();
 
     /**
+     * 唯一的8字节标识符，在其所有的 span 中都会设置一个
+     *
      * Unique 8-byte identifier for a trace, set on all spans within it.
      */
     Long traceId();
 
     /**
+     * 唯一的8字节标识符，标识 trace 中的当前的 span
+     *
      * Unique 8-byte identifier of this span within a trace.
      *
      * <p>A span is uniquely identified in storage by ({@linkplain #traceId}).
@@ -287,6 +295,8 @@ public interface Span {
     Long spanId();
 
     /**
+     * 父级的 spanId
+     *
      * The parent's {@link #spanId} or null if this the root span in a trace.
      */
     Long parentId();

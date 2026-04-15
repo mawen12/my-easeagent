@@ -21,7 +21,7 @@ import com.megaease.easeagent.plugin.api.Context;
 import com.megaease.easeagent.plugin.bridge.NoOpTracer;
 
 /**
- * 提供追踪所需的工具
+ * 提供追踪所需的工具，其角色类似于 tracer，可用来生成 span 和获取当前 span。
  *
  * This provides utilities needed for trace instrumentation.
  *

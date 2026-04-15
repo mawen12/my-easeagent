@@ -74,7 +74,7 @@ public class JdbcStmTracingInterceptor implements NonReentrantInterceptor {
             return;
         }
 
-        // 创建新的 span
+        // 创建新的 span，如果之前没有，该 span 为 root span，否则就是之前 span 的 child span
         Span span = context.nextSpan();
         // Statement stm = (Statement) methodInfo.getInvoker();
         // 记录目标方法，有 execute、executeQuery、executeUpdate、addBatch、clearBatch 等等
@@ -93,7 +93,7 @@ public class JdbcStmTracingInterceptor implements NonReentrantInterceptor {
         RedirectProcessor.setTagsIfRedirected(Redirect.DATABASE, span, url);
         // 读取数据库信息
         DatabaseInfo databaseInfo = DatabaseInfo.getFromConnection(conn);
-        if (databaseInfo != null) {
+        if (databaseInfo != null) { // 对于跨服务的场景，需要记录 remoteEndpoint 信息，方便链路追踪系统展示调用关系
             span.remoteServiceName(remoteServiceName(databaseInfo));
             span.remoteIpAndPort(databaseInfo.getHost(), databaseInfo.getPort());
         }

@@ -44,6 +44,9 @@ import com.megaease.easeagent.zipkin.logging.AgentMDCScopeDecorator;
 import zipkin2.reporter.Reporter;
 import zipkin2.reporter.brave.ConvertZipkinSpanHandler;
 
+/**
+ * 提供 brave Tracing 的初始化，以及上报的初始化。
+ */
 public class TracingProviderImpl implements BeanProvider, AgentReportAware, ConfigAware, AgentInitializingBean, TracingProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(TracingProviderImpl.class);
     private static final String ENV_ZIPKIN_SERVER_URL = "ZIPKIN_SERVER_URL";
@@ -53,6 +56,8 @@ public class TracingProviderImpl implements BeanProvider, AgentReportAware, Conf
     public static final String SAMPLER_TYPE_BOUNDARY = "boundary";
     // brave 的 Tracing
     private Tracing tracing;
+    // 封装了 brave.Tracing 的 ITracing 实现，提供给 plugin-api 使用
+    // 全局唯一
     private volatile ITracing iTracing;
     private AgentReport agentReport;
     private Config config;

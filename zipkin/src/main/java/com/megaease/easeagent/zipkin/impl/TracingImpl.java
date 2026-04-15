@@ -105,6 +105,7 @@ public class TracingImpl implements ITracing {
         if (tracer != null) {
             span = build(tracer.currentSpan());
         }
+        // 如果 span 为 null，就返回 NoOpTracer.NO_OP_SPAN，否则返回当前 span。
         return NoOpTracer.noNullSpan(span);
     }
 

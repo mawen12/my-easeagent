@@ -25,6 +25,8 @@ import com.megaease.easeagent.plugin.report.metric.MetricReporterFactory;
 /**
  * 专门用于 agent 的上报器，用于上报 trace/metric/access-log/app-log 数据
  *
+ * 需要注意的是，metric 可以通过 AgentHttpServer 的 /metrics 端点被 Prometheus 拉去。
+ *
  * report interface:
  * trace/metric/accessLog
  */

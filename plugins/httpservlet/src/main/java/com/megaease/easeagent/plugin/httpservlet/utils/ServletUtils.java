@@ -38,6 +38,7 @@ public class ServletUtils {
     public static final String BEST_MATCHING_PATTERN_ATTRIBUTE_FIELD_NAME = "BEST_MATCHING_PATTERN_ATTRIBUTE";
     public static final String BEST_MATCHING_PATTERN_ATTRIBUTE;
 
+    // 用于获取请求的 route，比如 /api/comments/{id}
     static {
         String pattern = null;
         Object field = ClassUtils.getStaticField(HANDLER_MAPPING_CLASS, BEST_MATCHING_PATTERN_ATTRIBUTE_FIELD_NAME);

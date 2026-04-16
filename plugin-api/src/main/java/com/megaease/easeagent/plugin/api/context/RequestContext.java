@@ -25,6 +25,8 @@ import com.megaease.easeagent.plugin.api.trace.Span;
 import java.util.Map;
 
 /**
+ * 带有 Request + Span（Kind=CLIENT/SERVER）+ scope（用于异步线程绑定 span） 的请求上下文
+ *
  * A cross-process data context, including tracing and Forwarded Headers
  * <p>
  * The Scope must be close after plugin:
@@ -90,4 +92,6 @@ public interface RequestContext extends Setter {
      * @param response {@link Response}
      */
     void finish(Response response);
+
+
 }

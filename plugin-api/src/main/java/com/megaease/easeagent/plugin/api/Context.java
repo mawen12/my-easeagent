@@ -330,6 +330,7 @@ public interface Context {
      * 为下一个 server 创建一个 RequestContext，其将传递多个 key:value 以满足 Trace。
      * 这发生在向 Dubbo/Motan/HTTP/Sofa/Kafka/RabbitMQ 等 Server 发起请求时
      *
+     * 用于创建 Kind=CLIENT 的 span，此处会在之后向其他服务器发起调用
      *
      * Create a RequestContext for the next Server
      * It will pass multiple key:value values required by Trace and EaseAgent through
@@ -367,6 +368,8 @@ public interface Context {
     /**
      * 从上游的 Server 创建一个 RequestContext，其将传递多个 key:value 以满足 Trace。
      * 这发生在接收来自 Dubbo/Motan/HTTP/Sofa/Kafka/RabbitMQ 等 Server 的请求时
+     *
+     * 用于创建 Kind=SERVER 的 span，此处用于响应客户端的调用
      *
      * Obtain key:value from the request passed by a parent Server and create a RequestContext
      * <p>

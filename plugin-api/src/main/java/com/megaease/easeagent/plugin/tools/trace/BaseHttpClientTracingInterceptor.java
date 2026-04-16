@@ -23,13 +23,16 @@ import com.megaease.easeagent.plugin.api.Context;
 import com.megaease.easeagent.plugin.api.context.RequestContext;
 import com.megaease.easeagent.plugin.interceptor.NonReentrantInterceptor;
 
+/**
+ * 用于客户端对象发起请求的基类，此处会创建一个 Kind=CLIENT 的 span
+ */
 public abstract class BaseHttpClientTracingInterceptor implements NonReentrantInterceptor {
 
     @Override
     public void doBefore(MethodInfo methodInfo, Context context) {
         // 读取请求
         HttpRequest request = getRequest(methodInfo, context);
-        // 创建带有 span 和请求信息的请求上下文
+        // 创建 CLIENT 的 span 和请求信息的请求上下文
         RequestContext requestContext = context.clientRequest(request);
         // 对 span 进行标记并启动
         HttpUtils.handleReceive(requestContext.span().start(), request);

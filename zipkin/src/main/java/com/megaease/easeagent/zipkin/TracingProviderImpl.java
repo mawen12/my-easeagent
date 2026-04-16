@@ -92,6 +92,7 @@ public class TracingProviderImpl implements BeanProvider, AgentReportAware, Conf
         // 当前从 agent.properties 读取的值为 demo-service
         serviceName = new AutoRefreshConfigItem<>(config, ConfigConst.SERVICE_NAME, Config::getString);
 
+        // TODO 代码无需分开
         Reporter<ReportSpan> reporter;
         reporter = span -> agentReport.report(span);
 

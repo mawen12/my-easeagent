@@ -30,6 +30,8 @@ import com.megaease.easeagent.plugin.report.encoder.JsonEncoder;
 import java.util.Map;
 
 /**
+ * 将 Map 数据编码为 JSON 形式的字节数组，然后保存到 EncodedData 中。
+ *
  * 指标的 json 编码器，指标是以 map 格式进行编码的
  *
  * 其底层使用 ByteWrapper 来包装编码结果

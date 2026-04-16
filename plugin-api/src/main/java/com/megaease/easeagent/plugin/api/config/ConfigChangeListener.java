@@ -19,6 +19,9 @@ package com.megaease.easeagent.plugin.api.config;
 
 import java.util.List;
 
+/**
+ * 当配置变更时，实现该接口的类应该将配置更新，然后对相应组件刷新
+ */
 public interface ConfigChangeListener {
     void onChange(List<ChangeItem> list);
 }

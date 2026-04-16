@@ -27,6 +27,9 @@ import com.megaease.easeagent.plugin.api.middleware.Type;
 import com.megaease.easeagent.plugin.api.trace.Span;
 import com.megaease.easeagent.plugin.interceptor.NonReentrantInterceptor;
 
+/**
+ * 适用于 jedis 和 lettuce 的 trace
+ */
 public abstract class CommonRedisTracingInterceptor implements NonReentrantInterceptor {
     private static final Object ENTER = new Object();
     private static final Object SPAN_KEY = new Object();
@@ -34,10 +37,13 @@ public abstract class CommonRedisTracingInterceptor implements NonReentrantInter
 
     @Override
     public void doBefore(MethodInfo methodInfo, Context context) {
+        // 读取当前已经存在的 span
         Span currentSpan = context.currentTracing().currentSpan();
         if (currentSpan.isNoop()) {
+            // 对于 noop 的 span，直接跳过
             return;
         }
+        //
         doTraceBefore(methodInfo, context);
     }
 
@@ -59,27 +65,38 @@ public abstract class CommonRedisTracingInterceptor implements NonReentrantInter
     public abstract void doTraceBefore(MethodInfo methodInfo, Context context);
 
     protected void startTracing(Context context, String name, String uri, String cmd) {
+        // 使用 cmd 作为 span 名称，生成新的 span
         Span span = context.nextSpan().name(name).start();
+        // 标记为 client
         span.kind(Span.Kind.CLIENT);
+        // 远程标识为 redis
         span.remoteServiceName("redis");
+        // 保存到 context
         context.put(SPAN_KEY, span);
         if (cmd != null) {
+            // 如果 cmd 不为 null，则记录到 redis.method 中
             span.tag("redis.method", cmd);
         }
+        // 记录component.type -> redis
         span.tag(MiddlewareConstants.TYPE_TAG_NAME, Type.REDIS.getRemoteType());
+
         RedirectProcessor.setTagsIfRedirected(Redirect.REDIS, span);
     }
 
     protected void finishTracing(Throwable throwable, Context context) {
         try {
+            // 获取 span
             Span span = context.get(SPAN_KEY);
             if (span == null) {
                 return;
             }
+            // 记录异常
             if (throwable != null) {
                 span.error(throwable);
             }
+            // 结束
             span.finish();
+            // 移除 span
             context.remove(SPAN_KEY);
         } catch (Exception ignored) {
         }

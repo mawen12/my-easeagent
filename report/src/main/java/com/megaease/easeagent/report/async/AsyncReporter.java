@@ -26,6 +26,8 @@ import java.util.concurrent.ThreadFactory;
 /**
  * AsyncReporter 异步上报工具
  *
+ * 支持配置变更
+ *
  * @param <S>
  */
 public interface AsyncReporter<S> extends ConfigChangeListener {

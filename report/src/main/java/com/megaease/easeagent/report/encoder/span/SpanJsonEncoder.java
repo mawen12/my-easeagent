@@ -29,6 +29,9 @@ import com.megaease.easeagent.plugin.report.tracing.ReportSpan;
 import com.megaease.easeagent.report.GlobalExtractor;
 import zipkin2.internal.JsonCodec;
 
+/**
+ * 将 ReportSpan 数据编码为 JSON 形式的字节数组，然后保存到 EncodedData 中。
+ */
 @AutoService(Encoder.class)
 @SuppressWarnings("unused")
 public class SpanJsonEncoder extends JsonEncoder<ReportSpan> {

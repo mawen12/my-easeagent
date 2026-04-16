@@ -37,6 +37,9 @@ import java.util.TreeMap;
 
 import static com.megaease.easeagent.config.report.ReportConfigConst.ENCODER_KEY;
 
+/**
+ * 将 AgentLogData 数据编码为 JSON 形式的字节数组，然后保存到 EncodedData 中。
+ */
 @AutoService(Encoder.class)
 public class LogDataJsonEncoder extends JsonEncoder<AgentLogData> implements ConfigChangeListener {
     public static final String ENCODER_NAME = ReportConfigConst.LOG_DATA_JSON_ENCODER_NAME;

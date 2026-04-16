@@ -66,8 +66,11 @@ public class TracingImpl implements ITracing {
         this.propagationKeys = tracing.propagation().keys();
         Propagation<String> propagation = tracing.propagation();
 
+        // 用于设置请求头的注入器，该 kind 从 request 上获取
         this.defaultZipkinInjector = propagation.injector(Request::setHeader);
+        // 用于设置请求头的注入器
         this.clientZipkinInjector = propagation.injector(new RemoteSetterImpl<>(brave.Span.Kind.CLIENT));
+        // 用于读取请求头的读取器
         this.defaultZipkinExtractor = propagation.extractor(Request::header);
         this.messagingTracing = MessagingTracingImpl.build(tracing);
     }
@@ -117,11 +120,14 @@ public class TracingImpl implements ITracing {
         return SpanImpl.build(tracing(), bSpan, cacheScope, defaultZipkinInjector);
     }
 
+    // 从 request 上读取 kind、name 设值到 span 上
     private void setInfo(brave.Span span, Request request) {
+        // 使用request的 kind 设值到 span上
         Span.Kind kind = request.kind();
         if (kind != null) {
             span.kind(SpanImpl.braveKind(kind));
         }
+        // 使用 request 的 name 设值到 span 上
         span.name(request.name());
     }
 
@@ -162,10 +168,14 @@ public class TracingImpl implements ITracing {
         return NoOpTracer.NO_OP_SCOPE;
     }
 
+    // 创建一个用于请求的上下文
     @Override
     public RequestContext clientRequest(Request request) {
+        // 创建一个新的 span
         brave.Span span = SpanImpl.nextBraveSpan(tracing, defaultZipkinExtractor, request);
+        // 封装到异步请求
         AsyncRequest asyncRequest = new AsyncRequest(request);
+        // 获取 context 中的值
         clientZipkinInjector.inject(span.context(), asyncRequest);
         Span newSpan = build(span, request.cacheScope());
         return new RequestContextImpl(newSpan, newSpan.maybeScope(), asyncRequest);
@@ -173,6 +183,7 @@ public class TracingImpl implements ITracing {
 
     @Override
     public RequestContext serverReceive(Request request) {
+        // 检查当前是否存在 span
         TraceContext maybeParent = tracing.currentTraceContext().get();
         // Unlike message consumers, we try current span before trying extraction. This is the proper
         // order because the span in scope should take precedence over a potentially stale header entry.
@@ -184,6 +195,7 @@ public class TracingImpl implements ITracing {
                 ? tracer().joinSpan(extracted.context())
                 : tracer().nextSpan(extracted);
         } else { // If we have a span in scope assume headers were cleared before
+            // 直接在当前的span下创建一个child
             span = tracing.tracer().newChild(maybeParent);
         }
 

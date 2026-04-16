@@ -22,6 +22,7 @@ import java.util.Iterator;
 /** Use of this type happens off the application's main thread. This type is not thread-safe */
 @SuppressWarnings("unused")
 public class AgentBufferNextMessage<S> implements WithSizeConsumer<S> {
+
     public static <S> AgentBufferNextMessage<S> create(Encoder<S> encoder, int maxBytes, long timeoutNanos) {
         return new AgentBufferNextMessage<>(encoder, maxBytes, timeoutNanos);
     }
@@ -40,6 +41,7 @@ public class AgentBufferNextMessage<S> implements WithSizeConsumer<S> {
         this.maxBytes = maxBytes;
         this.timeoutNanos = timeoutNanos;
         this.encoder = coder;
+        // 更新数据
         resetMessageSizeInBytes();
     }
 
@@ -48,6 +50,7 @@ public class AgentBufferNextMessage<S> implements WithSizeConsumer<S> {
     }
 
     void resetMessageSizeInBytes() {
+        // 获取数据以JSON格式，包含[,]的实际大小
         packageSizeInBytes = encoder.packageSizeInBytes(sizes);
     }
 

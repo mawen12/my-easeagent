@@ -65,6 +65,7 @@ public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
     ThreadFactory threadFactory;
 
     SenderWithEncoder sender;
+    // sender 所使用的编码器
     Encoder<S> encoder;
 
     AsyncProps asyncProperties;
@@ -105,6 +106,7 @@ public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
         return this.sender;
     }
 
+    // setSender 更新 sender 时会同时更新其编码器
     @Override
     public void setSender(SenderWithEncoder sender) {
         this.sender = sender;
@@ -141,35 +143,49 @@ public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
 
     /**
      * Returns true if the was encoded and accepted onto the queue.
+     *
+     * 上报数据，其将计算数据大小，决定能否加入到待发送的队列中
      */
     @SneakyThrows
     public void report(S next) {
+        // 检查 sender 是否可用
         if (!this.sender.isAvailable()) {
             return;
         }
 
         metrics.incrementItems(1);
+        // 计算要上报的数据的字节大小
         int nextSizeInBytes = encoder.sizeInBytes(next);
+        // 计算编码为 JSON 后的所有字节，加上 [,]
         int messageSizeOfNextSpan = encoder.packageSizeInBytes(Collections.singletonList(nextSizeInBytes));
+        // 增加字节计数
         metrics.incrementSpanBytes(nextSizeInBytes);
+
         if (closed.get() ||
             // don't enqueue something larger than we can drain
+            // 对于超出限制的数据，应当丢失
+
             messageSizeOfNextSpan > messageMaxBytes ||
+            // 将该内容加入到 pending 中
             !pending.offer(next, nextSizeInBytes)) {
+            // 上述任何操作失败，均代表数据不会被保存，需要+1
             metrics.incrementItemsDropped(1);
         }
     }
 
     public final void flush() {
+        // 检查 sender 是否可用
         if (!this.sender.isAvailable()) {
             return;
         }
 
+        //
         flush(AgentBufferNextMessage.create(encoder, messageMaxBytes, 0), pending);
     }
 
 
     void flush(AgentBufferNextMessage<S> bundler, AgentByteBoundedQueue<S> pending) {
+        // 检查 reporter 状态
         if (closed.get()) {
             throw new IllegalStateException("closed");
         }

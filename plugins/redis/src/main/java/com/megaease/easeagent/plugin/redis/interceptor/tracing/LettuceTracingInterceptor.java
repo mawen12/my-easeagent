@@ -28,7 +28,9 @@ import com.megaease.easeagent.plugin.redis.interceptor.RedisClientUtils;
 public class LettuceTracingInterceptor extends CommonRedisTracingInterceptor {
     @Override
     public void doTraceBefore(MethodInfo methodInfo, Context context) {
+        // 读取 cmd
         String cmd = RedisClientUtils.cmd(methodInfo.getArgs()[0]);
+        // 使用 cmd 作为名称
         this.startTracing(context, cmd, null, cmd);
     }
 }

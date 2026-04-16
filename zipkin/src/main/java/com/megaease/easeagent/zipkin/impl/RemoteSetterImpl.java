@@ -21,6 +21,9 @@ import brave.Span;
 import brave.propagation.Propagation;
 import com.megaease.easeagent.plugin.api.trace.Request;
 
+/**
+ * 负责将字段和值注入到 request 中
+ */
 public class RemoteSetterImpl<R extends Request> implements Propagation.RemoteSetter<R> {
     private final brave.Span.Kind kind;
 
@@ -35,6 +38,7 @@ public class RemoteSetterImpl<R extends Request> implements Propagation.RemoteSe
 
     @Override
     public void put(Request request, String fieldName, String value) {
+        // 核心方法：将字段和值注入到请求头中
         request.setHeader(fieldName, value);
     }
 }

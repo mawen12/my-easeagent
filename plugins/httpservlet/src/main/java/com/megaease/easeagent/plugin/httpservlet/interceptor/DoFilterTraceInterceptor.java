@@ -40,6 +40,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * 用于服务器接收请求的处理类，此处会创建 Kind=SERVER 的 span
+ */
 @AdviceTo(value = DoFilterPoints.class, plugin = HttpServletPlugin.class)
 public class DoFilterTraceInterceptor implements NonReentrantInterceptor {
     private static final String AFTER_MARK = DoFilterTraceInterceptor.class.getName() + "$AfterMark";
@@ -47,14 +50,18 @@ public class DoFilterTraceInterceptor implements NonReentrantInterceptor {
 
     @Override
     public void doBefore(MethodInfo methodInfo, Context context) {
+        // 以防已经有重复的存在了
         HttpServletRequest httpServletRequest = (HttpServletRequest) methodInfo.getArgs()[0];
         RequestContext requestContext = (RequestContext) httpServletRequest.getAttribute(ServletUtils.PROGRESS_CONTEXT);
         if (requestContext != null) {
             return;
         }
+
         HttpRequest httpRequest = new HttpServerRequest(httpServletRequest);
+        // 创建带有 request + span(KIND=SERVER) + scope 的 context
         requestContext = context.serverReceive(httpRequest);
         httpServletRequest.setAttribute(ServletUtils.PROGRESS_CONTEXT, requestContext);
+        // 开始 span
         HttpUtils.handleReceive(requestContext.span().start(), httpRequest);
     }
 
@@ -68,13 +75,18 @@ public class DoFilterTraceInterceptor implements NonReentrantInterceptor {
         RequestContext requestContext = (RequestContext) httpServletRequest.getAttribute(ServletUtils.PROGRESS_CONTEXT);
         try {
             Span span = requestContext.span();
-            if (!httpServletRequest.isAsyncStarted()) {
+            if (!httpServletRequest.isAsyncStarted()) { // 同步
+                // 记录 http.route 到 tag
                 span.tag(TraceConst.HTTP_TAG_ROUTE, ServletUtils.getHttpRouteAttributeFromRequest(httpServletRequest));
+                // 结束 span
                 HttpUtils.finish(span, new Response(methodInfo.getThrowable(), httpServletRequest, httpServletResponse));
-            } else if (methodInfo.getThrowable() != null) {
+            } else if (methodInfo.getThrowable() != null) { // 出现异常，就没有响应了
+                // 记录异常
                 span.error(methodInfo.getThrowable());
+                // 结束 span
                 span.finish();
-            } else {
+            } else { // 异步
+                // 使用异步监听器完成 span
                 httpServletRequest.getAsyncContext().addListener(new TracingAsyncListener(requestContext), httpServletRequest, httpServletResponse);
             }
         } finally {
@@ -147,8 +159,10 @@ public class DoFilterTraceInterceptor implements NonReentrantInterceptor {
         }
     }
 
+
     public static final class TracingAsyncListener implements AsyncListener {
         final RequestContext requestContext;
+        // TODO 该方法存在多次并发调用的可能
         final AtomicBoolean sendHandled = new AtomicBoolean();
 
         TracingAsyncListener(RequestContext requestContext) {
@@ -157,9 +171,10 @@ public class DoFilterTraceInterceptor implements NonReentrantInterceptor {
 
         public void onComplete(AsyncEvent e) {
             HttpServletRequest req = (HttpServletRequest) e.getSuppliedRequest();
-            if (sendHandled.compareAndSet(false, true)) {
+            if (sendHandled.compareAndSet(false, true)) { // 仅允许一次
                 HttpServletResponse res = (HttpServletResponse) e.getSuppliedResponse();
                 Response response = new Response(e.getThrowable(), req, res);
+                //
                 HttpUtils.save(requestContext.span(), response);
                 requestContext.finish(response);
             }
@@ -167,12 +182,15 @@ public class DoFilterTraceInterceptor implements NonReentrantInterceptor {
         }
 
         public void onTimeout(AsyncEvent e) {
+            // 记录错误
             onError(e);
         }
 
         public void onError(AsyncEvent e) {
+            // 记录错误
             ServletRequest request = e.getSuppliedRequest();
             if (request.getAttribute(ERROR_KEY) == null) {
+                // 设置 error
                 request.setAttribute(ERROR_KEY, e.getThrowable());
             }
         }

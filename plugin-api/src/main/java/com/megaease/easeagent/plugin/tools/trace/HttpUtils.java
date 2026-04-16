@@ -22,7 +22,8 @@ import com.megaease.easeagent.plugin.api.trace.Span;
 import static com.megaease.easeagent.plugin.tools.trace.TraceConst.HTTP_HEADER_X_FORWARDED_FOR;
 
 public class HttpUtils {
-    private HttpUtils() {}
+    private HttpUtils() {
+    }
 
     public static void handleReceive(Span span, HttpRequest httpRequest) {
         span.name(httpRequest.name());
@@ -45,30 +46,40 @@ public class HttpUtils {
 
     public static void finish(Span span, HttpResponse httpResponse) {
         save(span, httpResponse);
+        // 完成 span
         span.finish();
     }
 
+    // 记录
     public static void save(Span span, HttpResponse httpResponse) {
         Throwable error = httpResponse.maybeError();
-        if (error != null) {
+        if (error != null)
+            // 记录 error
             span.error(error); // Ensures MutableSpan.error() for SpanHandler
-        }
+        // 读取状态码
         int statusCode = httpResponse.statusCode();
-        if (statusCode != 0) {
+        if (statusCode != 0) { // 非 0 代表响应已经完成
             String nameFromRoute = spanNameFromRoute(httpResponse, statusCode);
-            if (nameFromRoute != null) span.name(nameFromRoute);
+            if (nameFromRoute != null)
+                // 记录方法描述（not found/direct）
+                span.name(nameFromRoute);
             if (statusCode < 200 || statusCode > 299) { // not success code
+                // 记录非 2xx 的响应码 http.status_code
                 span.tag(TraceConst.HTTP_TAG_STATUS_CODE, String.valueOf(statusCode));
             }
         }
         if (error == null && (statusCode < 100 || statusCode > 399)) {
+            // 记录 error [0, 100) && [400,) 的值
             span.tag(TraceConst.HTTP_TAG_ERROR, String.valueOf(statusCode));
         }
     }
 
+    // 从请求和响应中提取 spanName
     static String spanNameFromRoute(HttpResponse httpRequest, int statusCode) {
+        // 读取请求方法 GET/POST/DELETE/PUT/...
         String method = httpRequest.method();
         if (method == null) return null; // don't undo a valid name elsewhere
+        // 读取 router /api/comments/{id}
         String route = httpRequest.route();
         if (route == null) return null; // don't undo a valid name elsewhere
         if (!"".equals(route)) return method + " " + route;
@@ -78,6 +89,7 @@ public class HttpUtils {
     static String catchAllName(String method, int statusCode) {
         switch (statusCode) {
             // from https://tools.ietf.org/html/rfc7231#section-6.4
+            // 3xx 是重定向
             case 301:
             case 302:
             case 303:

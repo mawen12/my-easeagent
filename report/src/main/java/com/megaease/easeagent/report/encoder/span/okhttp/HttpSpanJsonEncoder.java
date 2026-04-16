@@ -27,6 +27,9 @@ import com.megaease.easeagent.report.encoder.span.SpanJsonEncoder;
 
 import java.util.List;
 
+/**
+ * 将 ReportSpan 数据编码为 JSON 形式的字节数组，然后保存到 EncodedData 中。
+ */
 @AutoService(Encoder.class)
 public class HttpSpanJsonEncoder implements Encoder<ReportSpan> {
     public static final String ENCODER_NAME = ReportConfigConst.HTTP_SPAN_JSON_ENCODER_NAME;

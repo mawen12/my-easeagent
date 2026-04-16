@@ -25,6 +25,11 @@ import com.megaease.easeagent.plugin.api.trace.Span;
 
 import java.util.Map;
 
+/**
+ * 带有请求的上下文追踪器
+ *
+ * 本质上用于请求场景的 span
+ */
 public class RequestContextImpl implements RequestContext {
     private final Span span;
     private final Scope scope;
@@ -63,12 +68,15 @@ public class RequestContextImpl implements RequestContext {
 
     @Override
     public void finish(Response response) {
+        // 读取 response 上携带的请求头字段
         String[] fields = ProgressFields.getResponseHoldTagFields();
         if (!ProgressFields.isEmpty(fields)) {
             for (String field : fields) {
+                // 记录到 span tags 中
                 span.tag(field, response.header(field));
             }
         }
+        // 结束 span
         span.finish();
     }
 }

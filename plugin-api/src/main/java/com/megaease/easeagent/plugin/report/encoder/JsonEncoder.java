@@ -24,6 +24,8 @@ import com.megaease.easeagent.plugin.report.Encoder;
 import java.util.List;
 
 /**
+ * JSON 编码器，用于将任意数据编码为 JSON 形式的字节数组，然后保存到 EncodedData 中。
+ *
  * JSON Encoder
  * @param <T> abstract type
  */
@@ -50,16 +52,23 @@ public abstract class JsonEncoder<T> implements Encoder<T> {
         return new ByteWrapper(buf);
     }
 
+    /**
+     * 计算多个元素组成的消息包大小，这些元素需要被编码为 JSON 格式， [xxx,xxx]，本质上是计算加上前后括号，逗号的整体长度
+     *
+     * @param sizes the size list of encoded items
+     * @return
+     */
     @Override
     public int packageSizeInBytes(List<Integer> sizes) {
+        // 前后括号
         int sizeInBytes = 2; // brackets
 
         if (sizes != null && !sizes.isEmpty()) {
             for (Integer size : sizes) {
                 sizeInBytes += size;
-                sizeInBytes++;
+                sizeInBytes++; // 逗号
             }
-            sizeInBytes--;
+            sizeInBytes--; // 最后一个不需要逗号
         }
 
         return sizeInBytes;

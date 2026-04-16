@@ -20,6 +20,10 @@ package com.megaease.easeagent.plugin.report;
 import com.megaease.easeagent.plugin.api.config.Config;
 
 /**
+ * 编码器，将编码后的结果保存到 EncodedData 中。
+ *
+ * 主要在数据上报时，将特定数据编码后转换为字节数组，然后进行上报
+ *
  * borrow from zipkin's BytesEncoder
  * Removing Encoding enum, and add encoderName method, allow define any kind of encoder with a unique name.
  * When the name is conflict with others, it will fail when load.

@@ -23,6 +23,9 @@ import com.megaease.easeagent.plugin.api.trace.Span;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 专门用于保存所有的 setHeader 的记录的
+ */
 public class AsyncRequest implements Request {
     private final Request request;
     private final Map<String, String> header;

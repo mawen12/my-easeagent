@@ -17,6 +17,11 @@
  */
 package com.megaease.easeagent.report.async.zipkin;
 
+/**
+ * 支持按字节大小进行限制的消费者
+ *
+ * @param <S>
+ */
 public interface WithSizeConsumer<S> {
     /** Returns true if the element could be added or false if it could not due to its size. */
     boolean offer(S next, int nextSizeInBytes);

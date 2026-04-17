@@ -19,7 +19,11 @@ import com.megaease.easeagent.plugin.report.Encoder;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-/** Use of this type happens off the application's main thread. This type is not thread-safe */
+/**
+ * Use of this type happens off the application's main thread. This type is not thread-safe
+ *
+ * 非线程安全的类
+ */
 @SuppressWarnings("unused")
 public class AgentBufferNextMessage<S> implements WithSizeConsumer<S> {
 
@@ -28,12 +32,14 @@ public class AgentBufferNextMessage<S> implements WithSizeConsumer<S> {
     }
 
     final Encoder<S> encoder;
+    // 原始的数据字节
     final int maxBytes;
     final long timeoutNanos;
     final ArrayList<S> spans = new ArrayList<>();
     final ArrayList<Integer> sizes = new ArrayList<>();
 
     long deadlineNanoTime;
+    // 经过编码器编码后的字节大小，比如使用 JSON 编码器，就需要在原先的基础加上 [,]
     int packageSizeInBytes;
     boolean bufferFull;
 
@@ -56,14 +62,17 @@ public class AgentBufferNextMessage<S> implements WithSizeConsumer<S> {
 
     /** This is done inside a lock that holds up writers, so has to be fast. No encoding! */
     public boolean offer(S next, int nextSizeInBytes) {
+        // 计算加入该字节后的累计大小
         int x = messageSizeInBytes(nextSizeInBytes);
+        // 检查是否超过限制
         int includingNextVsMaxBytes = Integer.compare(x, maxBytes); // Integer.compare, but JRE 6
-
-        if (includingNextVsMaxBytes > 0) {
+        if (includingNextVsMaxBytes > 0) { // 处理超过限制的场景
+            // 代表缓冲区已满，不能再加入元素了
             bufferFull = true;
             return false; // can't fit the next message into this buffer
         }
 
+        //
         addSpanToBuffer(next, nextSizeInBytes);
         packageSizeInBytes = x;
 

@@ -190,6 +190,7 @@ public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
             throw new IllegalStateException("closed");
         }
 
+        // 将message加入到队列中
         pending.drainTo(bundler, bundler.remainingNanos());
 
         // record after flushing reduces the amount of gauge events vs on doing this on report

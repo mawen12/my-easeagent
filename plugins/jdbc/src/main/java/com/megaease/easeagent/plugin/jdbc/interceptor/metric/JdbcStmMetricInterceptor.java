@@ -55,10 +55,10 @@ public class JdbcStmMetricInterceptor implements NonReentrantInterceptor {
                     metric = ServiceMetricRegistry.getOrCreate(config,
                         tags,
                         JdbcMetric.METRIC_SUPPLIER);
+                    // 读取压缩
                     sqlCompression = SQLCompressionFactory.getSqlCompression();
-                    cache = CacheBuilder.newBuilder()
-                        .maximumSize(maxCacheSize).removalListener(metric).build();
-
+                    // 构造最大容纳 1000 条记录的缓存
+                    cache = CacheBuilder.newBuilder().maximumSize(maxCacheSize).removalListener(metric).build();
                 }
             }
         }
@@ -73,11 +73,13 @@ public class JdbcStmMetricInterceptor implements NonReentrantInterceptor {
         // 读取在之前拦截器中设置的 sql
         SqlInfo sqlInfo = context.get(SqlInfo.class);
         String sql = sqlInfo.getSql();
-        // 对 sql 压缩
+        // 对 sql 压缩，结果为 MD5
         String key = sqlCompression.compress(sql);
         // 收集 sql 执行失败/成功的次数
         metric.collectMetric(key, methodInfo.getThrowable() == null, context);
+        // 读取缓存
         String value = cache.getIfPresent(key);
+        // 如果缓存为 null，则为空字符串
         if (value == null) {
             cache.put(key, "");
         }

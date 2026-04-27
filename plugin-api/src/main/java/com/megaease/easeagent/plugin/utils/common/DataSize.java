@@ -17,23 +17,34 @@
 
 package com.megaease.easeagent.plugin.utils.common;
 
+/**
+ * 字节大小定义工具
+ */
 public class DataSize {
     /**
+     * 1KB
+     *
      * Bytes per Kilobyte.
      */
     private static final long BYTES_PER_KB = 1024;
 
     /**
+     * 1MB
+     *
      * Bytes per Megabyte.
      */
     private static final long BYTES_PER_MB = BYTES_PER_KB * 1024;
 
     /**
+     * 1GB
+     *
      * Bytes per Gigabyte.
      */
     private static final long BYTES_PER_GB = BYTES_PER_MB * 1024;
 
     /**
+     * 1TB
+     *
      * Bytes per Terabyte.
      */
     private static final long BYTES_PER_TB = BYTES_PER_GB * 1024;

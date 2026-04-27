@@ -28,11 +28,15 @@ public class SQLCompressionWrapper implements SQLCompression {
 
     @Override
     public String compress(String origin) {
+        // 读取配置
         Config config = EaseAgent.getConfig();
+        // 检查是否开启了 SQL 压缩
         Boolean enabled = config.getBoolean(SQL_COMPRESS_ENABLED);
+        // 如果开启了，则使用 MD5 的 SQL 压缩方案
         if (enabled) {
             return MD5SQLCompression.getInstance().compress(origin);
         }
+        // 否则使用默认的方案，即不压缩
         return SQLCompression.DEFAULT.compress(origin);
     }
 }

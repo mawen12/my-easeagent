@@ -17,8 +17,14 @@
 
 package com.megaease.easeagent.plugin.jdbc.common;
 
+/**
+ * SQL 语句压缩
+ */
 public interface SQLCompression {
 
+    /**
+     * 默认不压缩
+     */
     SQLCompression DEFAULT = origin -> origin;
 
     String compress(String origin);

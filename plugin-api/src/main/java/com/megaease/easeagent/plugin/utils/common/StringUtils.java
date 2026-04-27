@@ -208,14 +208,28 @@ public class StringUtils {
         return true;
     }
 
+    /**
+     * 截取指定大小的字符串，需要处理最后一个字符出现截断的场景
+     *
+     * @param str
+     * @param size
+     * @return
+     */
     public static String cutStrByDataSize(String str, DataSize size) {
+        // 目标字符串转换为字节
         byte[] now = str.getBytes(StandardCharsets.UTF_8);
+        // 如果长度小于目标字节，则字节返回
         if (now.length <= size.toBytes()) {
             return str;
         }
+
+        // 构造上限为目标大小的字符串
         String tmp = new String(now, 0, (int) size.toBytes(), StandardCharsets.UTF_8);
+        // 读取新字符串最后一个字符
         char unstable = tmp.charAt(tmp.length() - 1);
+        // 读取旧字符串该位置的字符
         char old = str.charAt(tmp.length() - 1);
+        // 如果两个字符一致，就代表截取正确，否则需要往前挪一位，丢弃掉不可读的字符
         if (unstable == old) {
             return tmp;
         }

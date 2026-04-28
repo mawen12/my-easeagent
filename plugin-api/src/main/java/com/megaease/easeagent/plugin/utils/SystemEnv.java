@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 之后修改环境变量也都在 ENVIRONMENTS 上进行
  */
 public class SystemEnv {
+    // 值缓存，提升读取性能
     private static final Map<String, String> ENVIRONMENTS = new ConcurrentHashMap<>();
 
     public static String get(String name) {

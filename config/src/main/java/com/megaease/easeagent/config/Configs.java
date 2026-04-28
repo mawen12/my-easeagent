@@ -43,15 +43,18 @@ public class Configs implements Config {
         notifier = new ConfigNotifier("");
     }
 
+    // 仅更新配置，不通知
     public void updateConfigsNotNotify(Map<String, String> changes) {
         this.source.putAll(changes);
     }
 
+    // 更新配置并通知
     public void updateConfigs(Map<String, String> changes) {
         Map<String, String> dump = new TreeMap<>(this.source);
         List<ChangeItem> items = new LinkedList<>();
         changes.forEach((name, value) -> {
             String old = dump.get(name);
+            // 找出变更的配置
             if (!Objects.equals(old, value)) {
                 dump.put(name, value);
                 items.add(new ChangeItem(name, name, old, value));
@@ -60,6 +63,7 @@ public class Configs implements Config {
         if (!items.isEmpty()) {
             LOGGER.info("change items: {}", items);
             this.source = dump;
+            // 通知变更
             this.notifier.handleChanges(items);
         }
     }

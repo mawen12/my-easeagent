@@ -31,9 +31,18 @@ import com.megaease.easeagent.plugin.bridge.NoOpIPluginConfig;
 
 import java.util.function.Supplier;
 
+/**
+ * 封装了原始的拦截器，主要检查指定插件是否开启了配置
+ */
 public class InterceptorPluginDecorator implements Interceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(InterceptorPluginDecorator.class);
+    /**
+     * 原始的拦截器
+     */
     private final Interceptor interceptor;
+    /**
+     * 插件
+     */
     private final AgentPlugin plugin;
     private final AutoRefreshPluginConfigImpl config;
 
@@ -49,9 +58,12 @@ public class InterceptorPluginDecorator implements Interceptor {
 
     @Override
     public void before(MethodInfo methodInfo, Context context) {
+        // 读取配置
         IPluginConfig cfg = this.config.getConfig();
         InitializeContext innerContext = (InitializeContext) context;
+        // 将配置保存到栈顶
         innerContext.pushConfig(cfg);
+        // 如果插件未设置、开启了功能、则运行执行
         if (cfg == null || cfg.enabled() || cfg instanceof NoOpIPluginConfig) {
             innerContext.pushRetBound();
             this.interceptor.before(methodInfo, context);

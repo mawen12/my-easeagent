@@ -29,6 +29,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * 配置工厂，用于创建配置示例
+ */
 public class ConfigFactory {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigFactory.class);
     private static final String CONFIG_PROP_FILE = "agent.properties";
@@ -59,6 +62,7 @@ public class ConfigFactory {
     static {
         for (Map.Entry<String, String> entry : AGENT_CONFIG_KEYS_TO_PROPS.entrySet()) {
             // dot.case -> UPPER_UNDERSCORE
+            //
             AGENT_ENV_KEY_TO_PROPS.put(
                 ConfigPropertiesUtils.toEnvVarName(entry.getKey()),
                 entry.getValue()
@@ -74,6 +78,7 @@ public class ConfigFactory {
     static Map<String, String> updateEnvCfg() {
         Map<String, String> envCfg = new TreeMap<>();
 
+        // 读取变量 EASEAGENT_ENV_CONFIG 的值
         String configEnv = SystemEnv.get(EASEAGENT_ENV_CONFIG);
         if (StringUtils.isNotEmpty(configEnv)) {
             Map<String, Object> map = JsonUtil.toMap(configEnv);
@@ -111,7 +116,7 @@ public class ConfigFactory {
     /**
      * Get config file path from system properties or environment variables
      *
-     * 从系统属性或环境变量中获取配置文件路径，key从 easeagent.config.path -> otel.javaagent.configuration-file
+     * 从系统属性或环境变量中获取配置文件路径，key 从 easeagent.config.path -> otel.javaagent.configuration-file
      */
     public static String getConfigPath() {
         // get config path from -Deaseagent.config.path=/easeagent/agent.properties || export EASEAGENT_CONFIG_PATH=/easeagent/agent.properties
@@ -129,16 +134,18 @@ public class ConfigFactory {
     // loadConfigs 读取 agent.properties 和 agent.yaml 文件的配置
     // 再读取自定义的路径配置，然后进行合并
     public static GlobalConfigs loadConfigs(String pathname, ClassLoader loader) {
+        // Step 1: 读取默认配置
         // load property configuration file if exist
-        // 读取 agent.properties 文件的配置
+        // 读取默认配置 easeagent.jar/agent.properties
         GlobalConfigs configs = loadDefaultConfigs(loader, CONFIG_PROP_FILE);
 
         // load yaml configuration file if exist
-        // 读取 agent.yaml 文件的配置
+        // 读取默认配置 easeagent.jar/agent.yaml
         GlobalConfigs yConfigs = loadDefaultConfigs(loader, CONFIG_YAML_FILE);
-        // 合并配置
+        // 合并默认配置
         configs.mergeConfigs(yConfigs);
 
+        // Step 2: 读取用户自定义配置文件的配置，覆盖默认配置
         // override by user special config file
         // 读取用户自定义配置的路径，如果不为空，则加载该路径的配置，并进行合并
         if (StringUtils.isNotEmpty(pathname)) {
@@ -147,10 +154,12 @@ public class ConfigFactory {
             configs.mergeConfigs(configsFromOuterFile);
         }
 
+        // Step 3: 读取 otel 配置
         // override by opentelemetry sdk env config
         // 读取 opentelemetry sdk 的环境变量配置，并进行合并
         configs.updateConfigsNotNotify(OtelSdkConfigs.updateEnvCfg());
 
+        // Step 4: 读取 env 配置
         // check environment cfg override
         // 读取环境变量配置，并进行合并，优先级最高
         configs.updateConfigsNotNotify(updateEnvCfg());
@@ -163,6 +172,13 @@ public class ConfigFactory {
         return configs;
     }
 
+    /**
+     * 读取默认配置，默认配置就是 easeagent.jar/agent.properties/agent.yaml 的配置
+     *
+     * @param loader
+     * @param file
+     * @return
+     */
     private static GlobalConfigs loadDefaultConfigs(ClassLoader loader, String file) {
         GlobalConfigs globalConfigs = JarFileConfigLoader.load(file);
         if (globalConfigs != null) {

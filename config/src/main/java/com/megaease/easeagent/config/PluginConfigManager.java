@@ -84,6 +84,9 @@ public class PluginConfigManager implements IConfigFactory {
         return newPluginConfig;
     }
 
+    // 读取插件的全局配置，如：plugin.<domain>.global.<id>
+    // 比如：plugin.observability.global.metric.enabled=true
+    // plugin.observability.global.metric.enabled=true
     private Map<String, String> getGlobalConfig(String domain, String id) {
         // 全局配置为:plugin：
         return getConfigSource(domain, PLUGIN_GLOBAL, id);

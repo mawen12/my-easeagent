@@ -19,6 +19,9 @@ package com.megaease.easeagent.config;
 
 import com.megaease.easeagent.plugin.api.config.Config;
 
+/**
+ * 配置注入接口，实现该接口的类，都会在 config 初始化之后注入
+ */
 public interface ConfigAware {
     void setConfig(Config config);
 }

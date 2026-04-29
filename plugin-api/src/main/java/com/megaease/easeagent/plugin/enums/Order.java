@@ -33,8 +33,11 @@ public enum Order {
     FORWARDED(30, ConfigConst.PluginID.FORWARDED),
 
     TRACING_INIT(90, ConfigConst.PluginID.TRACING),
+
+    // 用于 Trace
     TRACING(100, ConfigConst.PluginID.TRACING),
 
+    // 用于 Metric
     METRIC(200, ConfigConst.PluginID.METRIC),
     LOG(201, ConfigConst.PluginID.LOG),
     LOW(210, "low"),

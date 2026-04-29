@@ -44,7 +44,7 @@ import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.WARNING;
 
 /**
- * 异步的上报器
+ * 异步的上报器，实现了将消息通过 sender 批量上报的功能
  *
  * @param <S>
  */
@@ -75,6 +75,7 @@ public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
      */
     private boolean shouldWarnException = true;
 
+    // 执行刷新的线程池
     List<Thread> flushThreads;
 
     DefaultAsyncReporter(Builder builder, AsyncProps asyncProperties) {
@@ -92,7 +93,7 @@ public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
     }
 
     public static <S> AsyncReporter<S> builderAsyncReporter(SenderWithEncoder sender,
-                                                                           AsyncProps asyncProperties) {
+                                                            AsyncProps asyncProperties) {
         return new Builder(sender, asyncProperties).build();
     }
 
@@ -143,8 +144,8 @@ public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
 
     /**
      * Returns true if the was encoded and accepted onto the queue.
-     *
-     * 上报数据，其将计算数据大小，决定能否加入到待发送的队列中
+     * <p>
+     * 上报数据，其将计算数据大小，决定能否加入到待发送的队列（pending）中
      */
     @SneakyThrows
     public void report(S next) {
@@ -163,8 +164,7 @@ public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
 
         if (closed.get() ||
             // don't enqueue something larger than we can drain
-            // 对于超出限制的数据，应当丢失
-
+            // 对于超出限制的数据，应当丢弃
             messageSizeOfNextSpan > messageMaxBytes ||
             // 将该内容加入到 pending 中
             !pending.offer(next, nextSizeInBytes)) {
@@ -190,7 +190,7 @@ public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
             throw new IllegalStateException("closed");
         }
 
-        // 将message加入到队列中
+        // 将当前 pending 的队列加入到 bundler 中
         pending.drainTo(bundler, bundler.remainingNanos());
 
         // record after flushing reduces the amount of gauge events vs on doing this on report
@@ -287,14 +287,21 @@ public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
         this.threadFactory = threadFactory;
     }
 
+    /**
+     * 创建线程池
+     */
     @Override
     public void startFlushThread() {
         if (this.messageTimeoutNanos > 0) {
+            // 创建线程池
             List<Thread> threads = new CopyOnWriteArrayList<>();
+            // 按照配置的数量进行创建
             for (int i = 0; i < asyncProperties.getReportThread(); i++) { // Multiple consumer consumption
                 final AgentBufferNextMessage<S> consumer =
                     AgentBufferNextMessage.create(encoder, this.messageMaxBytes, this.messageTimeoutNanos);
+                //
                 Thread flushThread = this.threadFactory.newThread(new Flusher<>(this, consumer));
+                // 线程名称格式：DefaultAsyncReporter{xxx}
                 flushThread.setName(NAME_PREFIX + "{" + this.sender + "}");
                 flushThread.setDaemon(true);
                 flushThread.start();
@@ -397,7 +404,9 @@ public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
             return this;
         }
 
-        /** How long to block for in-flight spans to send out-of-process on close. Default 1 second */
+        /**
+         * How long to block for in-flight spans to send out-of-process on close. Default 1 second
+         */
         public Builder closeTimeout(long timeout, TimeUnit unit) {
             if (timeout < 0) throw new IllegalArgumentException("closeTimeout < 0: " + timeout);
             if (unit == null) throw new NullPointerException("unit == null");
@@ -405,13 +414,17 @@ public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
             return this;
         }
 
-        /** Maximum backlog of items, such as Spans, reported vs sent. Default 10000 */
+        /**
+         * Maximum backlog of items, such as Spans, reported vs sent. Default 10000
+         */
         public Builder queuedMaxItems(int queuedMaxItems) {
             this.queuedMaxItems = queuedMaxItems;
             return this;
         }
 
-        /** Maximum backlog of items, such as Spans,  bytes reported vs sent. Default 1% of heap */
+        /**
+         * Maximum backlog of items, such as Spans,  bytes reported vs sent. Default 1% of heap
+         */
         public Builder queuedMaxBytes(int queuedMaxBytes) {
             this.queuedMaxBytes = queuedMaxBytes;
             return this;
@@ -433,9 +446,10 @@ public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
                 List<Thread> flushThreads = new CopyOnWriteArrayList<>();
                 for (int i = 0; i < this.props.getReportThread(); i++) {
                     // Multiple consumer consumption
+                    // 创建指定的 message 消费组
                     final AgentBufferNextMessage<S> consumer =
                         AgentBufferNextMessage.create(encoder, this.messageMaxBytes, this.messageTimeoutNanos);
-
+                    // 该线程消费该 message
                     Thread flushThread = this.threadFactory
                         .newThread(new Flusher<>(result, consumer));
                     flushThread.setName(NAME_PREFIX + "{" + this.sender + "}");
@@ -452,6 +466,11 @@ public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
         }
     }
 
+    /**
+     * 线程池要执行的任务
+     *
+     * @param <S>
+     */
     public static final class Flusher<S> implements Runnable {
         static final Logger logger = Logger.getLogger(Flusher.class.getName());
 
@@ -466,16 +485,21 @@ public class DefaultAsyncReporter<S> implements AsyncReporter<S> {
         @Override
         public void run() {
             try {
+                // 检查是否开启了 report，且 sender 可用
                 while (!reporter.closed.get() && reporter.check()) {
                     // flush will be block if there is no data ready, don't check trace is enabled,
                     // otherwise the cpu will spin.
+                    // 上报数据
                     reporter.flush(consumer, reporter.pending);
                 }
             } finally {
+                // 读取本地消费的总数
                 int count = consumer.count();
                 if (count > 0) {
+                    // 消费指标记录
                     reporter.metrics.incrementItemsDropped(count);
-                    logger.log(WARNING,"Dropped {0} spans due to AsyncReporter.close()", count);
+                    //
+                    logger.log(WARNING, "Dropped {0} spans due to AsyncReporter.close()", count);
                 }
                 reporter.close.countDown();
             }

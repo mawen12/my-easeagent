@@ -33,6 +33,7 @@ import com.megaease.easeagent.plugin.utils.common.StringUtils;
 
 @AdviceTo(LoggerPoints.class)
 public class LogbackAppenderInterceptor implements NonReentrantInterceptor, PluginConfigChangeListener {
+    // 默认为 INFO
     int collectLevel = Level.INFO.levelInt;
 
     @Override
@@ -46,10 +47,12 @@ public class LogbackAppenderInterceptor implements NonReentrantInterceptor, Plug
 
     @Override
     public void doBefore(MethodInfo methodInfo, Context context) {
+        // 将日志内容转换为 AgentLogData
         AgentLogData log = LogbackLogMapper.INSTANCE.mapLoggingEvent(methodInfo, collectLevel, context.getConfig());
         if (log == null) {
             return;
         }
+        // 上报日志到缓冲区
         EaseAgent.getAgentReport().report(log);
     }
 

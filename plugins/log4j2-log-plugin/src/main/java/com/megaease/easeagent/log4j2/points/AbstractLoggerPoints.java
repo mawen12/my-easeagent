@@ -33,6 +33,9 @@ public class AbstractLoggerPoints implements Points {
         return ClassMatcher.builder()
             .hasSuperClass("org.apache.logging.log4j.spi.AbstractLogger")
             .build();
+
+        // byte buddy
+        // hasSuperType(named("org.apache.logging.log4j.spi.AbstractLogger"))
     }
 
     @Override
@@ -48,6 +51,15 @@ public class AbstractLoggerPoints implements Points {
         .arg(5, "java.lang.Throwable")
         .build()
         .toSet();
+
+        // byte buddy
+        // named("log")
+        // .and(takeArguments(6))
+        // .and(takeArgument(0, named("org.apache.logging.log4j.Level"))
+        // .and(takeArgument(1, named("org.apache.logging.log4j.Marker"))
+        // .and(takeArgument(3, named("java.lang.StackTraceElement"))
+        // .and(takeArgument(4, named("org.apache.logging.log4j.message.Message"))
+        // .and(takeArgument(5, named("java.lang.Throwable"))
     }
 
     /**

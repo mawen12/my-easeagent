@@ -23,5 +23,13 @@ import com.megaease.easeagent.plugin.interceptor.MethodInfo;
 public interface LogMapper {
     public String MDC_KEYS = "encoder.collectMDCKeys";
 
+    /**
+     * 从方法中提取日志信息，转换为 AgentLogData
+     *
+     * @param methodInfo
+     * @param levelInt
+     * @param config
+     * @return
+     */
     AgentLogData mapLoggingEvent(MethodInfo methodInfo, int levelInt, IPluginConfig config);
 }

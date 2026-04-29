@@ -33,6 +33,9 @@ public class LoggerPoints implements Points {
         return ClassMatcher.builder()
             .hasClassName("ch.qos.logback.classic.Logger")
             .build();
+
+        // byte buddy
+        // named("ch.qos.logback.classic.Logger")
     }
 
     @Override
@@ -42,6 +45,11 @@ public class LoggerPoints implements Points {
             .argsLength(1)
             .arg(0, "ch.qos.logback.classic.spi.ILoggingEvent")
             .build().toSet();
+
+        // byte buddy
+        // named("callAppenders")
+        // .and(takeArguments(1))
+        // .and(takeArgument(0, named("ch.qos.logback.classic.spi.ILoggingEvent")))
     }
 
     /**

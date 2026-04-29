@@ -26,6 +26,9 @@ import zipkin2.reporter.Sender;
 
 import java.util.List;
 
+/**
+ * 写入到日志文件的数据发送器
+ */
 public class SimpleSender extends Sender implements SDKSender {
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleSender.class);
 
@@ -47,6 +50,7 @@ public class SimpleSender extends Sender implements SDKSender {
     @Override
     public Call<Void> sendSpans(List<byte[]> encodedSpans) {
         final byte[] bytes = BytesMessageEncoder.JSON.encode(encodedSpans);
+        // 写入到日志
         LOGGER.info("{}", new String(bytes));
         return Call.create(null);
     }

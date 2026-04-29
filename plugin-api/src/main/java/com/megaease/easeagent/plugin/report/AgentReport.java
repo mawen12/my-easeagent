@@ -48,7 +48,7 @@ public interface AgentReport {
     void report(AccessLogInfo log);
 
     /**
-     * 上报 application log
+     * 上报 application log，这些是拦截应用使用 logback/log4j2 所产生的日志记录信息
      *
      * report application log
      * @param log log info

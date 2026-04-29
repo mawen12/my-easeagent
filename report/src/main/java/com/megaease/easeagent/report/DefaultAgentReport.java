@@ -37,6 +37,9 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 默认的 Agent 上报器实现
+ */
 @Slf4j
 public class DefaultAgentReport implements AgentReport, ConfigChangeListener {
     private final TraceReport traceReport;

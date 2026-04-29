@@ -42,24 +42,35 @@ public class Log4j2AppenderInterceptor implements NonReentrantInterceptor, Plugi
     int collectLevel = Level.INFO.intLevel();
     @Override
     public void init(IPluginConfig config, int uniqueIndex) {
+        // read level config
         String lv = config.getString("level");
         if (StringUtils.isNotEmpty(lv)) {
+            // 如果未配置，则默认使用 OFF 级别
             collectLevel = Level.toLevel(lv, Level.OFF).intLevel();
         }
+
         config.addChangeListener(this); // 支持配置变更
+
         AgentHelperClassLoader.registryUrls(this.getClass());
     }
 
     @Override
     public void doBefore(MethodInfo methodInfo, Context context) {
+        // 读取执行目标方法的类加载器
         ClassLoader appLoader = methodInfo.getInvoker().getClass().getClassLoader();
+        // 读取该类加载器的
         LogMapper mapper = logMappers.getIfPresent(appLoader);
 
         if (mapper == null) {
+            // 构造 ClassLoader，为了解决 Message 找不到的问题
+            // 该 ClassLoader 以用户app的ClassLoader 为主，确保能够加载到用户app的 log4j2 的 Message/Level/Logger/ThreadContext
             ClassLoader help = AgentHelperClassLoader.getClassLoader(appLoader, EaseAgent.getAgentClassLoader());
             try {
+                // 加载 Log4jLogMapper，实际上该类 appClassLoader 就可以读取
                 Class<?> cls = help.loadClass("com.megaease.easeagent.log4j2.log.Log4jLogMapper");
+                // 初始化
                 mapper = (LogMapper) cls.getConstructor().newInstance();
+                // 保存
                 logMappers.putIfProbablyAbsent(appLoader, mapper);
             } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException
                 | InvocationTargetException | InstantiationException e) {
@@ -67,8 +78,10 @@ public class Log4j2AppenderInterceptor implements NonReentrantInterceptor, Plugi
             }
         }
 
+        // 将日志转换为 AgentLogData
         AgentLogData log = mapper.mapLoggingEvent(methodInfo, this.collectLevel, context.getConfig());
         if (log != null) {
+            // 上报日志
             EaseAgent.getAgentReport().report(log);
         }
     }
@@ -85,6 +98,7 @@ public class Log4j2AppenderInterceptor implements NonReentrantInterceptor, Plugi
 
     @Override
     public void onChange(IPluginConfig oldConfig, IPluginConfig newConfig) {
+        // 读取新的日志配置
         String lv = newConfig.getString("level");
 
         // 更新配置值

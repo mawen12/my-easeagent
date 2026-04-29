@@ -39,6 +39,9 @@ import java.util.concurrent.TimeUnit;
 
 import static com.megaease.easeagent.config.report.ReportConfigConst.*;
 
+/**
+ * 负责将应用通过 logback/log4j2 产生的日志进行上报
+ */
 @SuppressWarnings("unused")
 public class ApplicationLogReporter implements ConfigChangeListener {
     Config config;
@@ -51,16 +54,20 @@ public class ApplicationLogReporter implements ConfigChangeListener {
         this.config = new Configs(cfg);
         configs.addChangeListener(this);
 
+        // 读取 sender
         SenderWithEncoder sender = ReporterRegistry.getSender(ReportConfigConst.LOG_SENDER, configs);
         AsyncProps asyncProperties = new LogAsyncProps(this.config, null);
+        // 构造 asyncReporter
         this.asyncReporter = DefaultAsyncReporter.builderAsyncReporter(sender, asyncProperties);
         this.asyncReporter.startFlushThread();
     }
 
     public void report(LogData log) {
+        // 日志上报，只是将日志保存到队列中，等待异步上报
         this.asyncReporter.report(log);
     }
 
+    // 处理配置刷新
     @Override
     public void onChange(List<ChangeItem> list) {
         Map<String, String> changes = filterChanges(list);

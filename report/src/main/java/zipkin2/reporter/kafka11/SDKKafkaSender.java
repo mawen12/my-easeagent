@@ -25,6 +25,10 @@ import zipkin2.reporter.Sender;
 import java.io.IOException;
 import java.util.List;
 
+
+/**
+ * 写入到 kafka 的数据发送器，底层使用 zipkin2
+ */
 public class SDKKafkaSender extends Sender implements SDKSender {
     private final KafkaSender kafkaSender;
 
@@ -47,10 +51,13 @@ public class SDKKafkaSender extends Sender implements SDKSender {
     }
 
     public Call<Void> sendSpans(List<byte[]> encodedSpans) {
+        // 检查 kafka 发送器的状态
         if (kafkaSender.closeCalled) {
             throw new IllegalStateException("closed");
         } else {
+            // 对待发送数据进行编码
             byte[] message = kafkaSender.encoder.encode(encodedSpans);
+            //
             return kafkaSender.new KafkaCall(message);
         }
     }

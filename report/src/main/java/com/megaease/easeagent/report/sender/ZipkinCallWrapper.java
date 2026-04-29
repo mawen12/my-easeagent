@@ -23,6 +23,11 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 
+/**
+ * 包装 zipkin2 的 Call
+ *
+ * @param <V>
+ */
 @Slf4j
 public class ZipkinCallWrapper<V> implements Call<V> {
     private final zipkin2.Call<V> call;

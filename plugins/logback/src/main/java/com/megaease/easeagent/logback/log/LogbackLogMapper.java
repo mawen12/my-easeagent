@@ -33,6 +33,7 @@ import java.util.Map;
  * reference to opentelemetry logback instrumentation lib
  */
 public class LogbackLogMapper implements LogMapper {
+    // TODO replace by enum
     public static final LogbackLogMapper INSTANCE = new LogbackLogMapper();
 
     @Override
@@ -41,37 +42,39 @@ public class LogbackLogMapper implements LogMapper {
             return null;
         }
 
+        // 读取首个参数
         ILoggingEvent loggingEvent = (ILoggingEvent)methodInfo.getArgs()[0];
+        // 读取日志级别
         Level level = loggingEvent.getLevel();
         if (level == null || level.levelInt < levelInt) {
             return null;
         }
 
         AgentLogDataImpl.Builder builder = AgentLogDataImpl.builder();
-        // logger
+        // logger 读取 logger
         String logger = loggingEvent.getLoggerName();
         if (logger == null || logger.isEmpty()) {
             logger = "ROOT";
         }
         builder.logger(logger);
-        // message
+        // message 读取消息
         String message = loggingEvent.getFormattedMessage();
         if (message != null) {
             builder.body(message);
         }
 
-        // time
+        // time 读取时间戳
         long timestamp = loggingEvent.getTimeStamp();
         builder.epochMills(timestamp);
 
-        // level
+        // level 写入日志级别
         builder.severity(levelToSeverity(level));
         builder.severityText(level.levelStr);
 
-        // throwable
+        // throwable 处理异常
         Object throwableProxy = loggingEvent.getThrowableProxy();
         Throwable throwable = null;
-        if (throwableProxy instanceof ThrowableProxy) {
+        if (throwableProxy instanceof ThrowableProxy) { // 处理异常包装的情况
             // there is only one other subclass of ch.qos.logback.classic.spi.
             // IThrowableProxy and it is only used for logging exceptions over the wire
             throwable = ((ThrowableProxy) throwableProxy).getThrowable();
@@ -81,13 +84,14 @@ public class LogbackLogMapper implements LogMapper {
         }
 
         Thread currentThread = Thread.currentThread();
+        // 写入线程
         builder.thread(currentThread);
 
-        // MDC
+        // MDC 写入 MDC
         Map<String, String> contextData = loggingEvent.getMDCPropertyMap();
         builder.contextData(config.getStringList(LogMapper.MDC_KEYS), contextData);
 
-        // span context
+        // span context 写入 span
         builder.spanContext();
 
         return builder.build();

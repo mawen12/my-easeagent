@@ -87,11 +87,28 @@ public class ReportConfigConst {
      */
     public static final String GENERAL = join(REPORT, "general");
     // ------ lv3 ------
+    /**
+     * reporter.outputServer.bootstrapServer
+     */
     public static final String BOOTSTRAP_SERVERS = join(OUTPUT_SERVER_V2, "bootstrapServer");
+    /**
+     * reporter.outputServer.enabled
+     */
     public static final String OUTPUT_SERVERS_ENABLE = join(OUTPUT_SERVER_V2, ENABLED_KEY);
+
+    /**
+     * reporter.outputServer.timeout
+     */
     public static final String OUTPUT_SERVERS_TIMEOUT = join(OUTPUT_SERVER_V2, "timeout");
 
+    /**
+     * reporter.outputServer.security.protocol
+     */
     public static final String OUTPUT_SECURITY_PROTOCOL_V2 = join(OUTPUT_SERVER_V2, "security.protocol");
+
+    /**
+     * reporter.outputServer.ssl
+     */
     public static final String OUTPUT_SERVERS_SSL = join(OUTPUT_SERVER_V2, "ssl");
 
     /**

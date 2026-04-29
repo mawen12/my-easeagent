@@ -34,6 +34,9 @@ import java.util.Map;
 
 import static com.megaease.easeagent.config.report.ReportConfigConst.*;
 
+/**
+ * 基于 kafka 实现的数据发送器
+ */
 @AutoService(Sender.class)
 public class AgentKafkaSender implements Sender {
     public static final String SENDER_NAME = KAFKA_SENDER_NAME;
@@ -56,7 +59,9 @@ public class AgentKafkaSender implements Sender {
     public void init(Config config, String prefix) {
         this.config = config;
         this.prefix = prefix;
+        // reporter.log.sender.topic
         this.topicKey = join(this.prefix, TOPIC_KEY);
+        // 读取
         String outputServer = config.getString(BOOTSTRAP_SERVERS);
         if (StringUtils.isEmpty(outputServer)) {
             this.enabled = false;
@@ -64,6 +69,7 @@ public class AgentKafkaSender implements Sender {
         } else {
             enabled = checkEnable(config);
         }
+        // 从配置中读取主题，reporter.log.sender
         this.topic = config.getString(this.topicKey);
 
         this.maxByteKey = StringUtils.replaceSuffix(this.prefix, join(ASYNC_KEY, ASYNC_MSG_MAX_BYTES_KEY));
@@ -75,9 +81,9 @@ public class AgentKafkaSender implements Sender {
         }
         this.sender = SDKKafkaSender.wrap(KafkaSender.newBuilder()
             .bootstrapServers(outputServer)
-            .topic(this.topic)
-            .overrides(ssl)
-            .encoding(Encoding.JSON)
+            .topic(this.topic) // 发送到 kafka 的主题，默认主题为：application-log
+            .overrides(ssl) // ssl 配置
+            .encoding(Encoding.JSON) // 编码方式使用 JSON
             .messageMaxBytes(msgMaxBytes)
             .build());
     }

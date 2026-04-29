@@ -40,8 +40,10 @@ public class Log4jLogMapper implements LogMapper {
     private static final String SPECIAL_MAP_MESSAGE_ATTRIBUTE = "message";
 
     public AgentLogData mapLoggingEvent(MethodInfo logInfo, int levelInt, IPluginConfig config) {
+        // 读取参数，实际上该方法是 org.apache.logging.log4j.spi.AbstractLogger#log(Level, Marker, String, StackTraceElement, Message, Throwable) 方法
         Object[] args = logInfo.getArgs();
 
+        // 合法性校验
         if (args == null) {
             return null;
         }
@@ -53,18 +55,22 @@ public class Log4jLogMapper implements LogMapper {
                 case 0:
                     // level
                     Level level = (Level)args[i];
+                    // 如果超过了要记录的级别，则返回 null，代表不记录
                     if (level.intLevel() > levelInt) {
                         return null;
                     }
-                    builder.severity(levelToSeverity(level));
-                    builder.severityText(level.name());
+
+                    // 记录日志级别
+                    builder.severity(levelToSeverity(level)); // optl
+                    builder.severityText(level.name()); // name
                     break;
                 case 4:
                     // message
                     Message message = (Message)args[i];
                     if (!(message instanceof MapMessage)) {
+                        // 读取
                         builder.body(message.getFormattedMessage());
-                    } else {
+                    } else { // 处理 MapMessage
                         MapMessage<?, ?> mapMessage = (MapMessage<?, ?>) message;
 
                         String body = mapMessage.getFormat();
@@ -89,7 +95,7 @@ public class Log4jLogMapper implements LogMapper {
             }
         }
 
-        // logger
+        // logger 记录 logger
         Logger logger = (Logger)logInfo.getInvoker();
         if (logger.getName() == null || logger.getName().isEmpty()) {
             builder.logger("ROOT");
@@ -97,20 +103,22 @@ public class Log4jLogMapper implements LogMapper {
             builder.logger(logger.getName());
         }
 
-        // thread
+        // thread 记录线程
         builder.thread(Thread.currentThread());
+        // 记录当前时间
         builder.epochMills(SystemClock.now());
 
-        // MDC
+        // MDC 记录 MDC
         Map<String, String> contextData = ThreadContext.getImmutableContext();
         builder.contextData(config.getStringList(LogMapper.MDC_KEYS), contextData);
 
-        // span context
+        // span context 记录 context
         builder.spanContext();
 
         return builder.build();
     }
 
+    // 从 log4j2 level 转换为 optl 的 Severity
     private static Severity levelToSeverity(Level level) {
         switch (level.getStandardLevel()) {
             case ALL:

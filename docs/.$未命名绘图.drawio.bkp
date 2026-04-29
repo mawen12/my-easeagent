@@ -1,0 +1,98 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.6.6 Chrome/144.0.7559.236 Electron/40.8.4 Safari/537.36" version="29.6.6" pages="3">
+  <diagram name="第 1 页" id="ylPkqOlnPJQz-9_Wck4b">
+    <mxGraphModel dx="703" dy="583" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="nO-l7Gz1_K-AqtW5gkP8-1" parent="1" style="swimlane;whiteSpace=wrap;html=1;" value="Sender" vertex="1">
+          <mxGeometry height="280" width="840" x="240" y="520" as="geometry" />
+        </mxCell>
+        <mxCell id="nO-l7Gz1_K-AqtW5gkP8-2" parent="nO-l7Gz1_K-AqtW5gkP8-1" style="rounded=1;whiteSpace=wrap;html=1;" value="AgentKafkaSender" vertex="1">
+          <mxGeometry height="60" width="120" x="40" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="nO-l7Gz1_K-AqtW5gkP8-3" parent="nO-l7Gz1_K-AqtW5gkP8-1" style="rounded=1;whiteSpace=wrap;html=1;" value="AgentLoggerSender" vertex="1">
+          <mxGeometry height="60" width="120" x="200" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="nO-l7Gz1_K-AqtW5gkP8-4" parent="nO-l7Gz1_K-AqtW5gkP8-1" style="rounded=1;whiteSpace=wrap;html=1;" value="NoOpSender" vertex="1">
+          <mxGeometry height="60" width="120" x="360" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="nO-l7Gz1_K-AqtW5gkP8-6" parent="nO-l7Gz1_K-AqtW5gkP8-1" style="rounded=1;whiteSpace=wrap;html=1;" value="MetricKafkaSender" vertex="1">
+          <mxGeometry height="60" width="120" x="520" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="nO-l7Gz1_K-AqtW5gkP8-7" parent="nO-l7Gz1_K-AqtW5gkP8-1" style="rounded=1;whiteSpace=wrap;html=1;" value="HttpSender" vertex="1">
+          <mxGeometry height="60" width="120" x="680" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="nO-l7Gz1_K-AqtW5gkP8-8" parent="nO-l7Gz1_K-AqtW5gkP8-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="com.squareup.okhttp:&lt;br&gt;okhttp" vertex="1">
+          <mxGeometry height="60" width="120" x="680" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="nO-l7Gz1_K-AqtW5gkP8-17" parent="nO-l7Gz1_K-AqtW5gkP8-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="Log4j2" vertex="1">
+          <mxGeometry height="60" width="120" x="520" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="nO-l7Gz1_K-AqtW5gkP8-19" parent="nO-l7Gz1_K-AqtW5gkP8-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="NoOp" vertex="1">
+          <mxGeometry height="60" width="120" x="360" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="v8BlZ9FIuplu10VRYfGN-18" parent="nO-l7Gz1_K-AqtW5gkP8-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="Apache kafka" vertex="1">
+          <mxGeometry height="60" width="120" x="40" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="v8BlZ9FIuplu10VRYfGN-19" parent="nO-l7Gz1_K-AqtW5gkP8-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="Log4j2" vertex="1">
+          <mxGeometry height="60" width="120" x="200" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="v8BlZ9FIuplu10VRYfGN-20" parent="nO-l7Gz1_K-AqtW5gkP8-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="Apache kafka" vertex="1">
+          <mxGeometry height="60" width="120" x="520" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="v8BlZ9FIuplu10VRYfGN-12" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="AsyncReporter" vertex="1">
+          <mxGeometry height="60" width="840" x="240" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="v8BlZ9FIuplu10VRYfGN-13" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="ApplicationLogReporter" vertex="1">
+          <mxGeometry height="60" width="160" x="240" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="v8BlZ9FIuplu10VRYfGN-14" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="AccessLogReporter" vertex="1">
+          <mxGeometry height="60" width="160" x="560" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="v8BlZ9FIuplu10VRYfGN-15" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="TraceReport" vertex="1">
+          <mxGeometry height="60" width="160" x="920" y="280" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="EcYtA02aoAznmPE7uOPD" name="JDBC">
+    <mxGraphModel dx="530" dy="1044" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="sgRklEAvLnkmNL9Htg1m" name="REDIS">
+    <mxGraphModel dx="559" dy="616" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="S5OdfB9pF-jzXTzRR1HI-1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="JedisAdvice&lt;div&gt;BinaryRedis#&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="400" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="S5OdfB9pF-jzXTzRR1HI-2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="JedisConstrcutorAdvice" vertex="1">
+          <mxGeometry height="60" width="140" x="600" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="S5OdfB9pF-jzXTzRR1HI-3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="LettuceRedisClientService" vertex="1">
+          <mxGeometry height="60" width="160" x="800" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="S5OdfB9pF-jzXTzRR1HI-4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="RedisChannelWriterAdvice" vertex="1">
+          <mxGeometry height="60" width="160" x="1040" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="S5OdfB9pF-jzXTzRR1HI-5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="RedisClusterClientAdvice" vertex="1">
+          <mxGeometry height="60" width="160" x="1280" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="S5OdfB9pF-jzXTzRR1HI-7" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="RedisPropertiesAdvice" vertex="1">
+          <mxGeometry height="60" width="160" x="1520" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="S5OdfB9pF-jzXTzRR1HI-8" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="RedisPropertiesClusterAdvice" vertex="1">
+          <mxGeometry height="60" width="160" x="1760" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="S5OdfB9pF-jzXTzRR1HI-9" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="StatefulRedisConnectionAdvice" vertex="1">
+          <mxGeometry height="60" width="200" x="2000" y="320" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

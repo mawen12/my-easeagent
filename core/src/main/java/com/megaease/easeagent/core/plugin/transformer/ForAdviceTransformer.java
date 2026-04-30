@@ -71,7 +71,8 @@ public class ForAdviceTransformer implements AgentBuilder.Transformer {
 
     @Override
     public DynamicType.Builder<?> transform(DynamicType.Builder<?> b, TypeDescription td, ClassLoader cl, JavaModule m) {
-        // 将传入的 ClassLoader 加入到 EaseAgentClassLoader
+        // 将传入的 ClassLoader 加入到 EaseAgentClassLoader，此处是在检测到匹配的类可以被增强了
+        // 只有在类加载后才能触发增强，因此此处需要将目标类的加载器作为 parent，防止出现类找不到的情况
         CompoundClassloader.compound(this.getClass().getClassLoader(), cl);
 
         // 使用静态变量保存传入的 ClassLoader

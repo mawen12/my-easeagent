@@ -49,6 +49,8 @@ public class EaseAgentClassLoader extends URLClassLoader {
     @SuppressWarnings("unused")
     public void add(ClassLoader cl) {
         if (cl != null && !Objects.equals(cl, this)) {
+            // TODO by mawen 此处存在一个问题，那就是即使 cl 是一个，但是因为每次创建不同的 Reference 对象，因此会重复添加
+            // 而且原始使用了 CopyOnWriteArraySet 实现并发安全
             externals.add(new WeakReference<>(cl));
         }
     }
